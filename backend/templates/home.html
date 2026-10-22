@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Vendedores asignados</h1>
+<p>Sesión: {{ user.username }}. Esta vista utiliza una plantilla Django y datos persistidos.</p>
+<ul>{% for seller in sellers %}<li>{{ seller.name }} · {{ seller.reference }}</li>{% empty %}<li>No hay vendedores accesibles.</li>{% endfor %}</ul>
+<p><a href="/dashboard/">Panel React compilado</a> (requiere npm run build).</p>
+{% if user.is_superuser %}<p><a href="/admin/">Administración</a></p>{% endif %}
+<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Cerrar sesión</button></form>
+{% endblock %}
