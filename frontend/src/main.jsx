@@ -6,6 +6,7 @@ import './styles.css';
 const statuses = {
   ok: 'Dentro de referencia', alarm: 'Alarma', suspension_threshold: 'Umbral de suspensión (informativo)',
   insufficient_orders: 'Volumen insuficiente para MQC', below_reference: 'Por debajo de referencia',
+  not_evaluable: 'No evaluable: faltan datos o el periodo no es mensual',
 };
 
 function App() {

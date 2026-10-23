@@ -4,7 +4,7 @@
 
 Monolito Django con API REST y React compilable como archivos estáticos. Mantener sesiones y servidor bajo un mismo origen reduce la configuración de cookies, CORS y despliegue. Vite se usa como herramienta de frontend; no sustituye Django.
 
-Las aplicaciones `sellers` y `quality` corresponden a conceptos ya implementados. No se crean aplicaciones vacías para planes o usuarios. Se utiliza `auth.User`: los grupos nativos bastan para los roles actuales y no hay requisitos que justifiquen un modelo de usuario propio.
+Las aplicaciones `sellers`, `quality` y `action_plans` separan vendedores, métricas y gestión de mejora. La Fase 1 incorpora modelos efectivos de planes, objetivos, acciones y revisiones. Se utiliza `auth.User`: los grupos nativos bastan para los roles actuales y no hay requisitos que justifiquen un modelo de usuario propio.
 
 SQLite permite arrancar y probar sin servicios. PostgreSQL se exige cuando `DEBUG=False`, porque una función de Vercel no debe persistir datos en SQLite local. El driver está instalado; no se ha verificado una instancia PostgreSQL real.
 
@@ -49,9 +49,9 @@ Esta última validación entre versiones y los rangos dependientes de la políti
 
 ## Acceso y límites de confianza
 
-`IsMarketplaceAgent` controla el rol en la API. `visible_sellers()` limita las consultas del agente a `owner=user`, también en detalles, métricas y escrituras. La creación API asigna el propietario en el servidor. Reasignar vendedores requiere superusuario desde Admin. Los modelos de dominio del administrador están reservados a superusuarios, incluso si se conceden permisos de modelo a otro usuario staff.
+`IsMarketplaceAgent` controla el rol en la API. `visible_sellers()` limita las consultas del agente a `owner=user`, también en detalles, métricas y escrituras. La creación API asigna el propietario en el servidor. Reasignar vendedores requiere superusuario desde Admin. La administración de vendedores, políticas e indicadores permanece reservada a superusuarios. El Admin de planes permite agentes con grupo, `is_staff` y permisos Django explícitos; sus listados, detalles, referencias y escrituras se limitan a los vendedores accesibles.
 
-No hay cuentas de vendedor en el MVP. Un agente puede crear vendedores propios; no puede cambiar el propietario por JSON. El borrado con indicadores devuelve `409`. La eliminación y reasignación tendrán que revisarse al incorporar los planes y su histórico.
+No hay cuentas de vendedor en el MVP. Un agente puede crear vendedores propios; no puede cambiar el propietario por JSON. El borrado con indicadores o planes devuelve `409`. Los planes no cambian de vendedor; una reasignación administrativa de un vendedor transfiere el acceso a su histórico y conserva sus autores.
 
 ## React y plantillas
 
@@ -59,12 +59,12 @@ El portal `/` y el acceso son HTML renderizado por Django. El panel contiene dos
 
 `vite build` genera `frontend/dist/index.html` y recursos bajo `/static/react/`. Django renderiza el índice en `/dashboard/`; los recursos se recogen con `collectstatic`. WhiteNoise usa almacenamiento comprimido sin segundo renombrado: Vite ya incorpora hashes en los nombres y el índice generado conserva esas referencias. No debe configurarse un fallback SPA que capture `/api/`, `/accounts/` o `/admin/`.
 
-## Diseño futuro, todavía sin modelos ni migraciones
+## Gestión de planes implementada en Fase 1
 
-| Entidad | Relaciones y validaciones propuestas |
-| --- | --- |
-| `ActionPlan` | FK vendedor y responsable; problema, causa raíz, objetivo medible, fechas y estado |
-| `ActionItem` | FK plan y responsable; compromiso concreto, fecha objetivo, estado y evidencia |
-| `FollowUp` | FK plan y autor; fecha, resultado, observaciones y vínculo con nuevas métricas |
+`ImprovementPlan` tiene FK a vendedor, autor y responsable. `PlanMetric` relaciona cada plan con una observación `QualityMetric` inicial y un objetivo decimal. `PlanAction` conserva compromisos y evidencias. `PlanReview` registra mediciones sucesivas y deriva indicador, unidad y canal de la observación inicial protegida.
 
-Crear `action_plans` cuando empiece esta fase. Los permisos deben derivarse del vendedor del plan y extenderse a acciones y seguimientos. Las transiciones de estado deben validarse en un servicio común con pruebas; no basta con una lista de opciones en React. No se añaden colas ni microservicios.
+Los modelos validan fechas, relaciones, transiciones, rangos y conservación del histórico. `services.py` calcula resultados sin cambiar el estado administrativo y proporciona el cierre autorizado y transaccional con una instantánea de evaluación. Las consultas de detalle usan `select_related` y `prefetch_related`; hay una prueba que verifica el número de consultas al evaluar un plan con histórico.
+
+La migración `action_plans/0001_initial.py` es aditiva: crea cuatro tablas con FK protegidas, índices y restricciones, sin alterar datos anteriores. Los permisos de agente se asignan expresamente mediante `configure_plan_agent`; la migración no habilita usuarios automáticamente.
+
+El [documento de Fase 1](fase-1.md) contiene diagrama, estados, matriz de permisos, pasos de Admin, demo, decisiones sobre ventanas de medición y límites de integridad. La siguiente fase añadirá API y formularios React reutilizando estas reglas; no se introducen colas, microservicios ni dependencias.

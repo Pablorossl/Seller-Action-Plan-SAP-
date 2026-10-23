@@ -21,4 +21,4 @@ class SellerViewSet(viewsets.ModelViewSet):
         try:
             return super().destroy(request, *args, **kwargs)
         except ProtectedError:
-            return Response({"detail": "El vendedor tiene indicadores históricos y no puede eliminarse."}, status=409)
+            return Response({"detail": "El vendedor tiene indicadores o planes históricos y no puede eliminarse."}, status=409)

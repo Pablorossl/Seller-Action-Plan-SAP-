@@ -1,6 +1,6 @@
 # Verificación de la base — 22/10/2026
 
-Resultados observados localmente; no son resultados de GitHub Actions ni de Vercel. La auditoría original se conserva en [audit.md](audit.md).
+Resultados observados localmente; no son resultados de GitHub Actions ni de Vercel. La auditoría original se conserva en [auditoria.md](auditoria.md).
 
 ## Entorno y dependencias
 
@@ -59,3 +59,14 @@ Para repetir manualmente: seguir instalación, migraciones y demo del README, ab
 - Los accesos de red y la apertura de sockets están restringidos por el sandbox. Las instalaciones y la prueba HTTP se completaron tras solicitar las autorizaciones correspondientes.
 - No se probaron Windows/macOS, PostgreSQL externo, Vercel, dominio, HTTPS real, backup ni recuperación. Sus instrucciones y controles están preparados o documentados como pendientes.
 - La CI está escrita pero no se ejecutó en GitHub. La memoria y el vídeo son borradores de estructura, no entregables finales. No se atribuye una nota ni aprobación administrativa.
+
+
+## Verificación de Fase 1 — 23/10/2026
+
+Se repitieron primero las 18 pruebas de la base existente. La suite ampliada incluye 46 pruebas Django y casos de datos inválidos, FK inexistentes, transiciones, fechas, varios indicadores, comparaciones con igualdad, dirección de mejora, datos insuficientes, histórico, cierre y permisos. El recorrido de aceptación se realiza mediante formularios reales de Admin con el cliente de pruebas Django. Se exige CSRF en una prueba específica de cierre. No equivale a una nueva ejecución de navegador real.
+
+La migración `action_plans/0001_initial` se aplicó a la SQLite local sin modificar registros anteriores. La comprobación de modelos no detecta migraciones pendientes. Los resultados completos de cierre de fase se registran en [fase-1.md](fase-1.md).
+
+Durante la ampliación de pruebas, una aserción buscó comentarios en el listado de revisiones, que muestra valor y periodo y deja los comentarios en el detalle. Se corrigió para comprobar que el filtro devuelve las dos revisiones. Después pasaron las 45 pruebas; no quedó ese fallo pendiente. La primera invocación de la suite base usó una ruta relativa de Python incorrecta y se corrigió antes de ejecutarla correctamente desde `backend/`.
+
+Se conservan como históricos los resultados del 22/10 y sus límites: no acreditan PostgreSQL, CI remota ni despliegue público.

@@ -71,6 +71,38 @@ class QualityTests(TestCase):
         with self.assertRaises(ValidationError):
             metric.save()
 
+    def test_nonmonthly_and_missing_measurements_are_not_evaluable(self):
+        metric = self.metric("incidents", "6")
+        metric.period_start = date(2026, 9, 24)
+        self.assertEqual(classify(metric), "not_evaluable")
+        metric.period_start = date(2026, 9, 1)
+        metric.value = None
+        self.assertEqual(classify(metric), "not_evaluable")
+        metric.value = Decimal("6")
+        metric.order_count = None
+        self.assertEqual(classify(metric), "not_evaluable")
+
+    def test_mqc_minimum_cannot_be_lowered_below_official_volume(self):
+        metric = self.metric("incidents", "6", orders=29)
+        metric.policy.minimum_orders = 0
+        self.assertEqual(classify(metric), "insufficient_orders")
+        with self.assertRaises(ValidationError):
+            metric.policy.save()
+
+    def test_monthly_calendar_and_rolling_windows(self):
+        from quality.rules import is_monthly_period
+
+        for start, end, expected in [
+            (date(2026, 2, 1), date(2026, 2, 28), True),
+            (date(2024, 2, 1), date(2024, 2, 29), True),
+            (date(2026, 8, 15), date(2026, 9, 14), True),
+            (date(2026, 8, 15), date(2026, 9, 15), False),
+            (date(2026, 9, 1), date(2026, 10, 31), False),
+            (date(2026, 12, 1), date(2026, 12, 31), True),
+        ]:
+            with self.subTest(start=start, end=end):
+                self.assertEqual(is_monthly_period(start, end), expected)
+
     def test_persistence_uniqueness_and_policy_history(self):
         metric = self.metric("acceptance", "98.50")
         metric.save()

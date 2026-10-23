@@ -2,7 +2,7 @@
 
 Aplicación web para documentar y seguir planes de mejora de vendedores de marketplace a partir de indicadores de calidad. Proyecto Final del Máster en Desarrollo Full Stack de ConquerBlocks.
 
-**Estado: base funcional del MVP.** Incluye Django, API con control de acceso, persistencia, clasificación de indicadores y dos secciones React que consumen datos reales. La gestión de planes, acciones y seguimientos está pendiente. No existe todavía un despliegue público verificado.
+**Estado: Fase 1 funcional.** Incluye gestión de planes de mejora, acciones, objetivos por indicador, revisiones históricas y cierre documentado desde Django Admin, además de la API y las dos secciones React existentes. No existe todavía un despliegue público verificado. Consulta la [guía de la Fase 1](docs/fase-1.md).
 
 Proyecto académico independiente: no es una aplicación oficial de PcComponentes ni de Mirakl. SAP no suspende tiendas, no bloquea pagos ni tramita reaperturas. Se utilizan exclusivamente datos ficticios y reproducibles.
 
@@ -47,19 +47,19 @@ SAP propone complementar estos sistemas con un registro de indicadores, planes c
 | Evaluar los cinco criterios MQC con sus límites exactos | Servicio de clasificación y pruebas de fronteras implementados |
 | Restringir cada agente a sus vendedores | Consultas filtradas y pruebas de acceso implementadas |
 | Mostrar datos persistidos en Django y React | Plantilla HTML y dos secciones React implementadas |
-| Vincular cada plan con responsables, acciones y revisión | Pendiente de las siguientes fases |
+| Vincular cada plan con responsables, acciones y revisión | Implementado en Django Admin; demo 6% → 4,5% → 3% y pruebas del flujo completo |
 | Reproducir la instalación y demostrar el flujo completo | Dependencias fijadas; memoria, vídeo y URL pública pendientes |
 
 ## Funcionalidades y estado
 
 | Estado | Funcionalidades |
 | --- | --- |
-| Implementado | Login y logout Django; usuarios, grupos y administración; CRUD API de vendedores; aislamiento por propietario; registro administrativo de indicadores; API de indicadores de solo lectura; clasificación informativa; políticas de umbrales versionadas; plantilla Django; secciones React de vendedores e indicadores; demo idempotente; migraciones y pruebas |
+| Implementado | Login/logout, grupos, vendedores asignados, API y React de vendedores/indicadores, políticas versionadas, clasificación informativa, planes con varios indicadores, acciones, revisiones históricas, cierre autorizado y dos demos idempotentes, migraciones y pruebas |
 | Preparado parcialmente | Ajustes de producción, PostgreSQL y configuración Vercel; CI configurada, sin ejecución remota comprobada |
 | En desarrollo | No se declara ninguna funcionalidad adicional como iniciada |
-| Previsto | Planes, acciones, responsables, plazos, estados, causas raíz, seguimientos, evolución gráfica, formularios React y trazabilidad de cambios |
+| Previsto | API y formularios React de planes, ficha de vendedor, trazabilidad general de cambios y validación de producción |
 
-Las métricas son observaciones registradas, **no cálculos sobre pedidos importados**. La interfaz indica su canal y periodo; una observación histórica no representa automáticamente la situación actual. Las reglas y el tratamiento del periodo se explican en [dominio](docs/domain.md).
+Las métricas son observaciones registradas, **no cálculos sobre pedidos importados**. La interfaz indica su canal y periodo; una observación histórica no representa automáticamente la situación actual. Las reglas y el tratamiento del periodo se explican en [dominio](docs/dominio.md).
 
 ## Tecnologías
 
@@ -100,7 +100,7 @@ flowchart LR
 
 Django es el backend principal y gestiona sesiones, permisos y persistencia. En desarrollo Vite reenvía `/api/` y `/accounts/` a Django conservando el origen del navegador. En la compilación integrada, Django entrega `/dashboard/` y los archivos React se sirven bajo `/static/react/`. No se necesita habilitar CORS.
 
-Se conserva `auth.User` de Django. `Seller.owner` representa la asignación inicial a un agente; `QualityMetric` almacena un indicador por vendedor, política, canal y periodo. `ThresholdPolicy` permite nuevas versiones de umbrales sin reescribir el clasificador. La [arquitectura detallada](docs/architecture.md) distingue entidades existentes y diseño futuro.
+Se conserva `auth.User` de Django. `Seller.owner` representa la asignación inicial a un agente; `QualityMetric` almacena un indicador por vendedor, política, canal y periodo. `ThresholdPolicy` permite nuevas versiones de umbrales sin reescribir el clasificador. La app `action_plans` añade planes, acciones, objetivos vinculados a observaciones iniciales y revisiones. Consulta la [arquitectura](docs/arquitectura.md) y las [decisiones de la Fase 1](docs/fase-1.md).
 
 ## Estructura
 
@@ -110,6 +110,7 @@ Se conserva `auth.User` de Django. `Seller.owner` representa la asignación inic
 │   ├── config/              # Ajustes, rutas, vistas HTML y WSGI
 │   ├── sellers/             # Vendedores, acceso, API y comando seed_demo
 │   ├── quality/             # Indicadores, políticas, clasificador y API
+│   ├── action_plans/        # Planes, acciones, objetivos, revisiones, servicios y Admin
 │   ├── templates/           # Portal y formulario de acceso Django
 │   ├── manage.py
 │   ├── requirements.in
@@ -214,7 +215,16 @@ python manage.py migrate
 python manage.py makemigrations --check --dry-run
 ```
 
-Revisa y versiona las migraciones junto al cambio. `PROTECT` impide borrar propietarios, vendedores o políticas todavía referenciados. La API devuelve `409` al intentar borrar un vendedor con histórico.
+Revisa y versiona las migraciones junto al cambio. `PROTECT` impide borrar propietarios, vendedores, políticas o registros de planes todavía referenciados. La API devuelve `409` al intentar borrar un vendedor con histórico.
+
+Para habilitar la gestión de planes a un usuario existente, desde `backend/`:
+
+```bash
+python manage.py configure_plan_agent --username TU_USUARIO
+python manage.py seed_plan_demo --owner TU_USUARIO
+```
+
+El primer comando habilita `is_staff`, añade el grupo de agente y permisos individuales del módulo. No concede acceso administrativo a vendedores, políticas ni usuarios. El segundo carga, solo en desarrollo, un vendedor ficticio adicional con el caso completo **6% → 4,5% → 3%**, dos acciones y cierre. Puede repetirse sin modificar el histórico. Inicia sesión en `/admin/`; la [guía de Fase 1](docs/fase-1.md) explica también cómo crear el recorrido manualmente.
 
 ## Ejecución local
 
@@ -271,20 +281,20 @@ POST de vendedor, con sesión y token CSRF válidos:
 {"name": "Tienda Ficticia", "reference": "FICTICIA-003"}
 ```
 
-Las escrituras autenticadas necesitan `X-CSRFToken` o el campo de formulario `csrfmiddlewaretoken`. No hay endpoints de escritura de métricas, planes ni seguimientos. El registro de indicadores y políticas se realiza por el administrador.
+Las escrituras autenticadas necesitan `X-CSRFToken` o el campo de formulario `csrfmiddlewaretoken`. No hay endpoints de escritura de métricas, planes ni seguimientos. Las políticas y las observaciones iniciales se registran por superusuario; los planes, acciones y revisiones se gestionan desde Admin con permisos y aislamiento por vendedor.
 
-Clasificaciones: `ok`, `alarm`, `suspension_threshold`, `insufficient_orders` y `below_reference`. `suspension_threshold` significa exclusivamente que la observación alcanza el umbral informativo: SAP no ejecuta suspensiones. Sin sesión o rol se devuelve `403`; un recurso ajeno se oculta con `404`; errores de validación producen `400`; métodos no implementados, `405`.
+Clasificaciones: `ok`, `alarm`, `suspension_threshold`, `insufficient_orders`, `not_evaluable` y `below_reference`. MQC exige una ventana mensual y volumen conocido suficiente; el detalle de la convención de periodos está en [dominio](docs/dominio.md). `suspension_threshold` significa exclusivamente que la observación alcanza el umbral informativo: SAP no ejecuta suspensiones. Sin sesión o rol se devuelve `403`; un recurso ajeno se oculta con `404`; errores de validación producen `400`; métodos no implementados, `405`.
 
 ## Usuarios y permisos
 
 | Rol | Capacidades actuales |
 | --- | --- |
 | Administrador (`is_superuser`) | Todos los vendedores e indicadores; usuarios, grupos, asignaciones y políticas mediante Django Admin |
-| Marketplace Agent / Account Manager | CRUD de vendedores propios y lectura de sus indicadores; sin acceso administrativo por defecto |
+| Marketplace Agent / Account Manager | CRUD de vendedores propios y lectura de indicadores; Admin de sus planes si se habilita con permisos explícitos |
 | Autenticado sin rol | Sin acceso a la API de dominio; portal sin vendedores |
 | Anónimo | Formulario de acceso; sin acceso a datos |
 
-El filtrado del queryset se aplica tanto al listado como al detalle y a las escrituras. No se confía en ocultar botones para autorizar. Conceder `is_staff` por sí solo no otorga acceso administrativo a los modelos de dominio, reservados al superusuario en esta base.
+El filtrado del queryset se aplica tanto al listado como al detalle y a las escrituras. No se confía en ocultar botones para autorizar. Conceder `is_staff` por sí solo no otorga acceso a planes: se exige también grupo y permisos Django. La administración de vendedores, indicadores y políticas sigue reservada al superusuario.
 
 Casos de uso disponibles:
 
@@ -295,7 +305,7 @@ Casos de uso disponibles:
 | Administrador | Registrar indicadores y políticas desde Admin | Observaciones vinculadas al vendedor, canal, periodo y versión |
 | Agente | Abrir las secciones React | Consulta de vendedores e indicadores reales con clasificación informativa |
 
-Crear planes, asignar acciones y registrar revisiones son casos previstos, todavía sin implementación.
+El agente habilitado puede crear planes propios, añadir objetivos y acciones, registrar revisiones y finalizar el plan documentando el resultado. El cierre exige un permiso específico; el histórico no se edita ni se elimina desde Admin. [Recorrido completo y decisiones](docs/fase-1.md).
 
 ## Seguridad
 
@@ -305,11 +315,11 @@ Con `DEBUG=False` se activan HTTPS, cookies Secure, HSTS y protección contra in
 
 **Pendiente antes de exposición pública:** verificar TLS y proxy, protección frente a intentos repetidos de login en la plataforma, recuperación de contraseña, registro de auditoría de cambios, política de conservación y pruebas PostgreSQL. Los futuros formularios React validarán para ayudar al usuario, manteniendo Django como autoridad.
 
-**Copias de seguridad previstas:** PostgreSQL gestionado con copia diaria y retención inicial de 7 días; comprobar restauración en una base aislada antes de publicar y tras cambios relevantes. Esta política debe contratarse/configurarse y no existe todavía un backup operativo verificado. En local, detén el servidor antes de copiar SQLite; trata la copia como privada. Detalles en [seguridad y despliegue](docs/deployment.md).
+**Copias de seguridad previstas:** PostgreSQL gestionado con copia diaria y retención inicial de 7 días; comprobar restauración en una base aislada antes de publicar y tras cambios relevantes. Esta política debe contratarse/configurarse y no existe todavía un backup operativo verificado. En local, detén el servidor antes de copiar SQLite; trata la copia como privada. Detalles en [seguridad y despliegue](docs/despliegue.md).
 
 ## Testing
 
-Ejecuta los tests Django **desde `backend/`** para que el descubrimiento incluya ambas aplicaciones:
+Ejecuta los tests Django **desde `backend/`** para que el descubrimiento incluya las tres aplicaciones:
 
 ```bash
 # Entorno virtual activo; desde la raíz
@@ -326,34 +336,34 @@ cd ..
 python scripts/check_production.py
 ```
 
-Las pruebas Django utilizan una base de datos de test real de SQLite y ejecutan migraciones. Cubren login/logout, CSRF, roles, acceso entre propietarios, CRUD y persistencia, respuestas API, rangos, histórico de políticas, comparadores exclusivos/inclusivos y volúmenes 0, 29 y 30. Las pruebas de Fetch comprueban paginación y errores; sus dobles HTTP no acreditan persistencia, que se verifica en Django y en el flujo integrado.
+Las 46 pruebas Django verificadas en Fase 1 utilizan una base de datos de test real de SQLite y ejecutan migraciones. Incluyen el recorrido completo por Admin, permisos de planes, histórico y comparación de objetivos; consulta [la verificación de Fase 1](docs/fase-1.md). Cubren login/logout, CSRF, roles, acceso entre propietarios, CRUD y persistencia, respuestas API, rangos, histórico de políticas, comparadores exclusivos/inclusivos y volúmenes 0, 29 y 30. Las pruebas de Fetch comprueban paginación y errores; sus dobles HTTP no acreditan persistencia, que se verifica en Django y en el flujo integrado.
 
-El script de producción utiliza variables **ficticias y temporales** para ejecutar `check --deploy --fail-level WARNING`; no modifica `.env` ni conecta con PostgreSQL. El flujo de GitHub Actions está preparado, sin badge ni resultado remoto atribuido. Evidencia y limitaciones en [verificación](docs/verification.md).
+El script de producción utiliza variables **ficticias y temporales** para ejecutar `check --deploy --fail-level WARNING`; no modifica `.env` ni conecta con PostgreSQL. El flujo de GitHub Actions está preparado, sin badge ni resultado remoto atribuido. Evidencia y limitaciones en [verificación](docs/verificacion.md).
 
 ## Despliegue
 
 **Preparación local para Vercel; publicación pendiente.** `backend/vercel.json` declara Django y la compilación de React. El proveedor se plantea con raíz `backend/`, acceso a los archivos del monorepositorio y PostgreSQL externo persistente. No se instalaron Gunicorn ni una CLI global: el destino previsto proporciona el runtime WSGI.
 
-Se han preparado los ajustes y la compilación; esto no acredita un despliegue. Falta configurar cuenta/proyecto, variables privadas, servicio PostgreSQL, migraciones controladas, estáticos, dominio y pruebas HTTPS en el entorno remoto. No hay una URL pública de SAP que pueda documentarse todavía. Consulta [la preparación y las validaciones pendientes](docs/deployment.md) y la [documentación oficial de Vercel](https://vercel.com/docs/frameworks/full-stack/django).
+Se han preparado los ajustes y la compilación; esto no acredita un despliegue. Falta configurar cuenta/proyecto, variables privadas, servicio PostgreSQL, migraciones controladas, estáticos, dominio y pruebas HTTPS en el entorno remoto. No hay una URL pública de SAP que pueda documentarse todavía. Consulta [la preparación y las validaciones pendientes](docs/despliegue.md) y la [documentación oficial de Vercel](https://vercel.com/docs/frameworks/full-stack/django).
 
 ## Roadmap
 
-1. **Base técnica:** repositorio, entorno, vendedores, indicadores, roles, React y tests. Completada en el alcance descrito.
-2. **Planes y acciones:** modelos `ActionPlan` y `ActionItem`, estados, responsables, vencimientos, CRUD y pruebas por recurso.
-3. **Seguimiento:** `FollowUp`, causas raíz, resultados, histórico y vistas React de planes/evolución.
-4. **Entrega:** PostgreSQL y Vercel verificados, revisión de seguridad, memoria y vídeo de máximo cinco minutos.
+1. **Base técnica:** vendedores, indicadores, roles, React y tests, implementada.
+2. **Fase 1:** planes, acciones, objetivos, revisiones y cierre documentado desde Admin, implementada y probada.
+3. **Fase 2:** API y formularios React de planes y seguimiento, reutilizando reglas y permisos existentes.
+4. **Entrega:** verificar PostgreSQL, despliegue y seguridad operativa; preparar memoria y vídeo.
 
-El [roadmap detallado](docs/roadmap.md) define criterios de aceptación. No se prevén integraciones Mirakl en esta fase.
+El [roadmap detallado](docs/hoja-de-ruta.md) define criterios de aceptación. No se prevén integraciones Mirakl en esta fase.
 
 ## Cumplimiento académico
 
 | Requisito | Estado actual |
 | --- | --- |
-| Backend Django | Cumplido para la base técnica |
-| Modelos, vistas, plantillas, autenticación y persistencia Django | Cumplido para vendedores e indicadores |
-| React en una o dos vistas con datos reales | Cumplido en dos secciones del panel; MVP de planes pendiente |
-| Flujo funcional de datos | Parcialmente cumplido: flujo vendedores/indicadores, sin planes |
-| GitHub, README e historial significativo | Parcialmente cumplido: remoto y README; solo commit inicial en la auditoría |
+| Backend Django | Base y módulo de planes funcionales |
+| Modelos, vistas, plantillas, autenticación y persistencia Django | Cumplido para vendedores, indicadores y planes |
+| React en una o dos vistas con datos reales | Dos secciones del panel conservadas; interfaz React de planes prevista para Fase 2 |
+| Flujo funcional de datos | Caso completo de planes demostrado desde Django Admin con acciones, dos revisiones y cierre |
+| GitHub, README e historial significativo | Remoto e historial existentes; hito de Fase 1 guardado en un commit local con su informe técnico; publicación remota pendiente |
 | URL pública funcional | Pendiente |
 | Seguridad y protección de datos | Parcialmente cumplido: controles locales; validación operativa pendiente |
 | Arquitectura coherente | Cumplido para la base técnica |
@@ -361,11 +371,11 @@ El [roadmap detallado](docs/roadmap.md) define criterios de aceptación. No se p
 | Memoria PDF/Word y vídeo ≤5 min | Pendiente; estructura y guion preparados |
 | Actividades obligatorias aprobadas y autorización docente | No verificable a partir del repositorio |
 
-La [matriz de requisitos](docs/requirements-mapping.md) vincula cada punto con evidencias y la rúbrica. No se puede garantizar una nota por instalar paquetes o aprobar estas pruebas. El README no sustituye a memoria, vídeo ni despliegue.
+La [matriz de requisitos](docs/trazabilidad-requisitos.md) vincula cada punto con evidencias y la rúbrica. No se puede garantizar una nota por instalar paquetes o aprobar estas pruebas. El README no sustituye a memoria, vídeo ni despliegue.
 
 ## Referencias
 
-- Guía académica del PFM: requisitos y ponderaciones facilitados en el encargo. No se dispone en el repositorio del documento oficial ni de su versión; confirmar con el docente antes de la entrega.
+- Guía académica del PFM: requisitos y ponderaciones facilitados en el encargo. La [revisión del 22/10/2026](docs/revision-entrega.md) identifica el documento oficial consultado en esa revisión; no hay una copia versionada de la guía en el repositorio.
 - [PcComponentes: criterios de calidad automatizados](https://marketplacehelp.pccomponentes.com/hc/es-es/articles/20561228339357-criterios-de-calidad-automatizados).
 - [PcComponentes: preparación de planes de acción](https://marketplacehelp.pccomponentes.com/hc/es-es/articles/38119386983965-como-mejorar-tus-indicadores-de-calidad-y-preparar-un-plan-de-accion).
 - [PcComponentes: NPS y eficiencia de entrega](https://marketplacehelp.pccomponentes.com/hc/es-es/articles/37487009483805-NPS-y-eficiencia-de-entrega).

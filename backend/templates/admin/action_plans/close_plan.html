@@ -1,0 +1,6 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<p>{{ original }} · {{ summary }}</p>
+<p>El cierre conserva las revisiones y las acciones pendientes. Documenta las razones de tu decisión.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<input type="submit" value="Finalizar plan"></form>
+{% endblock %}

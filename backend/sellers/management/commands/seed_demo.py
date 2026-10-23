@@ -9,16 +9,8 @@ from django.db import transaction
 
 from quality.models import QualityMetric, ThresholdPolicy
 from sellers.models import AGENT_GROUP, Seller
-
-POLICIES = [
-    ("acceptance", "percent", "lt", "99", "98", True),
-    ("incidents", "percent", "gte", "4", "5", True),
-    ("tracking", "percent", "lt", "91", "90", True),
-    ("acceptance_hours", "hours", "gte", "20", "24", True),
-    ("response_hours", "hours", "gte", "20", "24", True),
-    ("nps", "percent", "lt", "65", None, False),
-    ("delivery", "percent", "lt", "90", None, False),
-]
+from quality.rules import DEFAULT_POLICIES as POLICIES
+from quality.rules import MQC_MINIMUM_ORDERS
 
 
 class Command(BaseCommand):
@@ -42,7 +34,7 @@ class Command(BaseCommand):
             policy, _ = ThresholdPolicy.objects.get_or_create(code=code, version=1, defaults={
                 "unit": unit, "operator": operator, "alarm": Decimal(alarm),
                 "suspension": Decimal(suspension) if suspension else None,
-                "is_mqc": is_mqc, "minimum_orders": 30 if is_mqc else 0,
+                "is_mqc": is_mqc, "minimum_orders": MQC_MINIMUM_ORDERS if is_mqc else 0,
             })
             policies.append(policy)
         for reference, name, values in [

@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 from sellers.models import Seller
+from quality.rules import MQC_MINIMUM_ORDERS, validate_value
 
 
 class MetricCode(models.TextChoices):
@@ -48,6 +49,8 @@ class ThresholdPolicy(models.Model):
             raise ValidationError("NPS y entrega se evalúan fuera de MQC.")
         if self.is_mqc != (self.suspension is not None):
             raise ValidationError("Solo MQC requiere un umbral informativo de suspensión.")
+        if self.is_mqc and self.minimum_orders is not None and self.minimum_orders < MQC_MINIMUM_ORDERS:
+            raise ValidationError({"minimum_orders": "MQC requiere al menos 30 pedidos en el mes."})
         lower = -100 if self.code == MetricCode.NPS else 0
         for value in [self.alarm, self.suspension]:
             if value is not None and (value < lower or (not hours and value > 100)):
@@ -81,6 +84,9 @@ class QualityMetric(models.Model):
     value = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(-100)])
     recorded_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.seller} · {self.policy} · {self.channel} · {self.period_start}/{self.period_end}: {self.value}"
+
     class Meta:
         ordering = ["-period_end", "seller_id", "id"]
         constraints = [
@@ -93,9 +99,15 @@ class QualityMetric(models.Model):
         super().clean()
         if not self.policy_id or self.value is None:
             return
-        lower = -100 if self.policy.code == MetricCode.NPS else 0
-        if self.value < lower or (self.policy.unit == "percent" and self.value > 100):
-            raise ValidationError({"value": "Valor fuera del rango del indicador."})
+        try:
+            validate_value(self.policy, self.value)
+        except ValidationError as exc:
+            raise ValidationError({"value": exc.messages}) from exc
+        if self.pk and self.plan_metrics.exists():
+            old = type(self).objects.get(pk=self.pk)
+            fields = ["seller_id", "policy_id", "channel", "period_start", "period_end", "order_count", "value"]
+            if any(getattr(old, field) != getattr(self, field) for field in fields):
+                raise ValidationError("Observación utilizada en un plan: registra una nueva observación.")
         if self.period_start and self.period_end and self.period_end < self.period_start:
             raise ValidationError({"period_end": "El fin debe ser igual o posterior al inicio."})
         duplicates = type(self).objects.filter(
