@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Vendedores asignados</h1>
-<p>Sesión: {{ user.username }}. Esta vista utiliza una plantilla Django y datos persistidos.</p>
-<ul>{% for seller in sellers %}<li>{{ seller.name }} · {{ seller.reference }}</li>{% empty %}<li>No hay vendedores accesibles.</li>{% endfor %}</ul>
-<p><a href="/dashboard/">Panel React compilado</a> (requiere npm run build).</p>
-{% if user.is_staff %}<p><a href="/admin/">Administración y planes de mejora</a></p>{% endif %}
+<p class="auth-eyebrow">SELLER ACTION PLAN</p>
+<h1>Tu espacio de trabajo</h1>
+<p>Hola, {{ user.username }}. Estos son tus vendedores asignados.</p>
+<ul class="seller-list">{% for seller in sellers %}<li><a href="/dashboard/#/sellers/{{ seller.pk }}">{{ seller.name }}</a> · {{ seller.reference }}</li>{% empty %}<li>No hay vendedores accesibles.</li>{% endfor %}</ul>
+<a class="primary-link" href="/dashboard/">Abrir dashboard →</a>
+{% if user.is_staff %}<p class="portal-links"><a href="/admin/">Administración</a></p>{% endif %}
 <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Cerrar sesión</button></form>
 {% endblock %}

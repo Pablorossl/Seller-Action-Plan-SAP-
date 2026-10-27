@@ -1,9 +1,10 @@
+{% load static %}
 <!doctype html>
 <html lang="es">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Seller Action Plan</title></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% block title %}Seller Action Plan{% endblock %}</title><link rel="stylesheet" href="{% static 'sap/auth.css' %}"></head>
 <body>
-<header><a href="/">Seller Action Plan · SAP</a></header>
+<header><a href="/dashboard/">SAP · Seller Action Plan</a></header>
 <main>{% block content %}{% endblock %}</main>
-<footer><p>Proyecto académico independiente. Solo datos ficticios.</p></footer>
+<footer><p>Proyecto académico independiente · Datos ficticios · Sin conexión con Mirakl</p></footer>
 </body>
 </html>

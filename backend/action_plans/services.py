@@ -4,7 +4,7 @@ from django.db import transaction
 from django.db.models import Prefetch
 from django.utils import timezone
 
-from action_plans.models import FINAL_STATUSES, ActionStatus, ImprovementPlan, PlanMetric, PlanStatus
+from action_plans.models import FINAL_STATUSES, ActionStatus, ImprovementPlan, PlanMetric, PlanReview, PlanStatus
 from quality.services import classify
 from sellers.models import visible_sellers
 
@@ -15,7 +15,8 @@ def visible_plans(user):
 
 def plans_with_history(queryset):
     return queryset.select_related("seller", "responsible", "created_by").prefetch_related(
-        "actions", Prefetch("metrics", queryset=PlanMetric.objects.select_related("baseline__policy").prefetch_related("reviews")),
+        "actions", Prefetch("metrics", queryset=PlanMetric.objects.select_related("baseline__policy", "baseline__seller").prefetch_related(
+            Prefetch("reviews", queryset=PlanReview.objects.select_related("recorded_by")))),
     )
 
 

@@ -1,5 +1,8 @@
 {% extends "base.html" %}
+{% block title %}Acceso · Seller Action Plan{% endblock %}
 {% block content %}
-<h1>Acceso a SAP</h1>
-<form method="post">{% csrf_token %}{{ form.as_p }}<input type="hidden" name="next" value="{{ next }}"><button type="submit">Entrar</button></form>
+<p class="auth-eyebrow">TU ESPACIO DE SEGUIMIENTO</p>
+<h1>Bienvenido a SAP</h1>
+<p>Accede para coordinar las acciones y seguir la mejora de tus vendedores.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<input type="hidden" name="next" value="{{ next }}"><button type="submit">Entrar en mi espacio →</button></form>
 {% endblock %}

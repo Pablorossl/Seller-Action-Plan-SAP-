@@ -2,7 +2,7 @@
 
 Aplicación web para documentar y seguir planes de mejora de vendedores de marketplace a partir de indicadores de calidad. Proyecto Final del Máster en Desarrollo Full Stack de ConquerBlocks.
 
-**Estado: Fase 1 funcional.** Incluye gestión de planes de mejora, acciones, objetivos por indicador, revisiones históricas y cierre documentado desde Django Admin, además de la API y las dos secciones React existentes. No existe todavía un despliegue público verificado. Consulta la [guía de la Fase 1](docs/fase-1.md).
+**Estado: Fase 2 implementada.** Dashboard operativo, vendedores con búsqueda y ficha individual, planes con varios indicadores, acciones, revisiones y cierre desde la interfaz React integrada con Django. Consulta la [guía de la Fase 2](docs/fase-2.md), sus capturas y el recorrido de demostración. Se conserva la [Fase 1](docs/fase-1.md). No existe todavía un despliegue público verificado.
 
 Proyecto académico independiente: no es una aplicación oficial de PcComponentes ni de Mirakl. SAP no suspende tiendas, no bloquea pagos ni tramita reaperturas. Se utilizan exclusivamente datos ficticios y reproducibles.
 
@@ -46,8 +46,8 @@ SAP propone complementar estos sistemas con un registro de indicadores, planes c
 | --- | --- |
 | Evaluar los cinco criterios MQC con sus límites exactos | Servicio de clasificación y pruebas de fronteras implementados |
 | Restringir cada agente a sus vendedores | Consultas filtradas y pruebas de acceso implementadas |
-| Mostrar datos persistidos en Django y React | Plantilla HTML y dos secciones React implementadas |
-| Vincular cada plan con responsables, acciones y revisión | Implementado en Django Admin; demo 6% → 4,5% → 3% y pruebas del flujo completo |
+| Mostrar datos persistidos en Django y React | Plantillas HTML y dashboard, vendedores y planes en React implementados |
+| Vincular cada plan con responsables, acciones y revisión | Implementado en React y Django Admin; demo 6% → 4,5% → 3% y pruebas del flujo completo |
 | Reproducir la instalación y demostrar el flujo completo | Dependencias fijadas; memoria, vídeo y URL pública pendientes |
 
 ## Funcionalidades y estado
@@ -56,8 +56,8 @@ SAP propone complementar estos sistemas con un registro de indicadores, planes c
 | --- | --- |
 | Implementado | Login/logout, grupos, vendedores asignados, API y React de vendedores/indicadores, políticas versionadas, clasificación informativa, planes con varios indicadores, acciones, revisiones históricas, cierre autorizado y dos demos idempotentes, migraciones y pruebas |
 | Preparado parcialmente | Ajustes de producción, PostgreSQL y configuración Vercel; CI configurada, sin ejecución remota comprobada |
-| En desarrollo | No se declara ninguna funcionalidad adicional como iniciada |
-| Previsto | API y formularios React de planes, ficha de vendedor, trazabilidad general de cambios y validación de producción |
+| Fase 2 | Dashboard con datos persistidos, fichas de vendedores, búsqueda y paginación, API de planes, formularios React, acciones, revisiones y cierre autorizado |
+| Previsto | Trazabilidad general de cambios y validación de producción |
 
 Las métricas son observaciones registradas, **no cálculos sobre pedidos importados**. La interfaz indica su canal y periodo; una observación histórica no representa automáticamente la situación actual. Las reglas y el tratamiento del periodo se explican en [dominio](docs/dominio.md).
 
@@ -71,7 +71,7 @@ Versiones instaladas en la preparación inicial del 22/10/2026:
 | Django | 5.2.18 LTS | Backend académico, ORM, plantillas, autenticación, validación y tests |
 | Django REST Framework | 3.18.3 | Serialización, permisos y API paginada |
 | django-environ | 0.14.0 | Lectura de `.env` y configuración de la URL de base de datos |
-| React / React DOM | 19.3.1 | Dos secciones interactivas que consultan Django mediante Fetch |
+| React / React DOM | 19.3.1 | Interfaz operativa que consulta y escribe en Django mediante Fetch |
 | Vite | 7.3.7 | Desarrollo y compilación; rama mantenida, compatible con npm disponible |
 | @vitejs/plugin-react | 5.2.0 | Soporte JSX y actualización durante el desarrollo |
 | SQLite | Incluida en Python | Base local sin servicios adicionales |
@@ -89,7 +89,7 @@ Django 5.2 es compatible con Python 3.12. Vite 7.3 sigue recibiendo correcciones
 ```mermaid
 flowchart LR
     U[Usuario autenticado] --> H[Vista HTML Django]
-    U --> R[React: vendedores e indicadores]
+    U --> R[React: dashboard, vendedores y planes]
     R -->|Fetch y cookie de sesión| API[API REST Django]
     H --> ORM[ORM Django]
     API --> P[Rol y vendedores asignados]
@@ -118,7 +118,9 @@ Se conserva `auth.User` de Django. `Seller.owner` representa la asignación inic
 │   └── vercel.json          # Preparación del proveedor, sin publicación
 ├── frontend/
 │   ├── src/services/        # Fetch paginado y pruebas
-│   ├── src/main.jsx         # Secciones React
+│   ├── src/main.jsx         # Navegación integrada
+│   ├── src/components/      # Formularios, estados, tablas y peticiones
+│   ├── src/pages/           # Dashboard, vendedores y ciclo de planes
 │   ├── src/styles.css
 │   ├── vite.config.js
 │   ├── package.json
@@ -224,7 +226,7 @@ python manage.py configure_plan_agent --username TU_USUARIO
 python manage.py seed_plan_demo --owner TU_USUARIO
 ```
 
-El primer comando habilita `is_staff`, añade el grupo de agente y permisos individuales del módulo. No concede acceso administrativo a vendedores, políticas ni usuarios. El segundo carga, solo en desarrollo, un vendedor ficticio adicional con el caso completo **6% → 4,5% → 3%**, dos acciones y cierre. Puede repetirse sin modificar el histórico. Inicia sesión en `/admin/`; la [guía de Fase 1](docs/fase-1.md) explica también cómo crear el recorrido manualmente.
+El primer comando habilita `is_staff`, añade el grupo de agente y permisos individuales del módulo. No concede acceso administrativo a vendedores, políticas ni usuarios. El segundo carga, solo en desarrollo, un vendedor ficticio adicional con el caso completo **6% → 4,5% → 3%**, dos acciones y cierre. Puede repetirse sin modificar el histórico. Para gestionar desde React, entra en `/dashboard/` después de compilar. El permiso `is_staff` solo es necesario para Admin; la [guía de Fase 1](docs/fase-1.md) explica también cómo crear el recorrido manualmente.
 
 ## Ejecución local
 
@@ -243,6 +245,7 @@ npm run dev
 | URL | Uso |
 | --- | --- |
 | `http://127.0.0.1:8000/` | Portal HTML Django, acceso y vendedores persistidos |
+| `http://127.0.0.1:8000/dashboard/` | Aplicación operativa de la Fase 2; requiere `npm run build` |
 | `http://127.0.0.1:8000/admin/` | Administración; requiere usuario autorizado |
 | `http://127.0.0.1:5173/static/react/` | React en desarrollo; usa su enlace «Iniciar sesión» |
 | `http://127.0.0.1:8000/api/sellers/` | JSON de los vendedores accesibles para la sesión |
@@ -263,15 +266,26 @@ Abre `http://127.0.0.1:8000/dashboard/` e inicia sesión. Si compilaste después
 
 ## API
 
-Autenticación por **cookie de sesión Django**, sin JWT ni Basic Auth. Se requiere superusuario o grupo `Marketplace Agent`. Las respuestas paginadas incluyen `count`, `next`, `previous` y `results` (50 registros por página).
+Autenticación por **cookie de sesión Django**, sin JWT ni Basic Auth. Se requiere superusuario o grupo `Marketplace Agent`. Las respuestas paginadas incluyen `count`, `next`, `previous` y `results`: 50 registros para vendedores/observaciones y 20 para planes/responsables. React solicita solo la página necesaria.
 
 | Endpoint | Métodos | Comportamiento |
 | --- | --- | --- |
 | `/api/` | GET | Índice de endpoints, con rol autorizado |
-| `/api/sellers/` | GET, POST | Lista accesible; crea vendedor asignado al usuario actual |
+| `/api/sellers/` | GET, POST | Lista accesible; búsqueda `search`, filtro `active_plans=1/0`, paginación y número de planes abiertos; crea vendedor asignado al usuario |
 | `/api/sellers/{id}/` | GET, PUT, PATCH, DELETE | Solo vendedor accesible; no permite reasignar `owner` |
-| `/api/metrics/` | GET | Observaciones de vendedores accesibles, con clasificación |
+| `/api/metrics/` | GET | Observaciones accesibles; filtros `seller` y `latest=1`, con clasificación del backend |
 | `/api/metrics/{id}/` | GET | Detalle de observación accesible |
+| `/api/workspace/` | GET | Sesión, capacidades y token CSRF |
+| `/api/overview/` | GET | Resumen operativo, prioridades y revisiones |
+| `/api/responsibles/` | GET | Responsables autorizados, búsqueda y paginación |
+| `/api/plans/` | GET, POST | Lista paginada y creación atómica con varios indicadores |
+| `/api/plans/{id}/` | GET, PATCH | Detalle, evaluación y edición autorizada |
+| `/api/plans/{id}/actions/` | POST | Crear una acción |
+| `/api/plans/{id}/actions/{action_id}/` | PATCH | Editar acción, estado, finalización y evidencias |
+| `/api/plans/{id}/metrics/` | POST | Añadir un indicador a un plan abierto |
+| `/api/plans/{id}/metrics/{metric_id}/` | PATCH | Editar el objetivo mientras el dominio lo permita |
+| `/api/plans/{id}/reviews/` | POST | Registrar una revisión histórica |
+| `/api/plans/{id}/close/` | POST | Finalización con razones, permiso específico y `confirm: true` |
 | `/accounts/login/` | GET, POST | Formulario HTML y creación de sesión; POST con CSRF |
 | `/accounts/logout/` | POST | Cierre de sesión con CSRF |
 
@@ -281,7 +295,7 @@ POST de vendedor, con sesión y token CSRF válidos:
 {"name": "Tienda Ficticia", "reference": "FICTICIA-003"}
 ```
 
-Las escrituras autenticadas necesitan `X-CSRFToken` o el campo de formulario `csrfmiddlewaretoken`. No hay endpoints de escritura de métricas, planes ni seguimientos. Las políticas y las observaciones iniciales se registran por superusuario; los planes, acciones y revisiones se gestionan desde Admin con permisos y aislamiento por vendedor.
+Las escrituras autenticadas necesitan `X-CSRFToken` o el campo de formulario `csrfmiddlewaretoken`. Las políticas y las observaciones iniciales siguen registrándose por un superusuario. La Fase 2 añade la API de planes, acciones, objetivos y revisiones con los permisos existentes y aislamiento por vendedor. La autoría la impone el servidor; las revisiones y los planes finalizados conservan su histórico.
 
 Clasificaciones: `ok`, `alarm`, `suspension_threshold`, `insufficient_orders`, `not_evaluable` y `below_reference`. MQC exige una ventana mensual y volumen conocido suficiente; el detalle de la convención de periodos está en [dominio](docs/dominio.md). `suspension_threshold` significa exclusivamente que la observación alcanza el umbral informativo: SAP no ejecuta suspensiones. Sin sesión o rol se devuelve `403`; un recurso ajeno se oculta con `404`; errores de validación producen `400`; métodos no implementados, `405`.
 
@@ -290,7 +304,7 @@ Clasificaciones: `ok`, `alarm`, `suspension_threshold`, `insufficient_orders`, `
 | Rol | Capacidades actuales |
 | --- | --- |
 | Administrador (`is_superuser`) | Todos los vendedores e indicadores; usuarios, grupos, asignaciones y políticas mediante Django Admin |
-| Marketplace Agent / Account Manager | CRUD de vendedores propios y lectura de indicadores; Admin de sus planes si se habilita con permisos explícitos |
+| Marketplace Agent / Account Manager | CRUD de vendedores propios y lectura de indicadores; gestión React de planes con permisos explícitos; Admin solo si además tiene `is_staff` |
 | Autenticado sin rol | Sin acceso a la API de dominio; portal sin vendedores |
 | Anónimo | Formulario de acceso; sin acceso a datos |
 
@@ -336,7 +350,7 @@ cd ..
 python scripts/check_production.py
 ```
 
-Las 46 pruebas Django verificadas en Fase 1 utilizan una base de datos de test real de SQLite y ejecutan migraciones. Incluyen el recorrido completo por Admin, permisos de planes, histórico y comparación de objetivos; consulta [la verificación de Fase 1](docs/fase-1.md). Cubren login/logout, CSRF, roles, acceso entre propietarios, CRUD y persistencia, respuestas API, rangos, histórico de políticas, comparadores exclusivos/inclusivos y volúmenes 0, 29 y 30. Las pruebas de Fetch comprueban paginación y errores; sus dobles HTTP no acreditan persistencia, que se verifica en Django y en el flujo integrado.
+La Fase 2 aprueba **58 pruebas Django y 6 casos JavaScript**, conservando las 46 pruebas originales. Las pruebas Django utilizan una base real de SQLite temporal y ejecutan migraciones. Incluyen el recorrido completo por Admin, permisos de planes, histórico y comparación de objetivos; consulta [la verificación de Fase 1](docs/fase-1.md). Cubren login/logout, CSRF, roles, acceso entre propietarios, CRUD y persistencia, respuestas API, rangos, histórico de políticas, comparadores exclusivos/inclusivos y volúmenes 0, 29 y 30. Las pruebas de Fetch comprueban paginación, escrituras con CSRF, resultados, validación y fallos de red/acceso. El script opcional `scripts/verify_phase2_browser.py` verifica el flujo **6% → 4,5% → 3%**, edición, acciones, cierre y recarga con Chromium y una base temporal. Requiere Playwright y Chromium en el Python de QA; no son dependencias de la aplicación. Consulta las [evidencias y capturas de Fase 2](docs/fase-2.md).
 
 El script de producción utiliza variables **ficticias y temporales** para ejecutar `check --deploy --fail-level WARNING`; no modifica `.env` ni conecta con PostgreSQL. El flujo de GitHub Actions está preparado, sin badge ni resultado remoto atribuido. Evidencia y limitaciones en [verificación](docs/verificacion.md).
 
@@ -350,7 +364,7 @@ Se han preparado los ajustes y la compilación; esto no acredita un despliegue. 
 
 1. **Base técnica:** vendedores, indicadores, roles, React y tests, implementada.
 2. **Fase 1:** planes, acciones, objetivos, revisiones y cierre documentado desde Admin, implementada y probada.
-3. **Fase 2:** API y formularios React de planes y seguimiento, reutilizando reglas y permisos existentes.
+3. **Fase 2:** dashboard, vendedores y gestión React de planes, implementados; pruebas y capturas en [fase-2.md](docs/fase-2.md).
 4. **Entrega:** verificar PostgreSQL, despliegue y seguridad operativa; preparar memoria y vídeo.
 
 El [roadmap detallado](docs/hoja-de-ruta.md) define criterios de aceptación. No se prevén integraciones Mirakl en esta fase.
@@ -361,8 +375,8 @@ El [roadmap detallado](docs/hoja-de-ruta.md) define criterios de aceptación. No
 | --- | --- |
 | Backend Django | Base y módulo de planes funcionales |
 | Modelos, vistas, plantillas, autenticación y persistencia Django | Cumplido para vendedores, indicadores y planes |
-| React en una o dos vistas con datos reales | Dos secciones del panel conservadas; interfaz React de planes prevista para Fase 2 |
-| Flujo funcional de datos | Caso completo de planes demostrado desde Django Admin con acciones, dos revisiones y cierre |
+| React en una o dos vistas con datos reales | Dashboard, vendedores y planes integrados con datos y escrituras reales de Django |
+| Flujo funcional de datos | Caso completo 6% → 4,5% → 3% comprobado en API y navegador, con acciones, revisiones y cierre sin entrar en Admin |
 | GitHub, README e historial significativo | Remoto e historial existentes; hito de Fase 1 guardado en un commit local con su informe técnico; publicación remota pendiente |
 | URL pública funcional | Pendiente |
 | Seguridad y protección de datos | Parcialmente cumplido: controles locales; validación operativa pendiente |
