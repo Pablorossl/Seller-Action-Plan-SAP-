@@ -20,6 +20,9 @@ FINAL_STATUSES = (PlanStatus.CLOSED, PlanStatus.CANCELLED)
 
 
 class ImprovementPlan(models.Model):
+    revision = models.PositiveIntegerField(default=1, editable=False)
+    request_key = models.UUIDField(null=True, blank=True, unique=True, editable=False)
+    request_hash = models.CharField(max_length=64, blank=True, editable=False)
     seller = models.ForeignKey(Seller, on_delete=models.PROTECT, related_name="plans", verbose_name="vendedor")
     title = models.CharField("título", max_length=200)
     problem = models.TextField("problema identificado")
@@ -109,8 +112,14 @@ class ImprovementPlan(models.Model):
     def save(self, *args, **kwargs):
         with transaction.atomic():
             if self.pk:
-                type(self).objects.select_for_update().get(pk=self.pk)
+                current = type(self).objects.select_for_update().get(pk=self.pk)
+                from action_plans.concurrency import check_revision
+                check_revision(current, self.revision)
             self.full_clean()
+            if self.pk:
+                self.revision += 1
+                if kwargs.get("update_fields") is not None:
+                    kwargs["update_fields"] = set(kwargs["update_fields"]) | {"revision"}
             return super().save(*args, **kwargs)
 
 
@@ -123,7 +132,15 @@ class PlanChild(models.Model):
         with transaction.atomic():
             if self.parent_plan_id:
                 ImprovementPlan.objects.select_for_update().filter(pk=self.parent_plan_id).first()
+            if self.pk and hasattr(self, "revision"):
+                from action_plans.concurrency import check_revision
+                current = type(self).objects.get(pk=self.pk)
+                check_revision(current, self.revision)
             self.full_clean()
+            if self.pk and hasattr(self, "revision"):
+                self.revision += 1
+                if kwargs.get("update_fields") is not None:
+                    kwargs["update_fields"] = set(kwargs["update_fields"]) | {"revision"}
             return super().save(*args, **kwargs)
 
     def validate_open_plan(self):
@@ -134,6 +151,7 @@ class PlanChild(models.Model):
 
 
 class PlanMetric(PlanChild):
+    revision = models.PositiveIntegerField(default=1, editable=False)
     plan = models.ForeignKey(ImprovementPlan, on_delete=models.PROTECT, related_name="metrics", verbose_name="plan")
     baseline = models.ForeignKey(QualityMetric, on_delete=models.PROTECT, related_name="plan_metrics", verbose_name="indicador inicial")
     target_value = models.DecimalField("objetivo medible", max_digits=8, decimal_places=2)
@@ -187,6 +205,9 @@ class ActionStatus(models.TextChoices):
 
 
 class PlanAction(PlanChild):
+    revision = models.PositiveIntegerField(default=1, editable=False)
+    request_key = models.UUIDField(null=True, blank=True, unique=True, editable=False)
+    request_hash = models.CharField(max_length=64, blank=True, editable=False)
     plan = models.ForeignKey(ImprovementPlan, on_delete=models.PROTECT, related_name="actions", verbose_name="plan")
     description = models.TextField("descripción")
     kind = models.CharField("tipo", max_length=12, choices=[("corrective", "Correctiva"), ("preventive", "Preventiva")])

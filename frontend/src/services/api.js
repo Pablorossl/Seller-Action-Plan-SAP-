@@ -7,6 +7,8 @@ export class ApiError extends Error {
           ? "No se encuentra este registro o no tienes acceso a él."
           : status === 400
             ? "Revisa los campos indicados antes de guardar."
+            : status === 409
+              ? "El registro ha cambiado. Recarga sus datos y revisa tus cambios antes de guardarlos."
             : "No se pudo conectar con SAP. Inténtalo de nuevo.",
     );
     this.status = status;
@@ -25,7 +27,7 @@ export function localPath(path) {
 
 export async function api(
   path,
-  { method = "GET", data, signal, request = fetch } = {},
+  { method = "GET", data, signal, idempotencyKey, request = fetch } = {},
 ) {
   let response;
   try {
@@ -37,6 +39,7 @@ export async function api(
         Accept: "application/json",
         ...(data !== undefined ? { "Content-Type": "application/json" } : {}),
         ...(method !== "GET" ? { "X-CSRFToken": csrfToken } : {}),
+        ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
       },
       ...(data !== undefined ? { body: JSON.stringify(data) } : {}),
     });

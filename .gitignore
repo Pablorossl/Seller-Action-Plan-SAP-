@@ -233,3 +233,7 @@ staticfiles/
 .DS_Store
 *.pem
 *.key
+*.dump
+*.sql.gz
+backups/
+artifacts/

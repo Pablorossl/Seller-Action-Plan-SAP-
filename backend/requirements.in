@@ -5,3 +5,5 @@ django-environ>=0.12,<1
 psycopg[binary]>=3.2,<4
 whitenoise>=6.9,<7
 tzdata>=2026,<2027
+gunicorn>=26.2,<27
+django-axes>=8.3,<9

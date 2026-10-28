@@ -2,7 +2,7 @@
 
 Aplicación web para documentar y seguir planes de mejora de vendedores de marketplace a partir de indicadores de calidad. Proyecto Final del Máster en Desarrollo Full Stack de ConquerBlocks.
 
-**Estado: Fase 2 implementada.** Dashboard operativo, vendedores con búsqueda y ficha individual, planes con varios indicadores, acciones, revisiones y cierre desde la interfaz React integrada con Django. Consulta la [guía de la Fase 2](docs/fase-2.md), sus capturas y el recorrido de demostración. Se conserva la [Fase 1](docs/fase-1.md). No existe todavía un despliegue público verificado.
+**Estado: preparación de Fase 3 implementada; despliegue público pendiente.** Consulta [Fase 3](docs/fase-3.md) y el [procedimiento operativo](docs/despliegue.md). Dashboard operativo, vendedores con búsqueda y ficha individual, planes con varios indicadores, acciones, revisiones y cierre desde la interfaz React integrada con Django. Consulta la [guía de la Fase 2](docs/fase-2.md), sus capturas y el recorrido de demostración. Se conserva la [Fase 1](docs/fase-1.md). No existe todavía un despliegue público verificado.
 
 Proyecto académico independiente: no es una aplicación oficial de PcComponentes ni de Mirakl. SAP no suspende tiendas, no bloquea pagos ni tramita reaperturas. Se utilizan exclusivamente datos ficticios y reproducibles.
 
@@ -55,7 +55,7 @@ SAP propone complementar estos sistemas con un registro de indicadores, planes c
 | Estado | Funcionalidades |
 | --- | --- |
 | Implementado | Login/logout, grupos, vendedores asignados, API y React de vendedores/indicadores, políticas versionadas, clasificación informativa, planes con varios indicadores, acciones, revisiones históricas, cierre autorizado y dos demos idempotentes, migraciones y pruebas |
-| Preparado parcialmente | Ajustes de producción, PostgreSQL y configuración Vercel; CI configurada, sin ejecución remota comprobada |
+| Fase 3 | PostgreSQL probado localmente, concurrencia, seguridad, Gunicorn, receta Render y QA de producción; publicación, backups y CI remotos pendientes |
 | Fase 2 | Dashboard con datos persistidos, fichas de vendedores, búsqueda y paginación, API de planes, formularios React, acciones, revisiones y cierre autorizado |
 | Previsto | Trazabilidad general de cambios y validación de producción |
 
@@ -75,8 +75,10 @@ Versiones instaladas en la preparación inicial del 22/10/2026:
 | Vite | 7.3.7 | Desarrollo y compilación; rama mantenida, compatible con npm disponible |
 | @vitejs/plugin-react | 5.2.0 | Soporte JSX y actualización durante el desarrollo |
 | SQLite | Incluida en Python | Base local sin servicios adicionales |
-| PostgreSQL / psycopg | Driver 3.3.6 | Base prevista para producción; conexión externa aún no verificada |
-| WhiteNoise | 6.12.0 | Servicio de estáticos compilados en una comprobación WSGI local; Vercel prevé servirlos por CDN |
+| PostgreSQL / psycopg | PostgreSQL 14.24 local; 16 propuesto para Render / driver 3.3.6 | Persistencia y bloqueos reales; instancia remota pendiente |
+| WhiteNoise | 6.12.0 | Estáticos Django y React compilados bajo el mismo origen |
+| Gunicorn | 26.2.0 | Servidor WSGI de producción, dos workers |
+| django-axes | 8.3.1 | Bloqueo persistente de intentos de login |
 | tzdata | 2026.5 | Zona horaria disponible también en Windows |
 | unittest Django / node:test | Incluidos | Pruebas sin instalar otro framework |
 
@@ -94,7 +96,7 @@ flowchart LR
     H --> ORM[ORM Django]
     API --> P[Rol y vendedores asignados]
     P --> ORM
-    ORM --> DB[(SQLite local / PostgreSQL previsto)]
+    ORM --> DB[(SQLite local / PostgreSQL producción)]
     API --> C[Clasificación según política versionada]
 ```
 
@@ -115,7 +117,7 @@ Se conserva `auth.User` de Django. `Seller.owner` representa la asignación inic
 │   ├── manage.py
 │   ├── requirements.in
 │   ├── requirements.txt
-│   └── vercel.json          # Preparación del proveedor, sin publicación
+│   └── gunicorn.conf.py     # Arranque WSGI de producción
 ├── frontend/
 │   ├── src/services/        # Fetch paginado y pruebas
 │   ├── src/main.jsx         # Navegación integrada
@@ -128,6 +130,7 @@ Se conserva `auth.User` de Django. `Seller.owner` representa la asignación inic
 ├── docs/                    # Dominio, arquitectura, PFM y verificación
 ├── scripts/                 # Configuración local y check de producción ficticia
 ├── .github/workflows/ci.yml
+├── render.yaml              # Propuesta revisable con coste; no aplicada
 ├── .env.example
 ├── .gitignore
 └── LICENSE
@@ -191,6 +194,9 @@ Django lee exclusivamente `.env` en la raíz, además de las variables del proce
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Orígenes HTTPS exactos; nunca comodines generales |
 | `DATABASE_URL` | Vacía: `backend/db.sqlite3` | URL PostgreSQL privada; p. ej. `postgresql://usuario:CLAVE@host:5432/sap?sslmode=require` |
 | `DJANGO_TRUST_PROXY` | `False` | `True` solamente si el proxy confiable reescribe `X-Forwarded-Proto` |
+| `RENDER_EXTERNAL_HOSTNAME` | No necesario | Render lo proporciona; host y origen HTTPS exactos |
+| `SAP_DEMO_MODE` | `False` | `True` sólo para la carga ficticia explícita; después `False` |
+| `WEB_CONCURRENCY` / `PORT` | No necesarios para runserver | Dos workers por defecto / puerto asignado por proveedor |
 
 Producción rechaza SQLite, requiere clave y activa cookies seguras, redirección HTTPS y HSTS. La verificación estática con valores ficticios no prueba la disponibilidad del servicio de base de datos.
 
@@ -226,7 +232,7 @@ python manage.py configure_plan_agent --username TU_USUARIO
 python manage.py seed_plan_demo --owner TU_USUARIO
 ```
 
-El primer comando habilita `is_staff`, añade el grupo de agente y permisos individuales del módulo. No concede acceso administrativo a vendedores, políticas ni usuarios. El segundo carga, solo en desarrollo, un vendedor ficticio adicional con el caso completo **6% → 4,5% → 3%**, dos acciones y cierre. Puede repetirse sin modificar el histórico. Para gestionar desde React, entra en `/dashboard/` después de compilar. El permiso `is_staff` solo es necesario para Admin; la [guía de Fase 1](docs/fase-1.md) explica también cómo crear el recorrido manualmente.
+El primer comando habilita `is_staff`, añade el grupo de agente y permisos individuales del módulo. No concede acceso administrativo a vendedores, políticas ni usuarios. Con `--interface-only` conserva `is_staff` y habilita sólo los permisos funcionales; para una cuenta nueva sin Admin usa `python manage.py create_demo_agent --username evaluador`. El segundo carga, solo en desarrollo, un vendedor ficticio adicional con el caso completo **6% → 4,5% → 3%**, dos acciones y cierre. Puede repetirse sin modificar el histórico. Para gestionar desde React, entra en `/dashboard/` después de compilar. El permiso `is_staff` solo es necesario para Admin; la [guía de Fase 1](docs/fase-1.md) explica también cómo crear el recorrido manualmente.
 
 ## Ejecución local
 
@@ -288,6 +294,7 @@ Autenticación por **cookie de sesión Django**, sin JWT ni Basic Auth. Se requi
 | `/api/plans/{id}/close/` | POST | Finalización con razones, permiso específico y `confirm: true` |
 | `/accounts/login/` | GET, POST | Formulario HTML y creación de sesión; POST con CSRF |
 | `/accounts/logout/` | POST | Cierre de sesión con CSRF |
+| `/healthz/` | GET, HEAD | Disponibilidad SQL; 200 o 503 sin datos privados |
 
 POST de vendedor, con sesión y token CSRF válidos:
 
@@ -296,6 +303,8 @@ POST de vendedor, con sesión y token CSRF válidos:
 ```
 
 Las escrituras autenticadas necesitan `X-CSRFToken` o el campo de formulario `csrfmiddlewaretoken`. Las políticas y las observaciones iniciales siguen registrándose por un superusuario. La Fase 2 añade la API de planes, acciones, objetivos y revisiones con los permisos existentes y aislamiento por vendedor. La autoría la impone el servidor; las revisiones y los planes finalizados conservan su histórico.
+
+Para editar planes, objetivos y acciones o cerrar un plan, React envía la `revision` recibida: una revisión obsoleta devuelve `409` y requiere recargar. Los clientes anteriores sin revisión conservan escrituras serializadas, pero no detectan formularios obsoletos. En POST de planes/acciones, `Idempotency-Key` (UUID) permite repetir los mismos datos: devuelve el plan existente y no crea otro registro; reutilizar la clave con datos distintos da `409`. Sin clave, cada POST es una nueva creación. Las revisiones se deduplican por objetivo y periodo.
 
 Clasificaciones: `ok`, `alarm`, `suspension_threshold`, `insufficient_orders`, `not_evaluable` y `below_reference`. MQC exige una ventana mensual y volumen conocido suficiente; el detalle de la convención de periodos está en [dominio](docs/dominio.md). `suspension_threshold` significa exclusivamente que la observación alcanza el umbral informativo: SAP no ejecuta suspensiones. Sin sesión o rol se devuelve `403`; un recurso ajeno se oculta con `404`; errores de validación producen `400`; métodos no implementados, `405`.
 
@@ -323,13 +332,11 @@ El agente habilitado puede crear planes propios, añadir objetivos y acciones, r
 
 ## Seguridad
 
-**Implementado:** hashing de contraseñas y validadores nativos de Django, sesiones en base de datos, cookie de sesión HttpOnly y SameSite, CSRF en login/logout/escrituras, escape de plantillas Django y React, ORM parametrizado, roles y acceso por vendedor, validación de indicadores, claves foráneas, restricciones de base de datos, secretos ignorados y respuestas de dominio sin caché. React es de solo lectura, por lo que no contiene todavía formularios de validación de negocio.
+Sesiones persistidas, CSRF en login/logout y escrituras, permisos por vendedor y operación, ORM y escape de HTML, FK protegidas, histórico inmutable y transacciones. React valida los formularios y Django vuelve a validar cada escritura. La Fase 3 añade bloqueo persistente de login (cinco fallos, quince minutos), revisiones para detectar ediciones obsoletas y claves idempotentes para crear planes/acciones sin duplicarlos al reintentar.
 
-Con `DEBUG=False` se activan HTTPS, cookies Secure, HSTS y protección contra inclusión en iframes; se exige PostgreSQL y se solicita TLS al driver. Estos son ajustes preparados: el HTTPS y la cadena de proxy reales siguen pendientes de verificación. CORS permanece cerrado al trabajar bajo el mismo origen.
+Con `DEBUG=False` se exige clave privada, hosts exactos y PostgreSQL con TLS; se activan cookies Secure, HSTS, redirección HTTPS y protección de iframes. No se permite `sslmode=disable`. `/healthz/` sólo informa de disponibilidad SQL y admite el probe HTTP interno. `check --deploy` no silencia avisos Django; se justifica exclusivamente `axes.W006` porque el bloqueo global por usuario no depende de IP, cookies o User-Agent. Véanse pruebas y explicación en [Fase 3](docs/fase-3.md).
 
-**Pendiente antes de exposición pública:** verificar TLS y proxy, protección frente a intentos repetidos de login en la plataforma, recuperación de contraseña, registro de auditoría de cambios, política de conservación y pruebas PostgreSQL. Los futuros formularios React validarán para ayudar al usuario, manteniendo Django como autoridad.
-
-**Copias de seguridad previstas:** PostgreSQL gestionado con copia diaria y retención inicial de 7 días; comprobar restauración en una base aislada antes de publicar y tras cambios relevantes. Esta política debe contratarse/configurarse y no existe todavía un backup operativo verificado. En local, detén el servidor antes de copiar SQLite; trata la copia como privada. Detalles en [seguridad y despliegue](docs/despliegue.md).
+La cadena HTTPS/proxy y los backups **remotos** siguen pendientes de verificar. Se ha preparado Render PostgreSQL de pago y una estrategia de recuperación; la ventana PITR depende del workspace (Hobby: tres días según documentación actual). Procedimiento, credenciales docentes y riesgos residuales en [despliegue](docs/despliegue.md).
 
 ## Testing
 
@@ -350,22 +357,30 @@ cd ..
 python scripts/check_production.py
 ```
 
-La Fase 2 aprueba **58 pruebas Django y 6 casos JavaScript**, conservando las 46 pruebas originales. Las pruebas Django utilizan una base real de SQLite temporal y ejecutan migraciones. Incluyen el recorrido completo por Admin, permisos de planes, histórico y comparación de objetivos; consulta [la verificación de Fase 1](docs/fase-1.md). Cubren login/logout, CSRF, roles, acceso entre propietarios, CRUD y persistencia, respuestas API, rangos, histórico de políticas, comparadores exclusivos/inclusivos y volúmenes 0, 29 y 30. Las pruebas de Fetch comprueban paginación, escrituras con CSRF, resultados, validación y fallos de red/acceso. El script opcional `scripts/verify_phase2_browser.py` verifica el flujo **6% → 4,5% → 3%**, edición, acciones, cierre y recarga con Chromium y una base temporal. Requiere Playwright y Chromium en el Python de QA; no son dependencias de la aplicación. Consulta las [evidencias y capturas de Fase 2](docs/fase-2.md).
+La Fase 3 conserva las pruebas anteriores y añade regresiones de reintentos, ediciones obsoletas, seguridad y volumen, además de pruebas `TransactionTestCase` con conexiones PostgreSQL independientes. SQLite omite expresamente las pruebas de bloqueo: no acredita concurrencia de filas. Los resultados exactos están en [fase-3.md](docs/fase-3.md).
 
-El script de producción utiliza variables **ficticias y temporales** para ejecutar `check --deploy --fail-level WARNING`; no modifica `.env` ni conecta con PostgreSQL. El flujo de GitHub Actions está preparado, sin badge ni resultado remoto atribuido. Evidencia y limitaciones en [verificación](docs/verificacion.md).
+```bash
+# QA opcional; Python con Playwright/Chromium y binarios PostgreSQL disponibles:
+python3 scripts/verify_phase3.py --pg-bin /usr/lib/postgresql/14/bin
+```
+
+El script crea un PostgreSQL aislado y temporal, aplica migraciones, ejecuta tests, arranca Gunicorn con `DEBUG=False` y TLS de prueba, verifica Chromium, reinicios y una restauración separada. Nunca usa la base ni las cuentas locales del usuario. Escribe evidencias en `artifacts/phase3/`, ignorado por Git. No es un despliegue público. Playwright y las herramientas de auditoría no son dependencias de la aplicación.
+
+`check_production.py` sigue siendo sólo una comprobación estática con valores ficticios. GitHub Actions incluye PostgreSQL 16 y pruebas SQLite; su ejecución remota no se ha comprobado. La [Fase 2](docs/fase-2.md) conserva sus evidencias históricas.
 
 ## Despliegue
 
-**Preparación local para Vercel; publicación pendiente.** `backend/vercel.json` declara Django y la compilación de React. El proveedor se plantea con raíz `backend/`, acceso a los archivos del monorepositorio y PostgreSQL externo persistente. No se instalaron Gunicorn ni una CLI global: el destino previsto proporciona el runtime WSGI.
+**Render preparado; publicación pendiente de cuenta, coste y autorización.** `render.yaml` propone web Python y PostgreSQL gestionado en Frankfurt. Es una configuración con coste y no se ha aplicado. `scripts/build.sh` compila React y recoge estáticos; `scripts/release.sh` aplica migraciones; Gunicorn sirve Django y WhiteNoise los estáticos. La base permanece fuera del disco efímero de la web.
 
-Se han preparado los ajustes y la compilación; esto no acredita un despliegue. Falta configurar cuenta/proyecto, variables privadas, servicio PostgreSQL, migraciones controladas, estáticos, dominio y pruebas HTTPS en el entorno remoto. No hay una URL pública de SAP que pueda documentarse todavía. Consulta [la preparación y las validaciones pendientes](docs/despliegue.md) y la [documentación oficial de Vercel](https://vercel.com/docs/frameworks/full-stack/django).
+No hay URL pública verificada. Antes de publicar deben autorizarse el push y los recursos del proveedor; después verificar HTTPS, flujo funcional y persistencia tras un despliegue real. Instrucciones completas de variables, usuario de evaluación, backups, recuperación y aceptación en [docs/despliegue.md](docs/despliegue.md).
 
 ## Roadmap
 
 1. **Base técnica:** vendedores, indicadores, roles, React y tests, implementada.
 2. **Fase 1:** planes, acciones, objetivos, revisiones y cierre documentado desde Admin, implementada y probada.
 3. **Fase 2:** dashboard, vendedores y gestión React de planes, implementados; pruebas y capturas en [fase-2.md](docs/fase-2.md).
-4. **Entrega:** verificar PostgreSQL, despliegue y seguridad operativa; preparar memoria y vídeo.
+4. **Fase 3:** preparación y verificación local de producción; faltan publicación y aceptación remota.
+5. **Fase 4:** memoria PDF/Word, vídeo de hasta cinco minutos y defensa.
 
 El [roadmap detallado](docs/hoja-de-ruta.md) define criterios de aceptación. No se prevén integraciones Mirakl en esta fase.
 
@@ -377,9 +392,9 @@ El [roadmap detallado](docs/hoja-de-ruta.md) define criterios de aceptación. No
 | Modelos, vistas, plantillas, autenticación y persistencia Django | Cumplido para vendedores, indicadores y planes |
 | React en una o dos vistas con datos reales | Dashboard, vendedores y planes integrados con datos y escrituras reales de Django |
 | Flujo funcional de datos | Caso completo 6% → 4,5% → 3% comprobado en API y navegador, con acciones, revisiones y cierre sin entrar en Admin |
-| GitHub, README e historial significativo | Remoto e historial existentes; hito de Fase 1 guardado en un commit local con su informe técnico; publicación remota pendiente |
+| GitHub, README e historial significativo | Commits de Fases 1 y 2 conservados; cambios de Fase 3 locales, sin push |
 | URL pública funcional | Pendiente |
-| Seguridad y protección de datos | Parcialmente cumplido: controles locales; validación operativa pendiente |
+| Seguridad y protección de datos | Controles, PostgreSQL y concurrencia probados localmente; aceptación remota pendiente |
 | Arquitectura coherente | Cumplido para la base técnica |
 | Documentación del problema, aportación, usuarios y seguridad | Cumplido en documentación del repositorio; memoria final pendiente |
 | Memoria PDF/Word y vídeo ≤5 min | Pendiente; estructura y guion preparados |

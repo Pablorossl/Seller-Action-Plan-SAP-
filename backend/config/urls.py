@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from config.views import dashboard, home
+from config.views import dashboard, home, health
 from quality.views import QualityMetricViewSet
 from sellers.views import SellerViewSet
 from action_plans.views import PlanViewSet, overview, responsibles, workspace
@@ -13,6 +13,7 @@ router.register("sellers", SellerViewSet, basename="seller")
 router.register("metrics", QualityMetricViewSet, basename="metric")
 router.register("plans", PlanViewSet, basename="plan")
 urlpatterns = [
+    path("healthz/", health, name="health"),
     path("", home, name="home"),
     path("dashboard/", dashboard, name="dashboard"),
     path("accounts/login/", auth_views.LoginView.as_view(), name="login"),

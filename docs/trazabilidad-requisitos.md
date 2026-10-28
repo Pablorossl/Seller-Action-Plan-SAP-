@@ -1,31 +1,31 @@
 # Matriz de cumplimiento del PFM
 
-Estados actualizados para Fase 1; no constituyen certificación académica. Se siguen los requisitos transcritos por el usuario y la referencia a la guía identificada en la revisión del 22/10. No hay una copia oficial versionada en el repositorio.
+Actualizada el 27/10/2026. Sigue los requisitos transcritos en el encargo y la guía identificada en la revisión anterior; no hay copia oficial versionada ni certificación académica.
 
 | Requisito | Estado | Evidencia y pendiente |
 | --- | --- | --- |
-| Backend Django | Cumplido | `backend/manage.py`, `config/settings.py`, apps `sellers`, `quality` y `action_plans` |
-| Modelos, vistas, plantillas, autenticación y persistencia | Cumplido | Modelos y migraciones, portal `home.html`, login/logout, SQLite y tests de persistencia |
-| React en una o dos vistas con datos reales | Cumplido | Secciones de vendedores e indicadores en `frontend/src/main.jsx`, Fetch a API Django; no son rutas SPA independientes |
-| Aplicación funcional y flujo real | Cumplido en Fase 1 | Plan completo por Admin: dos acciones, dos revisiones y cierre; API y formularios React de planes quedan para Fase 2 |
-| GitHub, README e historial significativo | Parcialmente cumplido | Remoto e historial existentes; commit local del hito de Fase 1 con implementación, pruebas e informe técnico; publicación remota pendiente |
-| Despliegue mediante URL pública | Pendiente | Configuración Vercel preparada, sin despliegue ni PostgreSQL externo verificados |
-| Seguridad y protección de datos | Parcialmente cumplido | Pruebas CSRF, roles, recursos y escape; TLS real, backups, auditoría y resistencia de login pendientes |
-| Arquitectura y estructura coherentes | Cumplido | Separación Django/React y apps de dominio; decisiones en `arquitectura.md` |
-| Documentación de problema, aportación, tecnologías, usuarios, casos de uso y seguridad | Cumplido | README, dominio, arquitectura, roles y endpoints; evidencia final deberá pasar a la memoria |
-| Memoria PDF/Word y vídeo de máximo 5 min | Pendiente | `esquema-informe-pfm.md` y `guion-demostracion.md` son preparación, no entregables finales |
-| Prework, Frontend y Backend obligatorios aprobados | No verificable | Requiere expediente o confirmación docente externa |
-| Autorización docente para iniciar PFM | No verificable | No se infiere del código ni del acceso al repositorio |
+| Django: modelos, vistas, plantillas y autenticación | Implementado y probado | Apps de dominio, portal, login/logout, API y Admin |
+| Persistencia e integridad | Probadas localmente | Migraciones vacías, restricciones, PostgreSQL 14.24, reinicios y restauración; proveedor remoto pendiente |
+| React consumiendo Django | Implementado y probado | Dashboard, vendedores y ciclo completo de planes con datos reales de la base ficticia |
+| Flujo funcional completo | Probado en QA | Chromium, Gunicorn y PostgreSQL con DEBUG=False: 6% → 4,5% → 3%, cierre, recarga y permisos |
+| URL pública funcional | **Pendiente** | Blueprint Render y runbook preparados; faltan acceso, autorización de coste/push y pruebas remotas |
+| Seguridad | Probada localmente; aceptación remota pendiente | CSRF, sesión, alcance por vendedor, login limitado, configuración TLS, ocho pruebas de concurrencia; proxy/HTTPS público pendientes |
+| Repositorio e historial | Parcial | Commits anteriores conservados, README actualizado y cambios Fase 3 locales; no se ha hecho push ni comprobado acceso docente |
+| Arquitectura coherente | Conservada | Monolito Django + React, PostgreSQL y WSGI sin infraestructura innecesaria |
+| Documentación técnica | Preparada | README, arquitectura, `fase-3.md`, `despliegue.md`, evidencia JSON y capturas ficticias |
+| Memoria PDF/Word | Fase 4 | Documentación actual es materia prima, no memoria final |
+| Vídeo ≤5 min y defensa ≤20 min | Fase 4 | No se han generado ni ensayado en esta fase |
+| Actividades obligatorias y autorización docente | No verificable | Requiere expediente/confirmación externa |
 
-## Rúbrica y evidencias a reunir
+## Rúbrica
 
-| Apartado | Peso | Evidencia actual | Para completar el objetivo |
-| --- | --- | --- | --- |
-| Backend Django | 30 % | ORM, migraciones, auth, plantillas, API y flujo de planes por Admin probado | Validación final sobre PostgreSQL y aplicación desplegada |
-| Integración React | 15 % | Dos secciones con datos persistidos | Formularios y seguimiento de planes, usabilidad y pruebas |
-| Arquitectura y buenas prácticas | 15 % | Dependencias fijadas, separación de responsabilidades, tests y CI preparada | Historial significativo, revisión y refactorización según necesidades |
-| Seguridad e integridad | 15 % | Acceso por vendedor, CSRF, rangos, restricciones y políticas versionadas | PostgreSQL, auditoría de cambios, revisión operativa y restauración |
-| Documentación y presentación | 15 % | README y documentos de apoyo | Memoria final, vídeo y URL pública comprobable |
-| Reflexión y valor aportado | 10 % | Problema y alcance delimitados | Evaluar utilidad con escenarios, límites y decisiones justificadas |
+| Criterio | Peso | Evidencia actual | Pendiente principal |
+| --- | ---: | --- | --- |
+| Backend Django | 30% | Dominio, ORM, auth, vistas, plantillas y pruebas | Validación del mismo código desplegado |
+| Integración React | 15% | Interfaz operativa, Fetch/CSRF y flujo Chromium | Repetir desde URL pública |
+| Arquitectura y buenas prácticas | 15% | Separación de apps, dependencias fijadas, migraciones y CI preparada | CI remota y revisión del hito publicado |
+| Seguridad e integridad | 15% | PostgreSQL, bloqueos, revisión, idempotencia, permisos y recuperación | Proxy/TLS y backups del proveedor |
+| Documentación y presentación | 15% | Informes y runbook reproducibles | Memoria, vídeo y URL |
+| Reflexión y valor aportado | 10% | Complemento de Mirakl, decisiones, límites y utilidad operativa | Síntesis y defensa en Fase 4 |
 
-Nota mínima indicada: 7/10. Los porcentajes no permiten calcular una nota real a partir de esta base. Confirmar que las dos secciones React satisfacen el criterio de «vistas» de la versión de la guía que aplique al alumno.
+La nota mínima indicada es 7/10. No se calcula ni garantiza una calificación a partir de estos estados. La Fase 3 no se declara completa mientras falten los criterios remotos.

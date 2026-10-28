@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Acceso temporalmente limitado</h1>
+<p>Se han registrado demasiados intentos de acceso. Espera 15 minutos antes de intentarlo de nuevo o contacta con la persona responsable de SAP.</p>
+<a href="{% url 'login' %}">Volver al acceso</a>
+{% endblock %}

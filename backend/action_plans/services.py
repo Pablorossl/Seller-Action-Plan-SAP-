@@ -56,10 +56,15 @@ def evaluate_plan(plan: ImprovementPlan) -> dict:
 
 
 @transaction.atomic
-def close_plan(*, plan_id: int, actor, notes: str, status: str = PlanStatus.CLOSED) -> ImprovementPlan:
+def close_plan(*, plan_id: int, actor, notes: str, status: str = PlanStatus.CLOSED, expected_revision=None) -> ImprovementPlan:
     if not actor.is_active or not actor.has_perms(["action_plans.change_improvementplan", "action_plans.close_improvementplan"]):
         raise PermissionDenied("No tienes permiso para finalizar planes.")
+    # También serializa el cierre con una reasignación administrativa del vendedor.
+    seller_id = visible_plans(actor).values_list("seller_id", flat=True).get(pk=plan_id)
+    visible_sellers(actor).select_for_update().get(pk=seller_id)
     plan = visible_plans(actor).select_for_update().get(pk=plan_id)
+    from action_plans.concurrency import check_revision
+    check_revision(plan, expected_revision)
     if status not in FINAL_STATUSES:
         raise ValidationError("La finalización debe ser un cierre o una cancelación.")
     if plan.status in FINAL_STATUSES:

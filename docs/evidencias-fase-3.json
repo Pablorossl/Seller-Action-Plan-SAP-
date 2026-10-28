@@ -1,0 +1,101 @@
+{
+  "date": "2026-10-27",
+  "environment": "local isolated; public deployment pending",
+  "database": "postgres (PostgreSQL) 14.24 (Ubuntu 14.24-0ubuntu0.22.04.1)",
+  "python": "3.12.4",
+  "node": "22.19.0",
+  "playwright": "1.62.0",
+  "chromium": "151.0.7922.34",
+  "tests": {
+    "original_django": 58,
+    "postgresql": {
+      "run": 77,
+      "passed": 77,
+      "skipped": 0,
+      "concurrency": 8
+    },
+    "sqlite": {
+      "run": 77,
+      "passed": 69,
+      "skipped": 8
+    },
+    "javascript": 7
+  },
+  "build": "passed",
+  "deploy_check": {
+    "issues": 0,
+    "silenced": [
+      "axes.W006 (username-based lockout; rationale and regression test documented)"
+    ]
+  },
+  "dependency_audit": {
+    "npm_known_vulnerabilities": 0,
+    "python_known_vulnerabilities": 0,
+    "python_pinned_packages": 12
+  },
+  "browser": {
+    "environment": "local TLS de prueba",
+    "flow": "6 → 4.5 → 3",
+    "status": "closed",
+    "result": "achieved",
+    "reload": true,
+    "csrf": true,
+    "other_agent_denied": true,
+    "mobile_width": 390,
+    "page_errors": [],
+    "critical_responses": []
+  },
+  "persistence": {
+    "postgres_restart_persistence": true,
+    "gunicorn_restart_persistence": true,
+    "release_repeat_persistence": true,
+    "backup_restored_separately": true
+  },
+  "restored_counts": {
+    "action_plans.ImprovementPlan": 4,
+    "action_plans.PlanAction": 8,
+    "action_plans.PlanMetric": 4,
+    "action_plans.PlanReview": 6,
+    "auth.Group": 1,
+    "auth.Group_permissions": 0,
+    "auth.Permission": 69,
+    "auth.User": 2,
+    "auth.User_groups": 2,
+    "auth.User_user_permissions": 24,
+    "quality.QualityMetric": 17,
+    "quality.ThresholdPolicy": 7,
+    "sellers.Seller": 5
+  },
+  "benchmark": {
+    "/api/overview/": {
+      "queries": 25,
+      "median_ms": 128.06,
+      "max_ms": 190.97
+    },
+    "/api/sellers/": {
+      "queries": 6,
+      "median_ms": 11.36,
+      "max_ms": 20.57
+    },
+    "/api/plans/": {
+      "queries": 10,
+      "median_ms": 22.17,
+      "max_ms": 25.0
+    },
+    "/api/plans/?status=open": {
+      "queries": 10,
+      "median_ms": 28.41,
+      "max_ms": 34.32
+    },
+    "sellers": 125,
+    "observations": 857
+  },
+  "not_verified": [
+    "public URL",
+    "public HTTPS/proxy",
+    "Render PostgreSQL 16",
+    "remote redeploy persistence",
+    "provider PITR/backups",
+    "remote CI"
+  ]
+}

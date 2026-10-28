@@ -2,12 +2,14 @@ from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpResponseRedirect
+from django.db import transaction
+from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html_join
 
-from action_plans.forms import ClosePlanForm, ImprovementPlanForm
+from action_plans.forms import ClosePlanForm, ImprovementPlanForm, RevisionForm
 from action_plans.models import FINAL_STATUSES, ImprovementPlan, PlanAction, PlanMetric, PlanReview
 from action_plans.services import close_plan, evaluate_plan, plans_with_history, visible_plans
 from quality.models import QualityMetric
@@ -23,6 +25,20 @@ class ScopedPlanAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).filter(**{f"{self.seller_path}__in": visible_sellers(request.user)})
+
+    def get_object(self, request, object_id, from_field=None):
+        obj = super().get_object(request, object_id, from_field)
+        if obj and request.method == "POST":
+            plan = obj if isinstance(obj, ImprovementPlan) else (obj.plan_metric.plan if isinstance(obj, PlanReview) else obj.plan)
+            get_object_or_404(visible_sellers(request.user).select_for_update(), pk=plan.seller_id)
+            ImprovementPlan.objects.select_for_update().get(pk=plan.pk)
+            obj = super().get_object(request, object_id, from_field)
+        return obj
+
+    def save_model(self, request, obj, form, change):
+        plan = obj if isinstance(obj, ImprovementPlan) else (obj.plan_metric.plan if isinstance(obj, PlanReview) else obj.plan)
+        get_object_or_404(visible_sellers(request.user).select_for_update(), pk=plan.seller_id)
+        super().save_model(request, obj, form, change)
 
     def has_module_permission(self, request):
         return self.allowed(request) and super().has_module_permission(request)
@@ -128,6 +144,7 @@ class ImprovementPlanAdmin(ScopedPlanAdmin):
         extra_context = {**(extra_context or {}), "can_close": request.user.has_perm("action_plans.close_improvementplan")}
         return super().change_view(request, object_id, form_url, extra_context)
 
+    @transaction.atomic
     def close_view(self, request, object_id):
         plan = self.get_object(request, object_id)
         if plan is None:
@@ -151,6 +168,7 @@ class ImprovementPlanAdmin(ScopedPlanAdmin):
 
 @admin.register(PlanMetric)
 class PlanMetricAdmin(ScopedPlanAdmin):
+    form = RevisionForm
     seller_path = "plan__seller"
     list_display = ["plan", "baseline", "target_value"]
     list_select_related = ["plan", "baseline__policy", "baseline__seller"]
@@ -172,6 +190,7 @@ class OverdueFilter(admin.SimpleListFilter):
 
 @admin.register(PlanAction)
 class PlanActionAdmin(ScopedPlanAdmin):
+    form = RevisionForm
     seller_path = "plan__seller"
     list_display = ["description", "plan", "kind", "responsible", "status", "due_date", "overdue"]
     list_select_related = ["plan"]

@@ -420,13 +420,20 @@ export function useMutation(onSuccess) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const lock = useRef(false);
+  const attempt = useRef(null);
   async function submit(url, data, method = "POST") {
     if (lock.current) return;
     lock.current = true;
     setBusy(true);
     setError(null);
     try {
-      const result = await api(url, { method, data });
+      // Un reintento con los mismos datos conserva su clave, incluso si se perdió
+      // la respuesta. Modificar el formulario inicia una operación diferente.
+      const signature = JSON.stringify([url, method, data]);
+      if (attempt.current?.signature !== signature)
+        attempt.current = { signature, key: crypto.randomUUID() };
+      const result = await api(url, { method, data, idempotencyKey: attempt.current.key });
+      attempt.current = null;
       onSuccess(result);
     } catch (err) {
       setError(err);

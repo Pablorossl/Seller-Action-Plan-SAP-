@@ -11,6 +11,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--username", required=True)
+        parser.add_argument("--interface-only", action="store_true", help="Concede permisos de React sin habilitar acceso a Admin.")
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -25,6 +26,7 @@ class Command(BaseCommand):
         group, _ = Group.objects.get_or_create(name=AGENT_GROUP)
         user.groups.add(group)
         user.user_permissions.add(*permissions)
-        user.is_staff = True
-        user.save(update_fields=["is_staff"])
-        self.stdout.write(self.style.SUCCESS("Agente habilitado: Admin de planes propios; sin acceso administrativo a vendedores o políticas."))
+        if not options["interface_only"]:
+            user.is_staff = True
+            user.save(update_fields=["is_staff"])
+        self.stdout.write(self.style.SUCCESS("Permisos de planes configurados; " + ("acceso Admin sin modificar." if options["interface_only"] else "Admin de planes propios habilitado.")))

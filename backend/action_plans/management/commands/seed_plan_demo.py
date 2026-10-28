@@ -18,10 +18,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--owner", required=True)
+        parser.add_argument("--allow-production", action="store_true")
 
     @transaction.atomic
     def handle(self, *args, **options):
-        if not settings.DEBUG:
+        if not settings.DEBUG and not (settings.SAP_DEMO_MODE and options["allow_production"]):
             raise CommandError("La demo solo se carga en desarrollo.")
         owner = get_user_model().objects.filter(username=options["owner"], is_active=True).first()
         if owner is None or not owner.has_perms(["action_plans.add_improvementplan", "action_plans.change_improvementplan", "action_plans.close_improvementplan"]):

@@ -1,21 +1,21 @@
-# Roadmap del MVP
+# Hoja de ruta de SAP
 
-## Fase 0 — Base verificable
+## Base y Fase 1 — Implementadas
 
-Entorno local, dependencias fijadas, roles y asignación, vendedores, indicadores y políticas, plantilla Django, panel React y pruebas. La preparación Vercel no implica publicación. Véase el informe de verificación.
+Vendedores, políticas, indicadores, roles, permisos, plantillas y planes con acciones, objetivos, revisiones y cierre documentado. Se conserva el commit y el informe de [Fase 1](fase-1.md).
 
-## Fase 1 — Planes, acciones y revisiones (implementada)
+## Fase 2 — Implementada
 
-Modelos `ImprovementPlan`, `PlanMetric`, `PlanAction` y `PlanReview`, migración aditiva, permisos por vendedor y operación de cierre con resultado y razones. Django Admin permite demostrar el caso 6% → 4,5% → 3%, dos acciones y dos revisiones. Se mantienen los indicadores, sus políticas y las dos secciones React. Evidencias y límites en [fase-1.md](fase-1.md).
+Dashboard, búsqueda/paginación, ficha de vendedor y gestión del ciclo de planes desde React integrado con Django. Caso 6% → 4,5% → 3% en navegador, sin Admin. Commit `0ec5a25` y [evidencias](fase-2.md) conservados.
 
-## Fase 2 — Interfaz operativa (siguiente prioridad)
+## Fase 3 — Preparación implementada; aceptación remota pendiente
 
-Crear API y formularios React para el módulo implementado, con ficha de vendedor, edición de acciones, captura de revisiones y cierre. Reutilizar acceso por vendedor, permisos y servicios, y mantener los errores de servidor visibles. Empezar por comparar valor inicial, objetivo y revisiones en una tabla; las gráficas son opcionales. No reconstruir el frontend existente.
+PostgreSQL, concurrencia, seguridad, Gunicorn, estáticos, demo controlada y restauración verificados localmente. Render propuesto con recursos de pago, sin contratar. Antes de cerrar la fase: autorizar publicación/coste, desplegar, comprobar URL y certificado reales, repetir el flujo desde Internet y verificar persistencia tras deploy y recuperación del proveedor. [Informe y resultados](fase-3.md), [procedimiento](despliegue.md).
 
-## Fase 3 — Entrega operativa y académica (tercera prioridad)
+## Fase 4 — Entrega académica
 
-Probar sobre PostgreSQL y desplegar en Vercel bajo un mismo origen. Verificar variables privadas, cookies, CSRF, HTTPS, estáticos y persistencia tras una nueva instancia. Configurar copias y probar restauración, protección de login y revisión de seguridad. Preparar memoria PDF/Word, vídeo ≤5 min y URL pública; confirmar requisitos administrativos con el docente.
+Memoria PDF/Word, vídeo de máximo cinco minutos y preparación de la defensa. Incorporar la evidencia de Fase 3 y añadir la URL real y resultados remotos cuando existan. Confirmar acceso al repositorio y los requisitos administrativos con el equipo docente. No se garantiza una nota a partir de las pruebas locales.
 
-## Fuera del MVP
+## Fuera del alcance
 
-API Mirakl, datos corporativos, suspensión de tiendas, pagos, reaperturas, cuentas de vendedores, notificaciones asíncronas e inteligencia artificial. Cualquier ampliación necesita requisitos concretos; no se añaden herramientas de infraestructura preventivamente.
+Integración Mirakl, datos corporativos, IA, notificaciones complejas, nuevos módulos comerciales, móviles nativas e infraestructura distribuida. SAP complementa el seguimiento del marketplace y no ejecuta suspensiones, pagos ni reaperturas.

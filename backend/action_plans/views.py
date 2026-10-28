@@ -17,6 +17,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from action_plans.models import FINAL_STATUSES, ImprovementPlan, PlanAction, PlanMetric
+from action_plans.concurrency import check_revision, lock_plan, previous_request, request_identity
 from action_plans.serializers import MetricInputSerializer, PlanActionSerializer, PlanDetailSerializer, PlanReviewSerializer, PlanSummarySerializer, PlanWriteSerializer, model_error
 from action_plans.services import close_plan, plans_with_history, visible_plans
 from quality.serializers import QualityMetricSerializer
@@ -80,55 +81,76 @@ class PlanViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Creat
         plan = plans_with_history(visible_plans(self.request.user)).get(pk=plan_id)
         return Response(PlanDetailSerializer(plan).data, status=status)
 
+    def check_revision(self, instance):
+        try:
+            check_revision(instance, self.request.data.get("revision"))
+        except ModelValidationError as exc:
+            raise model_error(exc) from exc
+
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         require(request.user, "add_improvementplan", "add_planmetric")
         serializer = PlanWriteSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
-        plan = serializer.save(created_by=request.user)
+        get_object_or_404(visible_sellers(request.user).select_for_update(), pk=serializer.validated_data["seller"].pk)
+        identity = request_identity(request)
+        previous = previous_request(ImprovementPlan, identity)
+        if previous:
+            return self.render_plan(previous.pk)
+        plan = serializer.save(created_by=request.user, **identity)
         return self.render_plan(plan.pk, 201)
 
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
         require(request.user, "change_improvementplan")
-        plan = get_object_or_404(visible_plans(request.user).select_for_update(), pk=kwargs["pk"])
+        plan = lock_plan(request.user, kwargs["pk"])
+        self.check_revision(plan)
         serializer = PlanWriteSerializer(plan, data=request.data, partial=True, context={"request": request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return self.render_plan(plan.pk)
 
     @action(detail=True, methods=["post"], url_path="actions")
+    @transaction.atomic
     def add_action(self, request, pk=None):
         require(request.user, "add_planaction")
-        plan = self.get_object()
+        plan = lock_plan(request.user, pk)
+        identity = request_identity(request)
+        previous = previous_request(PlanAction, identity)
+        if previous:
+            return self.render_plan(plan.pk)
         serializer = PlanActionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(plan=plan)
+        serializer.save(plan=plan, **identity)
         return self.render_plan(plan.pk, 201)
 
     @action(detail=True, methods=["patch"], url_path=r"actions/(?P<action_id>[0-9]+)")
     @transaction.atomic
     def edit_action(self, request, pk=None, action_id=None):
         require(request.user, "change_planaction")
-        plan = get_object_or_404(visible_plans(request.user).select_for_update(), pk=pk)
+        plan = lock_plan(request.user, pk)
         instance = get_object_or_404(PlanAction, plan=plan, pk=action_id)
+        self.check_revision(instance)
         serializer = PlanActionSerializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return self.render_plan(plan.pk)
 
     @action(detail=True, methods=["post"], url_path="reviews")
+    @transaction.atomic
     def add_review(self, request, pk=None):
         require(request.user, "add_planreview")
-        plan = self.get_object()
+        plan = lock_plan(request.user, pk)
         serializer = PlanReviewSerializer(data=request.data, context={"plan": plan})
         serializer.is_valid(raise_exception=True)
         serializer.save(recorded_by=request.user)
         return self.render_plan(plan.pk, 201)
 
     @action(detail=True, methods=["post"], url_path="metrics")
+    @transaction.atomic
     def add_metric(self, request, pk=None):
         require(request.user, "add_planmetric")
-        plan = self.get_object()
+        plan = lock_plan(request.user, pk)
         serializer = MetricInputSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         try:
@@ -141,8 +163,9 @@ class PlanViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Creat
     @transaction.atomic
     def edit_metric(self, request, pk=None, metric_id=None):
         require(request.user, "change_planmetric")
-        plan = get_object_or_404(visible_plans(request.user).select_for_update(), pk=pk)
+        plan = lock_plan(request.user, pk)
         metric = get_object_or_404(PlanMetric, plan=plan, pk=metric_id)
+        self.check_revision(metric)
         metric.target_value = serializers.DecimalField(max_digits=8, decimal_places=2).run_validation(request.data.get("target_value"))
         try:
             metric.save()
@@ -151,14 +174,15 @@ class PlanViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Creat
         return self.render_plan(plan.pk)
 
     @action(detail=True, methods=["post"], url_path="close")
+    @transaction.atomic
     def close(self, request, pk=None):
         require(request.user, "change_improvementplan", "close_improvementplan")
-        plan = self.get_object()
+        plan = lock_plan(request.user, pk)
         if request.data.get("confirm") is not True:
             raise serializers.ValidationError({"confirm": "Confirma el cierre después de revisar los resultados."})
         notes = serializers.CharField().run_validation(request.data.get("notes", ""))
         try:
-            close_plan(plan_id=plan.pk, actor=request.user, notes=notes, status=request.data.get("status", "closed"))
+            close_plan(plan_id=plan.pk, actor=request.user, notes=notes, status=request.data.get("status", "closed"), expected_revision=request.data.get("revision"))
         except ModelValidationError as exc:
             raise model_error(exc) from exc
         return self.render_plan(plan.pk)

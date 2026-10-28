@@ -3,7 +3,23 @@ from django import forms
 from action_plans.models import ImprovementPlan, PlanStatus
 
 
-class ImprovementPlanForm(forms.ModelForm):
+class RevisionForm(forms.ModelForm):
+    expected_revision = forms.IntegerField(widget=forms.HiddenInput, required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields["expected_revision"].initial = self.instance.revision
+
+    def clean(self):
+        data = super().clean()
+        if self.instance.pk and data.get("expected_revision") is not None:
+            from action_plans.concurrency import check_revision
+            check_revision(self.instance, data["expected_revision"])
+        return data
+
+
+class ImprovementPlanForm(RevisionForm):
     class Meta:
         model = ImprovementPlan
         fields = "__all__"

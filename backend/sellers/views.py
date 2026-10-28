@@ -1,5 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
+from django.db import transaction
+from django.shortcuts import get_object_or_404
 from django.db.models import Count, Q
 from django.db.models.deletion import ProtectedError
 from django.utils.decorators import method_decorator
@@ -28,6 +30,14 @@ class SellerViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        seller = get_object_or_404(visible_sellers(request.user).select_for_update(), pk=kwargs["pk"])
+        serializer = self.get_serializer(seller, data=request.data, partial=kwargs.get("partial", False))
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(self.get_serializer(self.get_queryset().get(pk=seller.pk)).data)
+
     def retrieve(self, request, *args, **kwargs):
         seller = self.get_object()
         data = self.get_serializer(seller).data
@@ -35,8 +45,11 @@ class SellerViewSet(viewsets.ModelViewSet):
         data["missing_indicators"] = [{"code": code, "label": label} for code, label in MetricCode.choices if code not in recorded]
         return Response(data)
 
+    @transaction.atomic
     def destroy(self, request, *args, **kwargs):
         try:
-            return super().destroy(request, *args, **kwargs)
+            seller = get_object_or_404(visible_sellers(request.user).select_for_update(), pk=kwargs["pk"])
+            seller.delete()
+            return Response(status=204)
         except ProtectedError:
             return Response({"detail": "El vendedor tiene indicadores o planes históricos y no puede eliminarse."}, status=409)

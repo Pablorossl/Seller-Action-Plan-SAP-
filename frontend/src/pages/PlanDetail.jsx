@@ -104,7 +104,7 @@ function MetricForm({ plan, metric, done, close }) {
           mutation.submit(
             `/api/plans/${plan.id}/metrics/${metric ? `${metric.id}/` : ""}`,
             metric
-              ? { target_value: target }
+              ? { target_value: target, revision: metric.revision }
               : { baseline, target_value: target },
             metric ? "PATCH" : "POST",
           );
@@ -229,7 +229,7 @@ function ActionForm({ plan, action, done, close }) {
           e.preventDefault();
           mutation.submit(
             `/api/plans/${plan.id}/actions/${action ? `${action.id}/` : ""}`,
-            { ...form, completed_on: form.completed_on || null },
+            { ...form, completed_on: form.completed_on || null, ...(action ? { revision: action.revision } : {}) },
             action ? "PATCH" : "POST",
           );
         }}
@@ -440,6 +440,7 @@ function CloseForm({ plan, done, close }) {
         onSubmit={(e) => {
           e.preventDefault();
           mutation.submit(`/api/plans/${plan.id}/close/`, {
+            revision: plan.revision,
             notes,
             status,
             confirm,
@@ -890,7 +891,7 @@ export function PlanDetail({ id, user, params }) {
                             onClick={() =>
                               transition.submit(
                                 `/api/plans/${id}/`,
-                                { status: "in_progress" },
+                                { status: "in_progress", revision: plan.revision },
                                 "PATCH",
                               )
                             }
@@ -907,7 +908,7 @@ export function PlanDetail({ id, user, params }) {
                           onClick={() =>
                             transition.submit(
                               `/api/plans/${id}/`,
-                              { status: "in_review" },
+                              { status: "in_review", revision: plan.revision },
                               "PATCH",
                             )
                           }
@@ -922,7 +923,7 @@ export function PlanDetail({ id, user, params }) {
                           onClick={() =>
                             transition.submit(
                               `/api/plans/${id}/`,
-                              { status: "in_progress" },
+                              { status: "in_progress", revision: plan.revision },
                               "PATCH",
                             )
                           }

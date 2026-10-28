@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as ModelValidationError
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.exceptions import APIException
 
 from action_plans.models import ImprovementPlan, PlanAction, PlanMetric, PlanReview
 from action_plans.services import evaluate_plan
@@ -12,6 +13,11 @@ from sellers.models import visible_sellers
 
 
 def model_error(exc):
+    from action_plans.concurrency import RevisionConflict
+    if isinstance(exc, RevisionConflict):
+        error = APIException(exc.messages[0])
+        error.status_code = 409
+        return error
     return serializers.ValidationError(getattr(exc, "message_dict", {"non_field_errors": exc.messages}))
 
 
@@ -34,8 +40,8 @@ class PlanActionSerializer(ValidatedModelSerializer):
 
     class Meta:
         model = PlanAction
-        fields = ["id", "description", "kind", "responsible", "due_date", "status", "completed_on", "notes", "evidence", "is_overdue"]
-        read_only_fields = ["id"]
+        fields = ["id", "revision", "description", "kind", "responsible", "due_date", "status", "completed_on", "notes", "evidence", "is_overdue"]
+        read_only_fields = ["id", "revision"]
 
 
 class PlanReviewSerializer(ValidatedModelSerializer):
@@ -68,7 +74,7 @@ class PlanMetricSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PlanMetric
-        fields = ["id", "baseline", "target_value"]
+        fields = ["id", "revision", "baseline", "target_value"]
 
 
 class PlanSummarySerializer(serializers.ModelSerializer):
@@ -82,7 +88,7 @@ class PlanSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ImprovementPlan
-        fields = ["id", "seller", "seller_name", "seller_reference", "title", "objective", "status", "responsible", "responsible_name", "created_at", "due_date", "next_review_on", "needs_review", "metrics", "next_action", "pending_actions", "closure_evaluation"]
+        fields = ["id", "revision", "seller", "seller_name", "seller_reference", "title", "objective", "status", "responsible", "responsible_name", "created_at", "due_date", "next_review_on", "needs_review", "metrics", "next_action", "pending_actions", "closure_evaluation"]
 
     def get_next_action(self, obj):
         actions = getattr(obj, "pending_action_list", [])

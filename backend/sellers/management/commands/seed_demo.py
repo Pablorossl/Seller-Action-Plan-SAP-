@@ -18,10 +18,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--owner", required=True, help="Username existente; no crea credenciales.")
+        parser.add_argument("--allow-production", action="store_true")
 
     @transaction.atomic
     def handle(self, *args, **options):
-        if not settings.DEBUG:
+        if not settings.DEBUG and not (settings.SAP_DEMO_MODE and options["allow_production"]):
             raise CommandError("Los datos demo solo se cargan en desarrollo.")
         try:
             owner = get_user_model().objects.get(username=options["owner"])

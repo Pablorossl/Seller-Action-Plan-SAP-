@@ -6,7 +6,7 @@ Monolito Django con API REST y React compilable como archivos estáticos. Manten
 
 Las aplicaciones `sellers`, `quality` y `action_plans` separan vendedores, métricas y gestión de mejora. La Fase 1 incorpora modelos efectivos de planes, objetivos, acciones y revisiones. Se utiliza `auth.User`: los grupos nativos bastan para los roles actuales y no hay requisitos que justifiquen un modelo de usuario propio.
 
-SQLite permite arrancar y probar sin servicios. PostgreSQL se exige cuando `DEBUG=False`, porque una función de Vercel no debe persistir datos en SQLite local. El driver está instalado; no se ha verificado una instancia PostgreSQL real.
+SQLite permite arrancar y probar sin servicios. PostgreSQL se exige cuando `DEBUG=False`: el disco efímero de la web no debe almacenar la base. La Fase 3 verifica PostgreSQL 14.24 local y propone PostgreSQL 16 gestionado en Render; todavía no hay instancia remota verificada.
 
 ## Modelo existente
 
@@ -55,7 +55,7 @@ No hay cuentas de vendedor en el MVP. Un agente puede crear vendedores propios; 
 
 ## React y plantillas
 
-El portal `/` y el acceso son HTML renderizado por Django. El panel contiene dos secciones React: vendedores e indicadores. Fetch sigue toda la paginación de la API manteniendo rutas del mismo origen, presenta carga, vacío y error, y cancela las peticiones al cambiar de sección. No se interpreta HTML procedente de la API.
+El portal `/` y el acceso son HTML renderizado por Django. La Fase 2 incorpora dashboard, directorio y ficha de vendedores, planes, acciones, revisiones y cierre. Fetch solicita páginas de API del mismo origen, presenta carga, vacío y error y cancela peticiones al cambiar de sección. No se interpreta HTML procedente de la API.
 
 `vite build` genera `frontend/dist/index.html` y recursos bajo `/static/react/`. Django renderiza el índice en `/dashboard/`; los recursos se recogen con `collectstatic`. WhiteNoise usa almacenamiento comprimido sin segundo renombrado: Vite ya incorpora hashes en los nombres y el índice generado conserva esas referencias. No debe configurarse un fallback SPA que capture `/api/`, `/accounts/` o `/admin/`.
 
@@ -67,4 +67,15 @@ Los modelos validan fechas, relaciones, transiciones, rangos y conservación del
 
 La migración `action_plans/0001_initial.py` es aditiva: crea cuatro tablas con FK protegidas, índices y restricciones, sin alterar datos anteriores. Los permisos de agente se asignan expresamente mediante `configure_plan_agent`; la migración no habilita usuarios automáticamente.
 
-El [documento de Fase 1](fase-1.md) contiene diagrama, estados, matriz de permisos, pasos de Admin, demo, decisiones sobre ventanas de medición y límites de integridad. La siguiente fase añadirá API y formularios React reutilizando estas reglas; no se introducen colas, microservicios ni dependencias.
+El [documento de Fase 1](fase-1.md) contiene diagrama, estados, matriz de permisos, pasos de Admin, demo, decisiones sobre ventanas de medición y límites de integridad. La Fase 2 añade API y formularios React reutilizando estas reglas. La Fase 3 mantiene el monolito y añade las garantías de producción descritas a continuación.
+
+
+## Producción e integridad de Fase 3
+
+Render HTTPS → Gunicorn WSGI (dos workers) → Django/WhiteNoise → PostgreSQL por TLS. `scripts/build.sh` construye React y estáticos; `scripts/release.sh` migra una vez antes del arranque. No hay migraciones por worker, contenedores obligatorios ni datos en el disco de la web. `/healthz/` comprueba SQL y devuelve 503 ante indisponibilidad, sin detalles internos.
+
+Las escrituras HTTP bloquean el vendedor autorizado y después el plan. Los hijos y el cierre comparten bloqueo del plan; las revisiones distintas son append-only. `revision` detecta ediciones obsoletas en React/Admin y `save()`. `request_key` y `request_hash` deduplican creaciones de planes/acciones bajo una transacción y una restricción única. El cliente conserva la clave al reintentar el mismo payload. Los clientes antiguos sin revisión/cabecera mantienen el contrato anterior; no reciben esas garantías adicionales de detección/deduplicación.
+
+Django-axes persiste el bloqueo temporal de login en PostgreSQL y no requiere Redis. Las sesiones caducan a las ocho horas. La confianza de proxy se activa expresamente, con hosts/orígenes exactos. Se justifica sólo la excepción `axes.W006`, comprobando que cambiar cookies/User-Agent no evita el bloqueo global por usuario. El resto de avisos Django permanece activo.
+
+La migración aditiva `0002_concurrency_guards` conserva las anteriores. Se comprobó migración vacía, carrera de cierres/revisiones/ediciones/creaciones, reinicios y restauración aislada; no se han comprobado despliegue ni recuperación remotos. Detalles en [Fase 3](fase-3.md) y [operación](despliegue.md).

@@ -2,6 +2,16 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { ApiError, api, getAllPages, setCsrfToken } from "./api.js";
 
+test("envía la clave de reintento y comunica conflictos de edición", async () => {
+  await assert.rejects(api("/api/plans/1/actions/", {
+    method: "POST", data: { description: "Revisar" }, idempotencyKey: "test-request-key",
+    request: async (path, options) => {
+      assert.equal(options.headers["Idempotency-Key"], "test-request-key");
+      return { ok: false, status: 409, json: async () => ({ detail: "El registro ha cambiado." }) };
+    },
+  }), (error) => error.status === 409 && error.message.includes("Recarga"));
+});
+
 test("consume todas las páginas usando rutas del mismo origen", async () => {
   const calls = [];
   const request = async (path, options) => {

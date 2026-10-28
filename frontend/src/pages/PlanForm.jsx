@@ -177,6 +177,7 @@ export function PlanForm({ user, params, existing, onSaved }) {
     e.preventDefault();
     const payload = {
       ...form,
+      ...(existing ? { revision: existing.revision } : {}),
       responsible: responsible.id,
       next_review_on: form.next_review_on || null,
     };

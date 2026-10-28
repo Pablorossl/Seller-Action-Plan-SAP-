@@ -5,6 +5,18 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: sap_ci
+          POSTGRES_USER: sap_ci
+          POSTGRES_PASSWORD: ci-only-ephemeral-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sap_ci -d sap_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -27,3 +39,9 @@ jobs:
       - run: python manage.py check && python manage.py makemigrations --check --dry-run && python manage.py migrate --noinput && python manage.py test && python manage.py collectstatic --noinput
         working-directory: backend
       - run: python scripts/check_production.py
+      - name: PostgreSQL migrations and real concurrency tests
+        working-directory: backend
+        env:
+          DJANGO_DEBUG: "True"
+          DATABASE_URL: postgresql://sap_ci:ci-only-ephemeral-password@127.0.0.1:5432/sap_ci
+        run: python manage.py migrate --noinput && python manage.py migrate --check && python manage.py test --verbosity 2

@@ -1,0 +1,39 @@
+# Propuesta con coste: revisar y autorizar antes de aplicar en Render.
+# No activa publicaciones automáticas desde GitHub.
+services:
+  - type: web
+    name: sap-web
+    runtime: python
+    region: frankfurt
+    plan: 0.5c-512mb
+    autoDeployTrigger: "off"
+    buildCommand: bash scripts/build.sh
+    preDeployCommand: bash scripts/release.sh
+    startCommand: cd backend && gunicorn config.wsgi:application --config gunicorn.conf.py
+    healthCheckPath: /healthz/
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        sync: false
+      - key: DJANGO_TRUST_PROXY
+        value: "True"
+      - key: SAP_DEMO_MODE
+        value: "False"
+      - key: WEB_CONCURRENCY
+        value: "2"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sap-db
+          property: connectionString
+databases:
+  - name: sap-db
+    region: frankfurt
+    plan: 0.1c-256mb
+    databaseName: sap
+    user: sap
+    postgresMajorVersion: "16"
+    diskSizeGB: 1
+    ipAllowList: []
