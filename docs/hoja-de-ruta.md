@@ -14,7 +14,7 @@ PostgreSQL, concurrencia, seguridad, Gunicorn, estáticos, demo controlada y res
 
 ## Fase 4 — Entrega académica
 
-Memoria PDF/Word, vídeo de máximo cinco minutos y preparación de la defensa. Incorporar la evidencia de Fase 3 y añadir la URL real y resultados remotos cuando existan. Confirmar acceso al repositorio y los requisitos administrativos con el equipo docente. No se garantiza una nota a partir de las pruebas locales.
+Memoria Markdown/PDF, 16 capturas locales, cuatro diagramas, guion de 4:50 y defensa preparados. GitHub público y CI de Fase 3 verificados. Faltan despliegue y aceptación pública, vídeo real y confirmaciones académicas. Consulta el [informe de Fase 4](fase-4.md) y el [checklist](checklist-entrega.md). No se garantiza una nota a partir de las pruebas locales.
 
 ## Fuera del alcance
 

@@ -1,0 +1,261 @@
+{
+  "environment": "local isolated; not a public deployment",
+  "database": "postgres (PostgreSQL) 14.24 (Ubuntu 14.24-0ubuntu0.22.04.1)",
+  "browser": {
+    "url": "https://127.0.0.1:55633",
+    "environment": "local TLS de prueba",
+    "plan_id": 5,
+    "flow": "6 → 4.5 → 3",
+    "status": "closed",
+    "result": "achieved",
+    "reload": true,
+    "logout": true,
+    "csrf": true,
+    "other_agent_denied": true,
+    "mobile_width": 390,
+    "page_errors": [],
+    "critical_responses": []
+  },
+  "postgres_restart_persistence": true,
+  "gunicorn_restart_persistence": true,
+  "release_repeat_persistence": true,
+  "backup_restored_separately": true,
+  "benchmark": {
+    "/api/overview/": {
+      "queries": 25,
+      "median_ms": 110.28,
+      "max_ms": 222.59
+    },
+    "/api/sellers/": {
+      "queries": 6,
+      "median_ms": 12.1,
+      "max_ms": 15.24
+    },
+    "/api/plans/": {
+      "queries": 10,
+      "median_ms": 25.32,
+      "max_ms": 29.01
+    },
+    "/api/plans/?status=open": {
+      "queries": 10,
+      "median_ms": 24.49,
+      "max_ms": 32.86
+    },
+    "sellers": 125,
+    "observations": 857
+  },
+  "date": "2026-10-28",
+  "product_commit": "49ee19800e35ae72602e6cc7f76e1e6c374ae0d6",
+  "phase4_changes": "documentation and QA evidence only; no product model or business-rule changes",
+  "django_tests": {
+    "passed": 77,
+    "concurrency_included": 8,
+    "engine": "PostgreSQL 14.24"
+  },
+  "javascript_tests": {
+    "passed": 7,
+    "node": "22.19.0"
+  },
+  "frontend_build": "passed",
+  "pip_check": "passed",
+  "production_static_check": "passed",
+  "github": {
+    "repo": {
+      "html_url": "https://github.com/Pablorossl/Seller-Action-Plan-SAP-",
+      "private": false,
+      "default_branch": "main",
+      "pushed_at": "2026-10-28T18:42:58Z"
+    },
+    "runs": [
+      {
+        "head_sha": "49ee19800e35ae72602e6cc7f76e1e6c374ae0d6",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/40747706230",
+        "created_at": "2026-10-28T18:43:01Z"
+      },
+      {
+        "head_sha": "0ec5a253f03a38920f782e0a882893cf70b69e25",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/40562240904",
+        "created_at": "2026-10-27T18:41:03Z"
+      },
+      {
+        "head_sha": "39a6d076dff5f2477d2e2df283a9ed271e93969b",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/39982045621",
+        "created_at": "2026-10-23T15:52:48Z"
+      }
+    ]
+  },
+  "public_deployment": {
+    "url": null,
+    "status": "pending"
+  },
+  "video": {
+    "url": null,
+    "status": "not recorded"
+  },
+  "secret_scan": {
+    "history_blobs_scanned": 166,
+    "scope": "private-key headers, GitHub and AWS token patterns, database URLs and static Django secret assignments; review of candidates",
+    "real_secrets_detected": false,
+    "candidates_reviewed": "README placeholders, static check placeholders, isolated CI password and tests",
+    "current_tree_files_checked": 146,
+    "current_tree_high_confidence_token_candidates": 0
+  },
+  "logs": {
+    "artifacts/phase4-evidence/postgres-tests.log": {
+      "sha256": "5646c4b8b60f040a7bc376476dfa40d31fdbbdcea4847f7a6ba43fde1691324c"
+    },
+    "artifacts/phase4-evidence/migrations-check.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase4-evidence/postgres-server.log": {
+      "sha256": "f30ec07202551d9328d514884e6c10e4e63180d61dabd9eb79306bae81704714"
+    },
+    "artifacts/phase4-evidence/seed-evaluation.log": {
+      "sha256": "219f42b8018eb7e1e46b85611ff63f3a035a3cf5d360fd2ac0955b7b48979a49"
+    },
+    "artifacts/phase4-evidence/database-create.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase4-evidence/postgres-init.log": {
+      "sha256": "53c0dcace045539e3edb19526399523003d95e73c8c172753e3e2e0774d11890"
+    },
+    "artifacts/phase4-evidence/gunicorn.log": {
+      "sha256": "016c02289f1c0bb82715a843dffe8312ae04ee8884d3842badfbffe51f7322c6"
+    },
+    "artifacts/phase4-evidence/production-check.log": {
+      "sha256": "277e5892d612a44858868df5039f03019a53cabe5d0d69b2ff107458da4e5b1c"
+    },
+    "artifacts/phase4-evidence/collectstatic-repeat.log": {
+      "sha256": "09e8c2ad12528e2597ce99b17110a251f5d09121e94a773608d61e2adaecfbd6"
+    },
+    "artifacts/phase4-evidence/model-drift.log": {
+      "sha256": "a2bfa7b376c38062f77ce2b1e703876aaa04662f96355cdf5dc9d0d075302b05"
+    },
+    "artifacts/phase4-evidence/release-repeat.log": {
+      "sha256": "9559f2f04fe91824a9955c8008dfc3ed83ac4c39a88f2f586c2b598598128ea9"
+    },
+    "artifacts/phase4-evidence/restore-database-create.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase4-evidence/restored-migrations.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase4-evidence/migrations-fresh.log": {
+      "sha256": "a9dcd6cfe759aacc4f362fd678b08a531434467fbbc48537f5acea35d8d432dc"
+    },
+    "artifacts/phase4-evidence/postgres-stop.log": {
+      "sha256": "ca19178a35ab4153b75b494963b66ce8243e1b94c173107c87b44d09db23652d"
+    },
+    "artifacts/phase4-evidence/collectstatic.log": {
+      "sha256": "09e8c2ad12528e2597ce99b17110a251f5d09121e94a773608d61e2adaecfbd6"
+    },
+    "artifacts/phase4-evidence/restore.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase4-evidence/local-certificate.log": {
+      "sha256": "23e3239b12d5e819498609853ebd535197bd5555b56199ff79e5502ec049f3fb"
+    },
+    "artifacts/phase4-evidence/postgres-restart.log": {
+      "sha256": "66afd0411ccc09366e99fdd99b85f21899c8d2d064f5835126859618802153ad"
+    },
+    "artifacts/phase4-evidence/seed-repeat.log": {
+      "sha256": "0917d1be547f0309346a648465223647a5e497c1621e6dd477b5a16556f47734"
+    },
+    "artifacts/phase4-evidence/backup.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase4-evidence/postgres-start.log": {
+      "sha256": "66afd0411ccc09366e99fdd99b85f21899c8d2d064f5835126859618802153ad"
+    }
+  },
+  "screenshots": {
+    "docs/screenshots/fase-4-accion.png": {
+      "sha256": "023469db9f33a325697f8b96789faa5cb2fa2ee14cf8293a411cc7fc6d7b218f",
+      "bytes": 37176
+    },
+    "docs/screenshots/fase-4-cierre.png": {
+      "sha256": "9c840d3400c2e73db55e2275fc92dd57cb336fcfdb5d61b384f5a9b6489a863f",
+      "bytes": 175650
+    },
+    "docs/screenshots/fase-4-confirmacion-cierre.png": {
+      "sha256": "d6b962f1d3bcb266711f5494729776327cbc7163846525ff0df5b858b382e026",
+      "bytes": 42086
+    },
+    "docs/screenshots/fase-4-dashboard.png": {
+      "sha256": "50a211696de34b1d0af44443bcd14ab556e9ebd9e9ae0db45f357a7097dcf5b3",
+      "bytes": 217604
+    },
+    "docs/screenshots/fase-4-detalle-plan.png": {
+      "sha256": "1185852fdd8542f87d0b9182c1be55d157b747b8286f0c737b88d4bc00490c0e",
+      "bytes": 145539
+    },
+    "docs/screenshots/fase-4-evaluacion.png": {
+      "sha256": "e24f0a785237634eb8b0278da7788ba5a5c5b102dd538cb06ef873641c783400",
+      "bytes": 27364
+    },
+    "docs/screenshots/fase-4-formulario-plan.png": {
+      "sha256": "15275c22a56208f44e4606e4a3e440c95b27d89e3113ba2f45a68732eed12d05",
+      "bytes": 152736
+    },
+    "docs/screenshots/fase-4-historial-revisiones.png": {
+      "sha256": "c35846a909ded8142e20a801c64d983db41b5dbed7e826693d643d023e73912c",
+      "bytes": 30313
+    },
+    "docs/screenshots/fase-4-indicadores.png": {
+      "sha256": "663978de390007f1d56ed7824a8c599c6e40925d9d0dcd7bc86dec05f3874c59",
+      "bytes": 31895
+    },
+    "docs/screenshots/fase-4-login.png": {
+      "sha256": "4bceb3dce7751c3b127b3642ee2710d35c529ef5a09fa621951dbeefc934192c",
+      "bytes": 37374
+    },
+    "docs/screenshots/fase-4-movil.png": {
+      "sha256": "33e1f9100405f7e1e04add9e107fbbde0af8eb9f909117053d183a718cab1acf",
+      "bytes": 136086
+    },
+    "docs/screenshots/fase-4-planes.png": {
+      "sha256": "a8731826d38aaa87a56c0fff25c7e1f1971e0a42da5269484b2cfab5e1315a19",
+      "bytes": 103477
+    },
+    "docs/screenshots/fase-4-resultado-cierre.png": {
+      "sha256": "a60ce55dab41454f81a7e3e138e3d8cede0499dd3ad3ae44579caf6666120948",
+      "bytes": 14149
+    },
+    "docs/screenshots/fase-4-revisiones.png": {
+      "sha256": "2fb63dac4ca9d44e7cee88e1b7665f19ff55e22f8e4f8c342b38f14d418600e5",
+      "bytes": 177903
+    },
+    "docs/screenshots/fase-4-vendedor.png": {
+      "sha256": "ea4f82842175a8e5992e579424e5f15f157193b703e6e85391f31931c202de3c",
+      "bytes": 94015
+    },
+    "docs/screenshots/fase-4-vendedores.png": {
+      "sha256": "9baeac48dee1371d93f5609fb513e4ac41b4ebbac76d663cd7a2fc4c91404338",
+      "bytes": 89847
+    }
+  },
+  "document_validation": {
+    "pdf": "docs/memoria-pfm.pdf",
+    "pages": 30,
+    "embedded_screenshots": 13,
+    "vector_diagrams": 4,
+    "toc_destinations": 18,
+    "local_markdown_links_checked": 135,
+    "broken_local_links": 0,
+    "pdf_sha256": "33c765b53ceb1f062d13cf9ca5e37f83362fe9c95ce1a655b010ab7c1f73f7ad",
+    "source_sha256": "58e0447c73ed77416c8ae35ba9a011854546d4b62231bfcf19df04d697aa6f2d",
+    "visual_review": "contact sheet of all 30 pages; detailed review of cover, index, architecture, ER, permissions, use cases, dashboard and form",
+    "text_outside_page_bounds": false
+  },
+  "qa_script_sha256": "1c359907bb7d648cc523ede7a2b70a0a739355feb0e96cbe7305733a372ad565",
+  "qa_tools": {
+    "python": "Python 3.12.4",
+    "playwright": "1.62.0"
+  }
+}

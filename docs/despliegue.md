@@ -1,6 +1,6 @@
 # Despliegue y operación de SAP
 
-Actualizado el 27/10/2026. **Preparación local; todavía no hay URL pública verificada.** El informe de pruebas y sus límites está en [Fase 3](fase-3.md). Los comandos parten de la raíz del repositorio, salvo indicación contraria.
+Actualizado el 28/10/2026. **Preparación local; todavía no hay URL pública verificada.** Los resultados actuales están en [Fase 4](fase-4.md) y el acta remota en [verificación pública](verificacion-publica.md). Los comandos parten de la raíz del repositorio, salvo indicación contraria.
 
 ## Destino propuesto y coste
 
@@ -11,6 +11,14 @@ Se conserva Django + React en un único origen. Gunicorn ejecuta WSGI con dos wo
 La alternativa Railway cobra por uso y exige vigilar consumo y volumen persistente; también sería válida. Se elige Render por su separación explícita de build/pre-deploy/arranque y recuperación gestionada. La preparación anterior `backend/vercel.json` permanece como referencia histórica, sin ser la receta elegida para esta fase.
 
 Referencias revisadas: [Django en Render](https://render.com/docs/deploy-django), [Blueprint y tamaños vigentes](https://render.com/docs/blueprint-spec), [pre-deploy](https://render.com/docs/deploys), [precios Render](https://render.com/pricing), [precios Railway](https://railway.com/pricing). La tarifa y los límites se confirman al contratar; no se presupone gratuidad. Render Free suspende la web tras 15 minutos sin tráfico y la base gratuita caduca; no se propone para la defensa. [Límites Free](https://render.com/docs/free).
+
+## Presupuesto comprobable antes de autorizar
+
+Consulta de tarifas públicas del 28/10/2026: web `0.5c-512mb`, **7 USD/mes**; PostgreSQL `0.1c-256mb`, **6 USD/mes**; workspace Hobby, **0 USD/mes más cómputo**. Base estimada: **13 USD/mes**, con 1 GB PostgreSQL indicado como incluido en la página de precios. Ampliación de almacenamiento: 0,30 USD/GB/mes; Hobby incluye 5 GB de transferencia, después 0,15 USD/GB. Confirmar factura, impuestos, minutos de build, retención externa y posible coste de una base de recuperación en el panel. No es un límite de gasto ni una oferta contratada. [Tarifas oficiales](https://render.com/pricing).
+
+El tamaño mínimo debe medirse en Render antes de recomendarlo como definitivo. No se promete alta disponibilidad. Free duerme a los 15 minutos y PostgreSQL Free caduca a los 30 días, carece de backups y no permite el mismo procedimiento de consola; no cumple la continuidad prevista de evaluación. [Condiciones Free](https://render.com/docs/free).
+
+La revisión conserva `render.yaml` sin cambios: identificadores, región, disco, versión PostgreSQL, comandos y variables son compatibles con la referencia consultada. Falta validación del Blueprint en la cuenta. En el panel: **New → Blueprint**, conectar este repositorio, elegir `main` y `render.yaml`, revisar exclusivamente `sap-web` y `sap-db`, introducir el secreto privado y comprobar el presupuesto. **No pulsar Apply/Deploy hasta autorizar recursos y coste.** Después seguir «Primera publicación». Los cambios de Fase 4 necesitarán un push expresamente autorizado si se quieren publicar; Fase 3 ya está disponible en GitHub.
 
 ## Variables y secretos
 

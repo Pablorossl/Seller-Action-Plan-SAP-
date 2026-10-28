@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="720" viewBox="0 0 1040 720" role="img"><title>Casos de uso · acceso según rol y vendedor</title>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#387466"/></marker></defs>
+<rect width="1040" height="720" fill="white"/>
+<text x="30" y="35" font-family="Arial,sans-serif" font-size="23" font-weight="700" fill="#173b35">Casos de uso · acceso según rol y vendedor</text>
+<rect x="30" y="100" width="260" height="127" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="46" y="130" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">Agente autorizado</text>
+<text x="46" y="158" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Marketplace Agent</text>
+<text x="46" y="183" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Permisos de planes</text>
+<text x="46" y="208" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Vendedores propios</text>
+<rect x="370" y="80" width="625" height="177" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="386" y="110" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">Operación React</text>
+<text x="386" y="138" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Consultar dashboard y buscar vendedor</text>
+<text x="386" y="163" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Leer indicadores y detectar desviación</text>
+<text x="386" y="188" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Crear plan, objetivos y acciones</text>
+<text x="386" y="213" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Registrar revisión y consultar evaluación</text>
+<text x="386" y="238" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Cerrar con razones y permiso específico</text>
+<rect x="30" y="400" width="260" height="102" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="46" y="430" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">Superusuario</text>
+<text x="46" y="458" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Administración global</text>
+<text x="46" y="483" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Acceso a todos los datos</text>
+<rect x="370" y="400" width="625" height="127" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="386" y="430" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">Configuración Django Admin</text>
+<text x="386" y="458" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Gestionar usuarios, grupos y permisos</text>
+<text x="386" y="483" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Crear/asignar vendedores</text>
+<text x="386" y="508" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Registrar políticas y observaciones iniciales</text>
+<polyline points="290,180 370,180" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="310" y="166" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">usa</text>
+<polyline points="290,475 370,475" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="310" y="461" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">usa</text>
+<polyline points="155,400 155,335 680,335 680,257" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="362" y="324" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">también puede operar</text>
+<text x="30" y="635" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#173b35">Todos los casos de negocio requieren sesión. Anónimo: login y salud pública, sin datos de dominio.</text>
+<text x="30" y="665" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#173b35">No hay rol de vendedor externo. is_staff permite entrar en Admin, pero no sustituye permisos.</text></svg>

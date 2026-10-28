@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="800" viewBox="0 0 1050 800" role="img"><title>Arquitectura de SAP · un origen web</title>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#387466"/></marker></defs>
+<rect width="1050" height="800" fill="white"/>
+<text x="30" y="35" font-family="Arial,sans-serif" font-size="23" font-weight="700" fill="#173b35">Arquitectura de SAP · un origen web</text>
+<rect x="30" y="80" width="440" height="127" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="46" y="110" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">Navegador</text>
+<text x="46" y="138" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Login y portal: plantillas Django</text>
+<text x="46" y="163" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">React: dashboard, vendedores y planes</text>
+<text x="46" y="188" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Fetch /api/ · sesión + CSRF</text>
+<rect x="590" y="80" width="420" height="127" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="606" y="110" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">Build y release</text>
+<text x="606" y="138" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Vite → frontend/dist</text>
+<text x="606" y="163" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">collectstatic → WhiteNoise</text>
+<text x="606" y="188" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">release.sh → migrate (una vez)</text>
+<rect x="30" y="290" width="440" height="102" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="46" y="320" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">Entrada WSGI</text>
+<text x="46" y="348" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Render HTTPS → Gunicorn (propuesto)</text>
+<text x="46" y="373" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">QA: Gunicorn + TLS local verificado</text>
+<rect x="30" y="475" width="580" height="152" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="46" y="505" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">Django</text>
+<text x="46" y="533" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">DRF: permisos y serializadores</text>
+<text x="46" y="558" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">sellers → quality → action_plans</text>
+<text x="46" y="583" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Servicios: evaluación y cierre</text>
+<text x="46" y="608" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">ORM · validación · transacciones</text>
+<rect x="720" y="485" width="290" height="127" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="736" y="515" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">PostgreSQL</text>
+<text x="736" y="543" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Usuarios y sesiones</text>
+<text x="736" y="568" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Dominio e histórico</text>
+<text x="736" y="593" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">TLS · bloqueos de fila</text>
+<polyline points="250,210 250,290" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="265" y="257" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">HTTPS / JSON</text>
+<polyline points="250,392 250,475" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="265" y="443" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">petición</text>
+<polyline points="610,555 720,555" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="636" y="542" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">ORM</text>
+<polyline points="800,210 800,330 470,330" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="610" y="312" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">estáticos compilados</text>
+<text x="30" y="725" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#173b35">PostgreSQL 14.24 probado localmente; 16 propuesto en Render. SQLite sólo desarrollo.</text>
+<text x="30" y="755" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#173b35">No existe conexión con Mirakl. El despliegue público continúa pendiente.</text></svg>

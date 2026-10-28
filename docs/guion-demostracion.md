@@ -1,5 +1,7 @@
 # Guion preparatorio del vídeo (máximo cinco minutos)
 
+> El guion actualizado para el producto implementado está en [guion-video-pfm.md](guion-video-pfm.md). Este texto se conserva como antecedente histórico de la base inicial.
+
 No hay un vídeo grabado en esta base. El guion debe ajustarse a lo que esté realmente implementado en la entrega.
 
 | Tiempo | Contenido y evidencia |

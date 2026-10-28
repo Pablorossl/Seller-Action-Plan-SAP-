@@ -2,7 +2,9 @@
 
 Aplicación web para documentar y seguir planes de mejora de vendedores de marketplace a partir de indicadores de calidad. Proyecto Final del Máster en Desarrollo Full Stack de ConquerBlocks.
 
-**Estado: preparación de Fase 3 implementada; despliegue público pendiente.** Consulta [Fase 3](docs/fase-3.md) y el [procedimiento operativo](docs/despliegue.md). Dashboard operativo, vendedores con búsqueda y ficha individual, planes con varios indicadores, acciones, revisiones y cierre desde la interfaz React integrada con Django. Consulta la [guía de la Fase 2](docs/fase-2.md), sus capturas y el recorrido de demostración. Se conserva la [Fase 1](docs/fase-1.md). No existe todavía un despliegue público verificado.
+**Estado: Fase 4 preparada localmente; entrega oficial pendiente de URL pública, vídeo y confirmación académica.** Consulta el [informe actual](docs/fase-4.md), la [memoria PDF](docs/memoria-pfm.pdf) y la [matriz de cumplimiento](docs/trazabilidad-requisitos.md).
+
+Dashboard operativo, vendedores con búsqueda y ficha individual, planes con varios indicadores, acciones, revisiones y cierre desde React integrado con Django. Los informes de [Fase 1](docs/fase-1.md), [Fase 2](docs/fase-2.md) y [Fase 3](docs/fase-3.md) conservan las decisiones y evidencias históricas. El [procedimiento operativo](docs/despliegue.md) prepara la publicación; todavía no existe un despliegue público verificado.
 
 Proyecto académico independiente: no es una aplicación oficial de PcComponentes ni de Mirakl. SAP no suspende tiendas, no bloquea pagos ni tramita reaperturas. Se utilizan exclusivamente datos ficticios y reproducibles.
 
@@ -26,6 +28,7 @@ Proyecto académico independiente: no es una aplicación oficial de PcComponente
 - [Testing](#testing)
 - [Despliegue](#despliegue)
 - [Roadmap](#roadmap)
+- [Demo y documentación académica](#demo-y-documentación-académica)
 - [Cumplimiento académico](#cumplimiento-académico)
 - [Referencias](#referencias)
 - [Autoría y licencia](#autoría-y-licencia)
@@ -48,14 +51,14 @@ SAP propone complementar estos sistemas con un registro de indicadores, planes c
 | Restringir cada agente a sus vendedores | Consultas filtradas y pruebas de acceso implementadas |
 | Mostrar datos persistidos en Django y React | Plantillas HTML y dashboard, vendedores y planes en React implementados |
 | Vincular cada plan con responsables, acciones y revisión | Implementado en React y Django Admin; demo 6% → 4,5% → 3% y pruebas del flujo completo |
-| Reproducir la instalación y demostrar el flujo completo | Dependencias fijadas; memoria, vídeo y URL pública pendientes |
+| Reproducir la instalación y demostrar el flujo completo | Dependencias fijadas y memoria PDF preparada; vídeo y URL pública pendientes |
 
 ## Funcionalidades y estado
 
 | Estado | Funcionalidades |
 | --- | --- |
 | Implementado | Login/logout, grupos, vendedores asignados, API y React de vendedores/indicadores, políticas versionadas, clasificación informativa, planes con varios indicadores, acciones, revisiones históricas, cierre autorizado y dos demos idempotentes, migraciones y pruebas |
-| Fase 3 | PostgreSQL probado localmente, concurrencia, seguridad, Gunicorn, receta Render y QA de producción; publicación, backups y CI remotos pendientes |
+| Fase 3 | PostgreSQL probado localmente, concurrencia, seguridad, Gunicorn, receta Render y QA de producción; publicación y backups remotos pendientes; CI de Fase 3 verificada |
 | Fase 2 | Dashboard con datos persistidos, fichas de vendedores, búsqueda y paginación, API de planes, formularios React, acciones, revisiones y cierre autorizado |
 | Previsto | Trazabilidad general de cambios y validación de producción |
 
@@ -63,7 +66,7 @@ Las métricas son observaciones registradas, **no cálculos sobre pedidos import
 
 ## Tecnologías
 
-Versiones instaladas en la preparación inicial del 22/10/2026:
+Versiones del repositorio auditado el 28/10/2026:
 
 | Tecnología | Versión | Función y justificación |
 | --- | --- | --- |
@@ -313,7 +316,7 @@ Clasificaciones: `ok`, `alarm`, `suspension_threshold`, `insufficient_orders`, `
 | Rol | Capacidades actuales |
 | --- | --- |
 | Administrador (`is_superuser`) | Todos los vendedores e indicadores; usuarios, grupos, asignaciones y políticas mediante Django Admin |
-| Marketplace Agent / Account Manager | CRUD de vendedores propios y lectura de indicadores; gestión React de planes con permisos explícitos; Admin solo si además tiene `is_staff` |
+| Marketplace Agent (incluye uso por Account Manager) | CRUD de vendedores propios y lectura de indicadores; gestión React de planes con permisos explícitos; Admin solo si además tiene `is_staff` |
 | Autenticado sin rol | Sin acceso a la API de dominio; portal sin vendedores |
 | Anónimo | Formulario de acceso; sin acceso a datos |
 
@@ -366,7 +369,7 @@ python3 scripts/verify_phase3.py --pg-bin /usr/lib/postgresql/14/bin
 
 El script crea un PostgreSQL aislado y temporal, aplica migraciones, ejecuta tests, arranca Gunicorn con `DEBUG=False` y TLS de prueba, verifica Chromium, reinicios y una restauración separada. Nunca usa la base ni las cuentas locales del usuario. Escribe evidencias en `artifacts/phase3/`, ignorado por Git. No es un despliegue público. Playwright y las herramientas de auditoría no son dependencias de la aplicación.
 
-`check_production.py` sigue siendo sólo una comprobación estática con valores ficticios. GitHub Actions incluye PostgreSQL 16 y pruebas SQLite; su ejecución remota no se ha comprobado. La [Fase 2](docs/fase-2.md) conserva sus evidencias históricas.
+`check_production.py` sigue siendo sólo una comprobación estática con valores ficticios. GitHub Actions incluye PostgreSQL 16 y pruebas SQLite. Se comprobó el [run aprobado de Fase 3](https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/40747706230) para `49ee198`; no acredita todavía los cambios locales de Fase 4. La [Fase 2](docs/fase-2.md) conserva sus evidencias históricas.
 
 ## Despliegue
 
@@ -380,9 +383,25 @@ No hay URL pública verificada. Antes de publicar deben autorizarse el push y lo
 2. **Fase 1:** planes, acciones, objetivos, revisiones y cierre documentado desde Admin, implementada y probada.
 3. **Fase 2:** dashboard, vendedores y gestión React de planes, implementados; pruebas y capturas en [fase-2.md](docs/fase-2.md).
 4. **Fase 3:** preparación y verificación local de producción; faltan publicación y aceptación remota.
-5. **Fase 4:** memoria PDF/Word, vídeo de hasta cinco minutos y defensa.
+5. **Fase 4:** memoria Markdown/PDF, capturas, diagramas, guion de 4:50 y preparación de defensa disponibles; grabación, publicación y confirmaciones pendientes.
 
 El [roadmap detallado](docs/hoja-de-ruta.md) define criterios de aceptación. No se prevén integraciones Mirakl en esta fase.
+
+## Demo y documentación académica
+
+**URL pública: pendiente.** La demo local se abre en `http://127.0.0.1:8000/dashboard/` después de instalar, migrar, crear una cuenta, cargar los datos ficticios y compilar siguiendo este README. La demo controlada de evaluación y el acceso privado del tribunal se preparan según [despliegue](docs/despliegue.md). Nunca publicar contraseñas de evaluación en GitHub.
+
+| Material | Ubicación |
+| --- | --- |
+| Informe de Fase 4 y pendientes | [fase-4.md](docs/fase-4.md) |
+| Memoria técnica | [PDF](docs/memoria-pfm.pdf) · [Markdown](docs/memoria-pfm.md) · [Conversión](docs/exportacion-memoria.md) |
+| Capturas, diagramas y pruebas | [Índice visual](docs/evidencias-visuales.md) · [Resultados JSON](docs/evidencias-fase-4.json) |
+| Vídeo, todavía sin grabar | [Guion de 4:50](docs/guion-video-pfm.md) |
+| Defensa | [Exposición y 25 preguntas](docs/preparacion-defensa.md) |
+| Requisitos oficiales | [Matriz](docs/trazabilidad-requisitos.md) · [Fuentes](docs/fuentes-pfm.md) |
+| Cierre externo | [Acta pública pendiente](docs/verificacion-publica.md) · [Checklist de entrega](docs/checklist-entrega.md) |
+
+El caso 6% → 4,5% → 3% utiliza datos ficticios y demuestra software, no resultados empresariales. La memoria reconoce los pendientes; el proyecto no se declara listo para entregar mientras falten URL, vídeo y confirmaciones obligatorias.
 
 ## Cumplimiento académico
 
@@ -392,26 +411,27 @@ El [roadmap detallado](docs/hoja-de-ruta.md) define criterios de aceptación. No
 | Modelos, vistas, plantillas, autenticación y persistencia Django | Cumplido para vendedores, indicadores y planes |
 | React en una o dos vistas con datos reales | Dashboard, vendedores y planes integrados con datos y escrituras reales de Django |
 | Flujo funcional de datos | Caso completo 6% → 4,5% → 3% comprobado en API y navegador, con acciones, revisiones y cierre sin entrar en Admin |
-| GitHub, README e historial significativo | Commits de Fases 1 y 2 conservados; cambios de Fase 3 locales, sin push |
+| GitHub, README e historial significativo | Repositorio público y CI de Fase 3 verificados; Fase 4 local, sin commit ni push |
 | URL pública funcional | Pendiente |
 | Seguridad y protección de datos | Controles, PostgreSQL y concurrencia probados localmente; aceptación remota pendiente |
 | Arquitectura coherente | Cumplido para la base técnica |
-| Documentación del problema, aportación, usuarios y seguridad | Cumplido en documentación del repositorio; memoria final pendiente |
-| Memoria PDF/Word y vídeo ≤5 min | Pendiente; estructura y guion preparados |
+| Documentación del problema, aportación, usuarios y seguridad | Memoria completa y PDF para revisión; falta incorporar aceptación pública |
+| Memoria PDF/Word | [PDF generado](docs/memoria-pfm.pdf) y [fuente editable](docs/memoria-pfm.md) |
+| Vídeo ≤5 min | Grabación y enlace pendientes; [guion 4:50](docs/guion-video-pfm.md) preparado |
 | Actividades obligatorias aprobadas y autorización docente | No verificable a partir del repositorio |
 
 La [matriz de requisitos](docs/trazabilidad-requisitos.md) vincula cada punto con evidencias y la rúbrica. No se puede garantizar una nota por instalar paquetes o aprobar estas pruebas. El README no sustituye a memoria, vídeo ni despliegue.
 
 ## Referencias
 
-- Guía académica del PFM: requisitos y ponderaciones facilitados en el encargo. La [revisión del 22/10/2026](docs/revision-entrega.md) identifica el documento oficial consultado en esa revisión; no hay una copia versionada de la guía en el repositorio.
+- [Guía oficial del PFM](https://docs.google.com/document/d/1KhmvNgC4g9WI8suPOBjGFcUCQeA8rVPkoVS53fYLOkQ/edit), consultada íntegramente el 28/10/2026. [Registro de fuentes y requisitos](docs/fuentes-pfm.md); no se redistribuye la guía académica en GitHub.
 - [PcComponentes: criterios de calidad automatizados](https://marketplacehelp.pccomponentes.com/hc/es-es/articles/20561228339357-criterios-de-calidad-automatizados).
 - [PcComponentes: preparación de planes de acción](https://marketplacehelp.pccomponentes.com/hc/es-es/articles/38119386983965-como-mejorar-tus-indicadores-de-calidad-y-preparar-un-plan-de-accion).
 - [PcComponentes: NPS y eficiencia de entrega](https://marketplacehelp.pccomponentes.com/hc/es-es/articles/37487009483805-NPS-y-eficiencia-de-entrega).
 - [Compatibilidad Django 5.2](https://docs.djangoproject.com/en/5.2/faq/install/) y [checklist de despliegue](https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/).
 - [Django REST Framework](https://www.django-rest-framework.org/), [React con herramientas de compilación](https://react.dev/learn/build-a-react-app-from-scratch), [Vite](https://vite.dev/guide/), [django-environ](https://django-environ.readthedocs.io/en/latest/quickstart.html), [psycopg](https://www.psycopg.org/psycopg3/docs/basic/install.html) y [WhiteNoise](https://whitenoise.readthedocs.io/en/stable/django.html).
 
-Fuentes públicas consultadas el 22/10/2026. Revisar su vigencia antes de modificar las políticas; no se consultaron datos corporativos ni credenciales.
+Fuentes funcionales y condiciones Render contrastadas el 28/10/2026, sin modificar umbrales ni acceder a datos corporativos. Las referencias técnicas históricas se conservan como documentación de las decisiones.
 
 ## Autoría y licencia
 

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="1030" viewBox="0 0 1120 1030" role="img"><title>Modelo entidad-relación · entidades y FK de dominio</title>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#387466"/></marker></defs>
+<rect width="1120" height="1030" fill="white"/>
+<text x="30" y="35" font-family="Arial,sans-serif" font-size="23" font-weight="700" fill="#173b35">Modelo entidad-relación · entidades y FK de dominio</text>
+<rect x="25" y="80" width="310" height="127" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="41" y="110" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">auth.User</text>
+<text x="41" y="138" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">PK id · username</text>
+<text x="41" y="163" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Grupos y permisos Django</text>
+<text x="41" y="188" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">is_staff / is_superuser</text>
+<rect x="405" y="80" width="310" height="127" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="421" y="110" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">Seller</text>
+<text x="421" y="138" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">PK id · reference UNIQUE</text>
+<text x="421" y="163" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">FK owner → User</text>
+<text x="421" y="188" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">name · created_at</text>
+<rect x="785" y="80" width="310" height="152" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="801" y="110" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">ThresholdPolicy</text>
+<text x="801" y="138" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">PK id · code + version UNIQUE</text>
+<text x="801" y="163" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">unit · operator · alarm</text>
+<text x="801" y="188" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">suspension · minimum_orders</text>
+<text x="801" y="213" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">is_mqc</text>
+<rect x="25" y="385" width="330" height="202" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="41" y="415" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">ImprovementPlan</text>
+<text x="41" y="443" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">PK id · FK seller</text>
+<text x="41" y="468" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">FK created_by / responsible</text>
+<text x="41" y="493" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">problem · root_cause · evidence</text>
+<text x="41" y="518" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">objective · dates · status</text>
+<text x="41" y="543" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">revision · request_key UNIQUE</text>
+<text x="41" y="568" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">closure_notes / evaluation</text>
+<rect x="785" y="385" width="310" height="127" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="801" y="415" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">QualityMetric</text>
+<text x="801" y="443" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">PK id · FK seller / policy</text>
+<text x="801" y="468" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">channel · period_start / end</text>
+<text x="801" y="493" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">order_count · value</text>
+<rect x="25" y="760" width="330" height="152" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="41" y="790" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">PlanAction</text>
+<text x="41" y="818" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">PK id · FK plan</text>
+<text x="41" y="843" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">kind · description · responsible*</text>
+<text x="41" y="868" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">due_date · status · evidence</text>
+<text x="41" y="893" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">revision · request_key UNIQUE</text>
+<rect x="405" y="760" width="310" height="127" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="421" y="790" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">PlanMetric</text>
+<text x="421" y="818" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">PK id · FK plan / baseline</text>
+<text x="421" y="843" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">target_value · revision</text>
+<text x="421" y="868" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">UNIQUE plan + baseline</text>
+<rect x="785" y="760" width="310" height="152" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<text x="801" y="790" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">PlanReview</text>
+<text x="801" y="818" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">PK id · FK plan_metric</text>
+<text x="801" y="843" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">FK recorded_by → User</text>
+<text x="801" y="868" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">period · value · order_count</text>
+<text x="801" y="893" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">comments · assessment</text>
+<polyline points="335,142 405,142" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="350" y="130" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">1:N</text>
+<polyline points="470,207 470,320 190,320 190,385" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="210" y="310" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">Seller 1:N planes</text>
+<polyline points="650,207 650,310 850,310 850,385" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="695" y="294" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">Seller 1:N observaciones</text>
+<polyline points="980,232 980,385" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="992" y="320" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">1:N</text>
+<polyline points="190,587 190,760" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="202" y="682" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">1:N</text>
+<polyline points="355,530 560,530 560,760" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="378" y="514" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">Plan 1:N objetivos</text>
+<polyline points="785,465 685,465 685,760" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="695" y="610" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">1:N</text>
+<polyline points="715,822 785,822" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="733" y="808" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">1:N</text>
+<text x="25" y="960" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">FK de dominio: PROTECT. User tiene dos relaciones 1:N con ImprovementPlan y una con PlanReview.</text>
+<text x="25" y="987" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">* PlanAction.responsible es texto (persona/equipo), no FK. User–Group–Permission: relaciones M:N nativas.</text></svg>

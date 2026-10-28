@@ -1,0 +1,30 @@
+{
+  "endpoint": "/api/plans/5/",
+  "status": "closed",
+  "evaluation": {
+    "result": "achieved",
+    "actions": {
+      "pending": 1,
+      "cancelled": 0,
+      "completed": 1,
+      "in_progress": 0
+    },
+    "metrics": [
+      {
+        "code": "incidents",
+        "unit": "percent",
+        "target": "3.00",
+        "channel": "ficticio-es",
+        "current": "3.00",
+        "initial": "6.00",
+        "achieved": true,
+        "improved": true,
+        "metric_id": 4,
+        "review_id": 6,
+        "period_end": "2026-09-30",
+        "classification": "ok"
+      }
+    ],
+    "overdue_actions": 0
+  }
+}

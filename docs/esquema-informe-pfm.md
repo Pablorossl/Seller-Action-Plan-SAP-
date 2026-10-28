@@ -1,5 +1,7 @@
 # Estructura de la futura memoria técnica
 
+> La memoria actual está en [memoria-pfm.md](memoria-pfm.md) y [PDF](memoria-pfm.pdf); este esquema se conserva como antecedente.
+
 Documento preparatorio. No sustituye la memoria final en PDF o Word.
 
 1. Portada con datos académicos confirmados, título y versión entregada.
