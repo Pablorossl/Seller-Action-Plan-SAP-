@@ -4,7 +4,7 @@ Aplicación web para documentar y seguir planes de mejora de vendedores de marke
 
 **Estado: Fase 4 preparada localmente; entrega oficial pendiente de URL pública, vídeo y confirmación académica.** Consulta el [informe actual](docs/fase-4.md), la [memoria PDF](docs/memoria-pfm.pdf) y la [matriz de cumplimiento](docs/trazabilidad-requisitos.md).
 
-Dashboard operativo, vendedores con búsqueda y ficha individual, planes con varios indicadores, acciones, revisiones y cierre desde React integrado con Django. Los informes de [Fase 1](docs/fase-1.md), [Fase 2](docs/fase-2.md) y [Fase 3](docs/fase-3.md) conservan las decisiones y evidencias históricas. El [procedimiento operativo](docs/despliegue.md) prepara la publicación; todavía no existe un despliegue público verificado.
+Dashboard operativo, vendedores con búsqueda y ficha individual, planes con varios indicadores, acciones, revisiones y cierre desde React integrado con Django. Los informes de [Fase 1](docs/fase-1.md), [Fase 2](docs/fase-2.md) y [Fase 3](docs/fase-3.md) conservan las decisiones y evidencias históricas. La [guía Vercel Hobby + Neon Free](docs/despliegue-vercel.md) prepara la publicación académica sin coste dentro de sus cuotas; todavía no existe un despliegue público verificado.
 
 Proyecto académico independiente: no es una aplicación oficial de PcComponentes ni de Mirakl. SAP no suspende tiendas, no bloquea pagos ni tramita reaperturas. Se utilizan exclusivamente datos ficticios y reproducibles.
 
@@ -187,7 +187,7 @@ El script crea `.env` desde `.env.example`, genera una clave aleatoria sin mostr
 
 ## Variables de entorno
 
-Django lee exclusivamente `.env` en la raíz, además de las variables del proceso, que tienen prioridad. Ninguna variable de secreto debe exponerse mediante `VITE_*`.
+Django lee `.env` en la raíz o, si no existe, `.env.local`. Las variables del proceso tienen prioridad. En Vercel sólo se utilizan las variables del proyecto, sin leer archivos de entorno locales. Ninguna variable de secreto debe exponerse mediante `VITE_*`.
 
 | Variable | Desarrollo | Producción |
 | --- | --- | --- |
@@ -196,6 +196,7 @@ Django lee exclusivamente `.env` en la raíz, además de las variables del proce
 | `DJANGO_ALLOWED_HOSTS` | `localhost,127.0.0.1` | Dominios reales sin esquema, separados por comas; evitar `*` |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Orígenes HTTPS exactos; nunca comodines generales |
 | `DATABASE_URL` | Vacía: `backend/db.sqlite3` | URL PostgreSQL privada; p. ej. `postgresql://usuario:CLAVE@host:5432/sap?sslmode=require` |
+| `DATABASE_URL_UNPOOLED` | Opcional para administrar Neon con `scripts/neon_manage.py` | Conexión directa privada para migraciones; el servidor utiliza `DATABASE_URL` pooled |
 | `DJANGO_TRUST_PROXY` | `False` | `True` solamente si el proxy confiable reescribe `X-Forwarded-Proto` |
 | `RENDER_EXTERNAL_HOSTNAME` | No necesario | Render lo proporciona; host y origen HTTPS exactos |
 | `SAP_DEMO_MODE` | `False` | `True` sólo para la carga ficticia explícita; después `False` |
@@ -369,13 +370,17 @@ python3 scripts/verify_phase3.py --pg-bin /usr/lib/postgresql/14/bin
 
 El script crea un PostgreSQL aislado y temporal, aplica migraciones, ejecuta tests, arranca Gunicorn con `DEBUG=False` y TLS de prueba, verifica Chromium, reinicios y una restauración separada. Nunca usa la base ni las cuentas locales del usuario. Escribe evidencias en `artifacts/phase3/`, ignorado por Git. No es un despliegue público. Playwright y las herramientas de auditoría no son dependencias de la aplicación.
 
-`check_production.py` sigue siendo sólo una comprobación estática con valores ficticios. GitHub Actions incluye PostgreSQL 16 y pruebas SQLite. Se comprobó el [run aprobado de Fase 3](https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/40747706230) para `49ee198`; no acredita todavía los cambios locales de Fase 4. La [Fase 2](docs/fase-2.md) conserva sus evidencias históricas.
+`check_production.py` sigue siendo sólo una comprobación estática con valores ficticios. GitHub Actions incluye PostgreSQL 16, pruebas SQLite y la verificación del paquete Vercel. Se comprobó el [run aprobado de Fase 3](https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/40747706230) para `49ee198`; la CI de los commits posteriores sigue pendiente de comprobación. La [Fase 2](docs/fase-2.md) conserva sus evidencias históricas.
 
 ## Despliegue
 
-**Render preparado; publicación pendiente de cuenta, coste y autorización.** `render.yaml` propone web Python y PostgreSQL gestionado en Frankfurt. Es una configuración con coste y no se ha aplicado. `scripts/build.sh` compila React y recoge estáticos; `scripts/release.sh` aplica migraciones; Gunicorn sirve Django y WhiteNoise los estáticos. La base permanece fuera del disco efímero de la web.
+**Configuración Neon del 29/10/2026:** CLI y `neon.ts` preparados; build raíz correcto y conexiones directa/pooled probadas con TLS. Falta autenticar el CLI aquí y confirmar el proyecto/rama de las URLs antes de migrar. La aplicación local arranca, pero `/healthz/` devuelve 503 porque faltan las tablas SAP. Resultados exactos y comandos pendientes en [Neon setup](docs/neon-setup.md). `npm run build` compila React desde la raíz y `npm start` inicia Django localmente.
 
-No hay URL pública verificada. Antes de publicar deben autorizarse el push y los recursos del proveedor; después verificar HTTPS, flujo funcional y persistencia tras un despliegue real. Instrucciones completas de variables, usuario de evaluación, backups, recuperación y aceptación en [docs/despliegue.md](docs/despliegue.md).
+**Destino actual: Vercel Hobby + Neon Free**, para una demo personal no comercial de bajo tráfico. Preset Django, raíz `backend`, build `python build_vercel.py` e inclusión de fuentes externas a la raíz. React se empaqueta dentro del backend y Vercel sirve los estáticos por CDN; Django mantiene login, sesiones, dashboard y API en el mismo origen. PostgreSQL externo con TLS conserva los datos; SQLite sigue disponible localmente.
+
+El titular confirmó `sap-bice.vercel.app` como dominio de Production; el 29/10/2026 responde 404 de Vercel, sin aplicación pública verificada. No se ha hecho push ni desplegado esta adaptación. La [guía paso a paso](docs/despliegue-vercel.md) contiene ajustes exactos, variables, Neon, migraciones manuales desde Ubuntu, usuario de evaluación, Preview separado, límites gratuitos y aceptación tras redesplegar. Las [evidencias locales](docs/verificacion-vercel.md) distinguen lo probado de lo pendiente.
+
+Verificación del build y paquete sin publicar: `python scripts/verify_vercel.py` desde el venv con Node 22. No requiere credenciales ni una base real. Las migraciones y la demo nunca se ejecutan durante el build o al importar WSGI. `render.yaml` y [la receta Render](docs/despliegue.md) se conservan como antecedentes de pago; no se aplican para este destino.
 
 ## Roadmap
 
@@ -389,7 +394,7 @@ El [roadmap detallado](docs/hoja-de-ruta.md) define criterios de aceptación. No
 
 ## Demo y documentación académica
 
-**URL pública: pendiente.** La demo local se abre en `http://127.0.0.1:8000/dashboard/` después de instalar, migrar, crear una cuenta, cargar los datos ficticios y compilar siguiendo este README. La demo controlada de evaluación y el acceso privado del tribunal se preparan según [despliegue](docs/despliegue.md). Nunca publicar contraseñas de evaluación en GitHub.
+**Aplicación pública: pendiente de verificar en `sap-bice.vercel.app`.** La demo local se abre en `http://127.0.0.1:8000/dashboard/` después de instalar, migrar, crear una cuenta, cargar los datos ficticios y compilar siguiendo este README. La demo controlada de evaluación y el acceso privado del tribunal se preparan según [despliegue Vercel](docs/despliegue-vercel.md). Nunca publicar contraseñas de evaluación en GitHub.
 
 | Material | Ubicación |
 | --- | --- |
@@ -411,7 +416,7 @@ El caso 6% → 4,5% → 3% utiliza datos ficticios y demuestra software, no resu
 | Modelos, vistas, plantillas, autenticación y persistencia Django | Cumplido para vendedores, indicadores y planes |
 | React en una o dos vistas con datos reales | Dashboard, vendedores y planes integrados con datos y escrituras reales de Django |
 | Flujo funcional de datos | Caso completo 6% → 4,5% → 3% comprobado en API y navegador, con acciones, revisiones y cierre sin entrar en Admin |
-| GitHub, README e historial significativo | Repositorio público y CI de Fase 3 verificados; Fase 4 local, sin commit ni push |
+| GitHub, README e historial significativo | Fase 4 registrada en `57d296f`; adaptación Vercel/Neon con evidencias locales; publicación y CI del nuevo commit pendientes |
 | URL pública funcional | Pendiente |
 | Seguridad y protección de datos | Controles, PostgreSQL y concurrencia probados localmente; aceptación remota pendiente |
 | Arquitectura coherente | Cumplido para la base técnica |

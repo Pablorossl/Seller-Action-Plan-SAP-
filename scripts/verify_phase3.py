@@ -92,12 +92,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--pg-bin", default=None)
     parser.add_argument("--artifacts", default="artifacts/phase3")
+    parser.add_argument("--vercel-settings", action="store_true", help="QA local con los ajustes Vercel; requiere ejecutar antes verify_vercel.py. No despliega.")
     args = parser.parse_args()
     pg_bin = Path(args.pg_bin or subprocess.check_output(["pg_config", "--bindir"], text=True).strip())
     artifacts = (ROOT / args.artifacts).resolve()
     artifacts.mkdir(parents=True, exist_ok=True)
     if not (ROOT / "frontend/dist/index.html").exists():
         raise SystemExit("Compila React antes de ejecutar QA.")
+    if args.vercel_settings and not (ROOT / "backend/frontend_dist/index.html").exists():
+        raise SystemExit("Ejecuta scripts/verify_vercel.py antes de QA con ajustes Vercel.")
     with tempfile.TemporaryDirectory(prefix="sap-phase3-") as temporary:
         tmp = Path(temporary)
         data = tmp / "pgdata"
@@ -111,6 +114,7 @@ def main():
             "DJANGO_TRUST_PROXY": "False", "RENDER_EXTERNAL_HOSTNAME": "", "SAP_DEMO_MODE": "True",
             "DATABASE_URL": f"postgresql://sap_qa@127.0.0.1:{pgport}/sap_verification?sslmode=require",
             "SAP_QA_PASSWORD": secrets.token_urlsafe(28), "PYTHONUNBUFFERED": "1",
+            "VERCEL": "1" if args.vercel_settings else "0",
         }
         pg_env = environment | {"PGHOST": "127.0.0.1", "PGPORT": str(pgport), "PGUSER": "sap_qa", "PGSSLMODE": "require"}
         # No incluir contraseñas/URL en los comandos impresos ni en los logs.
@@ -147,7 +151,7 @@ def main():
             manage("migrate", "--noinput", name="migrations-fresh")
             manage("makemigrations", "--check", "--dry-run", name="model-drift")
             manage("migrate", "--check", name="migrations-check")
-            manage("test", "--verbosity", "2", name="postgres-tests", env=environment | {"DJANGO_DEBUG": "True"})
+            manage("test", "--verbosity", "2", name="postgres-tests", env=environment | {"DJANGO_DEBUG": "True", "VERCEL": "0"})
             manage("check", "--deploy", "--fail-level", "WARNING", name="production-check")
             manage("collectstatic", "--noinput", name="collectstatic")
             manage("shell", "-c", SEED, name="seed-evaluation")
@@ -212,7 +216,8 @@ def main():
             manage("migrate", "--check", name="restored-migrations", env=restored_env)
             benchmark = shell(BENCHMARK)
             stop_web()
-            report = {"environment": "local isolated; not a public deployment", "database": subprocess.check_output([str(pg_bin / "postgres"), "--version"], text=True).strip(),
+            report = {"environment": "local isolated; not a public deployment", "vercel_settings": args.vercel_settings,
+                "database": subprocess.check_output([str(pg_bin / "postgres"), "--version"], text=True).strip(),
                 "browser": browser, "postgres_restart_persistence": True, "gunicorn_restart_persistence": True,
                 "release_repeat_persistence": True, "backup_restored_separately": True, "snapshot": before, "benchmark": benchmark}
             (artifacts / "result.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")

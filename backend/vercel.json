@@ -1,5 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "django",
-  "buildCommand": "npm --prefix ../frontend ci && npm --prefix ../frontend run build"
+  "buildCommand": "python build_vercel.py",
+  "ignoreCommand": "test \"$VERCEL_ENV\" != production",
+  "regions": ["fra1"],
+  "functions": {
+    "config/wsgi.py": {
+      "maxDuration": 60,
+      "includeFiles": "{templates/**,frontend_dist/**}",
+      "excludeFiles": "{**/*.sqlite3,**/*.sqlite3-*,.env,.env.*}"
+    }
+  }
 }

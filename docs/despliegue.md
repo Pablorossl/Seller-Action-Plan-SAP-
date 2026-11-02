@@ -1,5 +1,7 @@
 # Despliegue y operación de SAP
 
+> **Antecedente Render, sustituido como destino el 29/10/2026.** Para la demostración de coste 0 seguir [Vercel Hobby + Neon Free](despliegue-vercel.md). Se conserva este procedimiento para documentar el trabajo previo; sus recursos de pago y comandos de pre-deploy no se aplican a Vercel. `backend/vercel.json` es ahora la configuración activa de la nueva receta.
+
 Actualizado el 28/10/2026. **Preparación local; todavía no hay URL pública verificada.** Los resultados actuales están en [Fase 4](fase-4.md) y el acta remota en [verificación pública](verificacion-publica.md). Los comandos parten de la raíz del repositorio, salvo indicación contraria.
 
 ## Destino propuesto y coste

@@ -1,6 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
 from urllib.parse import urlsplit
+import os
 
 import environ
 from django.core.exceptions import ImproperlyConfigured
@@ -8,16 +9,23 @@ from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = BASE_DIR.parent
 env = environ.Env()
-environ.Env.read_env(ROOT_DIR / ".env")
+ON_VERCEL = os.environ.get("VERCEL") == "1"
+# En Vercel sólo se usan las variables del proyecto, nunca un .env local.
+if not ON_VERCEL:
+    # Mismo destino que neon env pull: .env si existe; en otro caso .env.local.
+    local_env = ROOT_DIR / ".env"
+    environ.Env.read_env(local_env if local_env.is_file() else ROOT_DIR / ".env.local")
 
 DEBUG = env.bool("DJANGO_DEBUG", default=False)
+if ON_VERCEL and DEBUG:
+    raise ImproperlyConfigured("Vercel requiere DJANGO_DEBUG=False, también en Preview.")
 SECRET_KEY = env("DJANGO_SECRET_KEY")
-if len(SECRET_KEY) < 50 or len(set(SECRET_KEY)) < 5:
+if len(SECRET_KEY) < 50 or len(set(SECRET_KEY)) < 5 or SECRET_KEY.startswith("django-insecure-"):
     raise ImproperlyConfigured("Genera DJANGO_SECRET_KEY con get_random_secret_key().")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"] if DEBUG else [])
 CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=[])
 render_hostname = env("RENDER_EXTERNAL_HOSTNAME", default="")
-if not DEBUG and render_hostname:
+if not DEBUG and render_hostname and not ON_VERCEL:
     ALLOWED_HOSTS.append(render_hostname)
     CSRF_TRUSTED_ORIGINS.append(f"https://{render_hostname}")
 if not DEBUG:
@@ -46,9 +54,12 @@ MIDDLEWARE = [
 ]
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
+# El build copia React dentro de la raíz de la función. No depende de ../frontend
+# en ejecución ni publica el HTML del dashboard fuera de su vista autenticada.
+frontend_dist = BASE_DIR / "frontend_dist" if ON_VERCEL else ROOT_DIR / "frontend" / "dist"
 TEMPLATES = [{
     "BACKEND": "django.template.backends.django.DjangoTemplates",
-    "DIRS": [BASE_DIR / "templates", ROOT_DIR / "frontend" / "dist"],
+    "DIRS": [BASE_DIR / "templates", frontend_dist],
     "APP_DIRS": True,
     "OPTIONS": {"context_processors": [
         "django.template.context_processors.request",
@@ -69,6 +80,8 @@ if not DEBUG:
 DATABASES["default"]["CONN_MAX_AGE"] = 0
 if DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql":
     DATABASES["default"].setdefault("OPTIONS", {}).update({"connect_timeout": 5})
+    # PgBouncer de Neon trabaja en modo transacción; un cursor no debe sobrevivirla.
+    DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
 
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesStandaloneBackend",
@@ -106,11 +119,11 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-frontend_dist = ROOT_DIR / "frontend" / "dist"
-STATICFILES_DIRS = [("react", frontend_dist)] if frontend_dist.exists() else []
+STATICFILES_DIRS = [("react/assets", frontend_dist / "assets")] if (frontend_dist / "assets").exists() else []
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage" if ON_VERCEL
+        else "whitenoise.storage.CompressedStaticFilesStorage"},
 }
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],
@@ -128,7 +141,7 @@ CSRF_COOKIE_SECURE = not DEBUG
 SECURE_SSL_REDIRECT = not DEBUG
 # El probe interno debe ejecutar SQL: Render también acepta 301 como saludable.
 # Este endpoint sólo devuelve ok/unavailable, sin sesión ni datos de dominio.
-SECURE_REDIRECT_EXEMPT = [r"^healthz/$"]
+SECURE_REDIRECT_EXEMPT = [] if ON_VERCEL else [r"^healthz/$"]
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
@@ -136,7 +149,9 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
 X_FRAME_OPTIONS = "DENY"
 WHITENOISE_IMMUTABLE_FILE_TEST = r"^/static/react/assets/.+-[A-Za-z0-9_-]{8,}\.(css|js)$"
-if env.bool("DJANGO_TRUST_PROXY", default=False):
+# Vercel termina TLS y comunica el protocolo mediante X-Forwarded-Proto.
+# Host sigue validándose contra ALLOWED_HOSTS; no confiar en X-Forwarded-Host.
+if ON_VERCEL or env.bool("DJANGO_TRUST_PROXY", default=False):
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 SAP_DEMO_MODE = env.bool("SAP_DEMO_MODE", default=False)
