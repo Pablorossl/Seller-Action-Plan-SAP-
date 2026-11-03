@@ -9,7 +9,8 @@
     "build": "npm --prefix frontend run build",
     "start": ".venv/bin/python backend/manage.py runserver 127.0.0.1:8000",
     "test": "npm --prefix frontend test",
-    "db:migrate": ".venv/bin/python scripts/neon_manage.py migrate"
+    "db:migrate": ".venv/bin/python scripts/neon_manage.py migrate",
+    "verify:neon": ".venv/bin/python scripts/verify_neon_e2e.py"
   },
   "dependencies": {
     "@neon/config": "^1.9.5",

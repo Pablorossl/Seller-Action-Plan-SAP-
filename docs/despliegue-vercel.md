@@ -2,7 +2,7 @@
 
 Revisado el **29/10/2026** con documentación oficial. Objetivo: demo académica personal, no comercial y de poco tráfico, **0 € mientras se mantengan estos planes y sus cuotas**. No se ha contratado, publicado ni hecho push. La validación local no acredita un despliegue público.
 
-Seguimiento posterior: [configuración Neon y comprobaciones reales de sólo lectura](neon-setup.md). Hay URLs locales con conectividad TLS comprobada, pero su proyecto/rama no está confirmado y siguen pendientes autenticación CLI, migraciones y aceptación funcional.
+**Actualización del 03/11/2026:** se reutiliza Neon `empty-feather-02803695`, rama `production` (`br-divine-sky-b9hvdrte`), ya configurada y probada. La revisión actual de solo lectura confirma identidad, pooling, TLS, 33 migraciones registradas y cero usuarios/datos de negocio. No repetir migraciones ni cargar datos como parte de esta revisión. La rama es predeterminada y no tiene caducidad. Ver [Neon](neon-setup.md) y [preparación de publicación](preparacion-publicacion-vercel-2026-11-03.md).
 
 **Dominio:** el titular confirmó en Settings → Domains que `sap-bice.vercel.app` está asignado a Production. La consulta HTTPS del 29/10/2026 devuelve `404`, `server: Vercel`, `x-vercel-error: NOT_FOUND`: la asignación está confirmada por el titular, pero SAP todavía no está accesible. Si se cambia el dominio, sustituirlo en las variables y los comandos de esta guía.
 
@@ -42,22 +42,13 @@ La inclusión de archivos externos está documentada en [Monorepos FAQ](https://
 
 No conectar/aplicar `render.yaml`. No ejecutar `scripts/release.sh` como Build Command. No usar Gunicorn como comando de arranque de Vercel: lo gestiona el runtime WSGI nativo.
 
-## 3. Crear Neon Free y obtener las conexiones
+## 3. Reutilizar el proyecto Neon configurado
 
-1. Abrir [Neon Console](https://console.neon.tech) y crear una cuenta **Free**, sin tarjeta ni cambio a Launch/Scale. Hacerlo directamente en Neon evita añadir una integración que pueda copiar credenciales a Preview.
-2. Crear un proyecto, por ejemplo `sap-tfg`, en **AWS Europe (Frankfurt), eu-central-1**. Elegir PostgreSQL **16** si está disponible (la CI del repositorio lo utiliza). Mantener un tamaño pequeño, por ejemplo 0,25 CU, y la suspensión automática de Free.
-3. Usar la rama de producción del proyecto y su base, por ejemplo `neondb`. Anotar privadamente proyecto, rama, base y rol. No hace falta Neon Auth: SAP conserva la autenticación Django.
-4. Pulsar **Connect**, seleccionar esa rama/base/rol y activar **Connection pooling**. Copiar la URL completa, con `-pooler` en el hostname y sus parámetros TLS. Será `DATABASE_URL` **sólo de Production** en Vercel.
-5. En la misma ventana desactivar pooling y copiar la URL **directa**. Usarla únicamente desde Ubuntu para migraciones, administración y copias. No crear una segunda base para migrar: ambas URLs deben señalar la misma rama/base/rol.
-
-Ejemplos **ficticios, no utilizables**:
-
-```text
-# Vercel: pooled
-postgresql://USUARIO:CLAVE@ep-EJEMPLO-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
-# Ubuntu: directa
-postgresql://USUARIO:CLAVE@ep-EJEMPLO.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
-```
+1. Seleccionar el proyecto existente `empty-feather-02803695`, organización `org-rough-thunder-87253091`, rama `production`. No crear otro proyecto ni ejecutar `neon deploy` durante una revisión.
+2. La base inspeccionada usa **PostgreSQL 18**; la CI actual usa PostgreSQL 16. Registrar ambas versiones y no presentar la CI como una prueba del servidor 18. Para exportar/restaurar, preparar clientes PostgreSQL 18 compatibles; el cliente 14 instalado en este equipo no sirve para exportar un servidor 18.
+3. La pareja local canónica ya está en `.env`: `DATABASE_URL` pooled y `DATABASE_URL_UNPOOLED` directa. Se comparó la conexión pooled, sin imprimirla, con la que devuelve el CLI autenticado para el proyecto/rama explícitos.
+4. Tras autorizar la configuración externa, transferir privadamente la URL pooled a `DATABASE_URL` **solo de Production** en Vercel. Verificar el destino por metadatos; no pegar valores en Git, el chat ni logs. La directa queda fuera del runtime Vercel.
+5. Mantener `neon.ts` y el login Django. La rama predeterminada no recibe el TTL de siete días que la configuración reserva a ramas nuevas no predeterminadas. No se contratan otros servicios.
 
 Copiar los valores de Neon evita errores al codificar caracteres especiales de la contraseña. No quitar `sslmode` ni `channel_binding` si Neon los proporciona. Django exige TLS en producción, usa `CONN_MAX_AGE=0`, timeout de conexión de 5 s y desactiva cursores del servidor para PgBouncer en modo transacción. Una conexión se cierra al finalizar la petición; no se añade un segundo pool local. [Django con Neon](https://neon.com/docs/guides/django), [conexiones serverless](https://neon.com/docs/guides/serverless-connection-pooling).
 
@@ -128,7 +119,7 @@ npm --prefix frontend run build
 
 Si no tienes nvm, seguir su [instalación oficial](https://github.com/nvm-sh/nvm#installing-and-updating) y abrir otra terminal antes de estos comandos. No instalar Node 20 antiguo desde `apt` para este Vite.
 
-Para **desarrollo local**, mantener `.env` según `.env.example`, con `DJANGO_DEBUG=True` y `DATABASE_URL=`. `python scripts/configure_env.py` crea ese archivo sólo si no existe. No sobrescribirlo con credenciales de producción.
+El `.env` actual apunta a Neon `production` para las verificaciones autorizadas. Para desarrollar sin tocar esa base, usar otro entorno local explícito (por ejemplo SQLite mediante una variable de proceso vacía); no sobrescribir el archivo actual ni ejecutar semillas/pruebas de escritura contra Production por defecto. `python scripts/configure_env.py` crea `.env` solo si no existe.
 
 Para **administrar Neon**, usar una subshell: al terminar con `exit`, desaparecen las variables productivas y se recupera el entorno local. No usar `set -x` ni pegar secretos en comandos que queden en el historial.
 
@@ -150,10 +141,10 @@ read -rsp 'URL directa de Neon (migraciones): ' DATABASE_URL; echo
 export DATABASE_URL
 
 python backend/manage.py check --deploy --fail-level WARNING
-python backend/manage.py migrate --plan
-# Revisar el proyecto/base elegidos en Neon antes de aplicar:
-python backend/manage.py migrate --noinput
-python backend/manage.py migrate --check
+# Consulta del estado; no aplica migraciones:
+python backend/manage.py showmigrations --plan
+# Este destino ya registra las 33 migraciones. No repetir migrate.
+# Solo después de autorizar el alta ficticia y confirmar de nuevo la base:
 python backend/manage.py create_demo_agent --username evaluador
 ```
 
@@ -179,8 +170,8 @@ Las actualizaciones siguen el mismo procedimiento de migraciones **una vez por r
 
 Estos pasos los realizará el titular **cuando autorice la publicación**. Este trabajo no hace push ni despliega.
 
-1. Revisar el diff y guardar/publicar el código autorizado. Un push a una rama conectada puede disparar Vercel automáticamente: no hacerlo antes de configurar variables y migrar la base.
-2. Guardar todos los ajustes anteriores. En Deployments, elegir el commit actualizado y **Redeploy → Production**; para la primera comprobación desactivar “Use existing Build Cache”. No redesplegar un commit antiguo esperando que incluya cambios locales.
+1. Revisar el diff y guardar/publicar el código autorizado. Corregir la integración Git al repo ID `1430152684`, como detalla la revisión actual. Un push a una rama conectada puede disparar Vercel automáticamente: coordinarlo con la aprobación de CI y la configuración de variables. El esquema actual ya está aplicado; no repetir migraciones por rutina.
+2. Guardar los ajustes autorizados. Crear un deployment Production desde el SHA final exacto: si todavía no existe un deployment de ese SHA, publicarlo mediante la integración Git configurada; si existe, revisar su SHA antes de usar Redeploy. Un Redeploy conserva la fuente del deployment elegido y no incorpora cambios locales ni el nuevo HEAD por sí solo. Para la primera comprobación desactivar “Use existing Build Cache”.
 3. Revisar el log: Python 3.12, instalación de requirements, `npm ci`, `vite build`, comprobación Django y `collectstatic`. Debe terminar sin migraciones, semillas ni errores de variables. Comprobar `sap-bice.vercel.app` como dominio de Production.
 4. Abrir `https://sap-bice.vercel.app/accounts/login/` y entrar con el agente. El destino debe ser `/dashboard/`; revisar CSS/JS, vendedores, planes y `/api/workspace/` con la sesión. Sin sesión, dashboard redirige al login y la API devuelve 403. Un agente sin asignaciones no debe ver registros ajenos (404 al pedir su detalle).
 5. Comprobar `/healthz/` → `200 {"status":"ok"}`, HTTP → HTTPS, ausencia de bucles y cookies seguras. Logout es POST y requiere CSRF. Un POST sin token o desde un origen ajeno debe devolver 403. Un host ajeno debe ser rechazado por Vercel o Django, sin servir SAP.
@@ -225,7 +216,7 @@ Valores consultados el 29/10/2026, sujetos a cambios del proveedor. Confirmar **
 
 Vercel puede pausar funciones al exceder cuotas, normalmente hasta que pasen 30 días. Neon suspende cómputo al agotar CU-h o transferencia hasta el siguiente periodo; al superar espacio fallan operaciones que aumentan almacenamiento. La cuota no equivale a disponibilidad garantizada. Mantener ambos planes gratuitos evita contratar consumo adicional; una pausa puede impedir la defensa. [Vercel Hobby](https://vercel.com/docs/plans/hobby), [Neon Pricing](https://neon.com/pricing), [límites y consecuencias de Neon Free](https://neon.com/docs/introduction/plans).
 
-No hacen falta dominio comprado, Redis, almacenamiento de archivos, IP dedicada, failover, monitor de pago, cron ni funciones beta. No activar un monitor que consulte SQL cada minuto: impediría que Neon duerma y consumiría la cuota. Preparar también una demo local y capturas para contingencias de red o disponibilidad. Las copias deben ir a almacenamiento privado fuera del disco efímero de Vercel; usar `pg_dump` con la conexión directa y cliente compatible, siguiendo el apartado de copias del procedimiento histórico, sin contratar Render ni copiar sus ajustes de TLS.
+No hacen falta dominio comprado, Redis, almacenamiento de archivos, IP dedicada, failover, monitor de pago, cron ni funciones beta. No activar un monitor que consulte SQL cada minuto: impediría que Neon duerma y consumiría la cuota. Preparar también una demo local y capturas para contingencias de red o disponibilidad. Las copias deben ir a almacenamiento privado fuera del disco efímero de Vercel. Para esta base PostgreSQL 18, preparar `pg_dump`/`pg_restore` 18, exportar por conexión directa y restaurar únicamente en una base aislada autorizada. Comparar migraciones, conteos e IDs de control antes de eliminar el entorno de restauración. No ejecutar estos pasos durante una revisión de solo lectura.
 
 ## 9. Validación local y estado pendiente
 
@@ -250,4 +241,4 @@ python3 scripts/verify_phase3.py --pg-bin /usr/lib/postgresql/14/bin \
 
 Este script crea una base temporal, usa TLS local, migra, verifica permisos y flujo de navegador, reinicios y restauración; no toca Neon ni los datos del usuario. Con `--vercel-settings`, el recorrido de producción usa `VERCEL=1` y los assets empaquetados. La suite de tests conserva su configuración de pruebas habitual. El PostgreSQL 14 local no sustituye a comprobar Neon y su pool. Resultados de esta adaptación: [verificacion-vercel.md](verificacion-vercel.md).
 
-Quedan pendientes de cuenta/credenciales y autorización: crear Neon Free, guardar variables Production, migrar y crear el evaluador en Neon, publicar el commit, desplegar y completar el recorrido público con persistencia tras redespliegue. No guardar credenciales en el informe.
+Neon y las 33 migraciones están preparados. La revisión del 03/11/2026 ya inspeccionó Vercel y confirmó Hobby activo; encontró una integración Git con otro repo ID y un alias sobre un build sin salida Django. Quedan pendientes: corregir esa integración y guardar las variables Production tras autorización, crear las cuentas/datos ficticios autorizados, versionar los cambios posteriores a `160fc4c`, aprobar la CI de ese nuevo SHA, publicar ese SHA y completar el recorrido público, persistencia tras redespliegue y restauración aislada. No guardar credenciales en el informe. La aprobación de CI de `160fc4c` no cubre archivos locales posteriores.
