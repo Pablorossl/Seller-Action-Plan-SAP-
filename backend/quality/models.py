@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 
 from sellers.models import Seller
 from quality.rules import MQC_MINIMUM_ORDERS, validate_value
@@ -95,8 +96,18 @@ class QualityMetric(models.Model):
             models.UniqueConstraint(fields=["seller", "policy", "channel", "period_start", "period_end"], name="unique_metric_observation"),
         ]
 
+    @property
+    def is_future(self):
+        today = timezone.localdate()
+        return any(value and value > today for value in (self.period_start, self.period_end))
+
     def clean(self):
         super().clean()
+        errors = {field: "La fecha de una observación no puede estar en el futuro (Europe/Madrid)."
+                  for field in ("period_start", "period_end")
+                  if getattr(self, field) and getattr(self, field) > timezone.localdate()}
+        if errors:
+            raise ValidationError(errors)
         if not self.policy_id or self.value is None:
             return
         try:

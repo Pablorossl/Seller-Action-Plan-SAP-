@@ -4,6 +4,8 @@ Aplicación web para documentar y seguir planes de mejora de vendedores de marke
 
 **Estado: Fase 4 preparada localmente; entrega oficial pendiente de URL pública, vídeo y confirmación académica.** Consulta el [informe actual](docs/fase-4.md), la [memoria PDF](docs/memoria-pfm.pdf) y la [matriz de cumplimiento](docs/trazabilidad-requisitos.md).
 
+Incremento local del 03/11/2026: rectificación de revisiones con historial, protección frente a observaciones futuras y vencimientos conservados al cierre. Consulta la [trazabilidad actualizada](docs/trazabilidad-requisitos.md#vigencia-del-candidato-local--03112026) y el [diagnóstico de publicación](docs/diagnostico-publicacion-2026-11-03.md). Publicación, aceptación pública y vídeo siguen pendientes.
+
 Dashboard operativo, vendedores con búsqueda y ficha individual, planes con varios indicadores, acciones, revisiones y cierre desde React integrado con Django. Los informes de [Fase 1](docs/fase-1.md), [Fase 2](docs/fase-2.md) y [Fase 3](docs/fase-3.md) conservan las decisiones y evidencias históricas. La [guía Vercel Hobby + Neon Free](docs/despliegue-vercel.md) prepara la publicación académica sin coste dentro de sus cuotas; todavía no existe un despliegue público verificado.
 
 Proyecto académico independiente: no es una aplicación oficial de PcComponentes ni de Mirakl. SAP no suspende tiendas, no bloquea pagos ni tramita reaperturas. Se utilizan exclusivamente datos ficticios y reproducibles.

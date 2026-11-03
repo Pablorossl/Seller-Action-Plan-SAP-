@@ -55,3 +55,13 @@ Estados: **Cumplido y verificado**; **Implementado, pendiente de validación**; 
 | Reflexión y valor aportado | 10% | Contexto, beneficios esperados, límites y decisiones | Sin estudio de impacto profesional |
 
 Nota mínima: **7/10**. No se deduce una calificación del número de tests. **Fase 4 no finalizada y proyecto todavía no listo para entrega oficial.**
+
+## Vigencia del candidato local — 03/11/2026
+
+La guía original se volvió a leer mediante Google Drive (modificación 08/10/2026). Sus requisitos no exigen rectificaciones, una política concreta de fechas ni un formato de instantánea: F01–F03 son decisiones funcionales de SAP que refuerzan el flujo verificable, los casos de uso con errores y la integridad de datos. SAP sigue siendo una herramienta académica independiente para Account Managers/Marketplace Support Agents, sin integración oficial con Mirakl o PcComponentes.
+
+Las cifras de 77 pruebas de las filas anteriores identifican evidencia histórica. Para este incremento, la suite completa ejecutada en PostgreSQL temporal consta de 112 pruebas correctas sin omisiones; después se ampliaron límites de cierre y se verificó su módulo (27 pruebas, incluidas 25 importadas). Véanse [F01](rectificacion-revisiones-2026-11-03.md), [concurrencia y F02](concurrencia-y-observaciones-futuras-2026-11-03.md) y [F03](cierre-historico-f03-2026-11-03.md). Los recuentos incluyen pruebas heredadas/importadas y no equivalen a casos de uso independientes.
+
+El autor confirmó actividades previas y autorización docente según la [auditoría del 02/11](auditoria-integral-2026-11-02.md); no se ha inspeccionado su expediente. Esto actualiza la ausencia de confirmación registrada en las filas históricas, sin convertirlo en verificación documental.
+
+Este candidato es local: siguen pendientes publicación del SHA definitivo y su CI, identidad del destino Neon, despliegue funcional estable, aceptación pública, persistencia/recuperación remotas, actualización final de memoria/PDF y evidencias, vídeo accesible de hasta cinco minutos y preparación/defensa personal. El [diagnóstico de publicación](diagnostico-publicacion-2026-11-03.md) concreta pasos y accesos. No se declara completada la entrega académica.

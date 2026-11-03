@@ -149,3 +149,56 @@ class QualityTests(TestCase):
     def test_demo_is_blocked_in_production(self):
         with self.assertRaises(CommandError):
             call_command("seed_demo", owner="owner")
+
+    def test_future_dates_today_and_madrid_midnight(self):
+        from datetime import datetime, timezone as dt_timezone
+        from unittest.mock import patch
+        # 23:30 UTC del día 2 ya es día 3 en Madrid.
+        with patch("django.utils.timezone.now", return_value=datetime(2026, 11, 2, 23, 30, tzinfo=dt_timezone.utc)):
+            metric = self.metric("nps", "65")
+            metric.period_start = metric.period_end = date(2026, 11, 3)
+            metric.save()
+            for field in ("period_start", "period_end"):
+                setattr(metric, field, date(2026, 11, 4))
+                with self.assertRaises(ValidationError) as error:
+                    metric.save()
+                self.assertIn(field, error.exception.message_dict)
+                setattr(metric, field, date(2026, 11, 3))
+
+    def test_legacy_future_is_preserved_but_not_current_and_api_is_read_only(self):
+        from unittest.mock import patch
+        from rest_framework.test import APIClient
+        from quality.views import latest_metrics
+        call_command("configure_plan_agent", username=self.user.username, stdout=StringIO())
+        past = self.metric("incidents", "6")
+        past.save()
+        future = self.metric("incidents", "3")
+        future.channel = "other"
+        future.save()
+        # Simula datos heredados sin pasar por save(), sin borrarlos después.
+        QualityMetric.objects.filter(pk=future.pk).update(channel="test-es", period_start=date(2027, 1, 1), period_end=date(2027, 1, 31))
+        with patch("django.utils.timezone.localdate", return_value=date(2026, 11, 3)):
+            self.assertEqual(list(latest_metrics([self.seller]).values_list("pk", flat=True)), [past.pk])
+            future.refresh_from_db()
+            self.assertEqual(classify(future), "not_evaluable")
+            client = APIClient(); client.force_authenticate(self.user)
+            history = client.get(f"/api/metrics/{future.pk}/").json()
+            self.assertTrue(history["is_future"])
+            self.assertEqual(client.post("/api/metrics/", history, format="json").status_code, 405)
+            self.assertEqual(client.patch(f"/api/metrics/{future.pk}/", {"period_end": "2028-01-31"}, format="json").status_code, 405)
+            self.assertEqual(client.get("/api/overview/").json()["counts"]["sellers_with_deviations"], 1)
+            data = dict(title="Diagnóstico futuro", problem="Problema", root_cause="Causa", evidence="Evidencia", objective="Mejorar", responsible=self.user.pk)
+            data.update(seller=self.seller.pk, period_start="2027-01-01", period_end="2027-01-31", due_date="2027-02-01", metrics=[{"baseline": future.pk, "target_value": "2"}])
+            self.assertEqual(client.post("/api/plans/", data, format="json").status_code, 400)
+            self.assertTrue(QualityMetric.objects.filter(pk=future.pk, period_end=date(2027, 1, 31)).exists())
+
+    def test_admin_form_reports_future_dates_on_each_field(self):
+        from django.forms import modelform_factory
+        from unittest.mock import patch
+        form_class = modelform_factory(QualityMetric, fields="__all__")
+        with patch("django.utils.timezone.localdate", return_value=date(2026, 11, 3)):
+            form = form_class(data=dict(seller=self.seller.pk, policy=self.policies["nps"].pk,
+                channel="admin", period_start="2026-11-04", period_end="2026-11-05", order_count=30, value=65))
+            self.assertFalse(form.is_valid())
+            for field in ("period_start", "period_end"):
+                self.assertIn("futuro", str(form.errors[field]))

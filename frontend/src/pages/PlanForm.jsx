@@ -342,6 +342,7 @@ export function PlanForm({ user, params, existing, onSaved }) {
                                       {date(m.period_end)}
                                     </small>
                                     <Badge status={m.classification} />
+                                    {m.is_future && <small>Observación futura · excluida del resumen actual</small>}
                                   </div>
                                   <strong>{value(m.value, m.unit)}</strong>
                                   <button

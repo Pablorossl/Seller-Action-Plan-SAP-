@@ -1,0 +1,19 @@
+{
+  "postgres_destination": {
+    "host": "127.0.0.1",
+    "port": 55441,
+    "data_directory": "/tmp/sap-f02-pg",
+    "test_database": "test_postgres"
+  },
+  "full_suite": {
+    "tests": 110,
+    "skipped": 0,
+    "result": "OK"
+  },
+  "browser": "Chromium: Admin rechaza inicio y fin futuros",
+  "artifacts": {
+    "/tmp/sap-f02-concurrency-ok.log": "015549ed7f8c41da45c91b27b6a400b4f15d6864d15824e46d08375710bd63d8",
+    "/tmp/sap-f02-postgres-all.log": "df71f97188f736bf09432f879e75b05e504932cfc9361aa5aadb5e1e42c03fc2",
+    "/tmp/sap-f02-admin.png": "1fb4ed238b3027c17e10e825348327492006a5abe8fa38d9cf2d03c609031d3a"
+  }
+}

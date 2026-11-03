@@ -4,6 +4,7 @@ from quality.services import classify
 
 
 class QualityMetricSerializer(serializers.ModelSerializer):
+    is_future = serializers.BooleanField(read_only=True)
     code = serializers.CharField(source="policy.code", read_only=True)
     label = serializers.CharField(source="policy.get_code_display", read_only=True)
     unit = serializers.CharField(source="policy.unit", read_only=True)
@@ -14,7 +15,7 @@ class QualityMetricSerializer(serializers.ModelSerializer):
     class Meta:
         model = QualityMetric
         fields = ["id", "seller", "seller_name", "code", "label", "unit", "policy_version",
-                  "channel", "period_start", "period_end", "order_count", "value", "classification"]
+                  "channel", "period_start", "period_end", "order_count", "value", "classification", "is_future"]
 
     def get_classification(self, obj):
         return classify(obj)

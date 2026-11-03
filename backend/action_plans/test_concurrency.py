@@ -160,3 +160,30 @@ class ConcurrencyTests(TransactionTestCase):
         client = Client()
         client.force_login(self.agent)
         self.assertEqual(client.patch(f"/api/plans/{plan.pk}/", {"title": "No autorizado"}, content_type="application/json").status_code, 404)
+
+    def test_api_competing_rectifications_and_originals(self):
+        for rectify in (False, True):
+            with self.subTest(rectify=rectify):
+                plan, metric, _ = self.ready_plan()
+                original = self.review(metric) if rectify else None
+                clients = [Client(), Client()]
+                for client in clients:
+                    client.force_login(self.agent)
+                def write(client, value):
+                    data = dict(plan_metric=metric.pk, reviewed_on="2026-09-01", period_start="2026-08-01",
+                                period_end="2026-08-31", value=value, order_count=100, comments="Medición", assessment="on_track")
+                    if original:
+                        data.update(supersedes=original.pk, correction_reason="Corregir errata")
+                    return lambda: client.post(f"/api/plans/{plan.pk}/reviews/", data, content_type="application/json")
+                responses = self.concurrent(write(clients[0], "2"), write(clients[1], "5"))
+                self.assertCountEqual([r.status_code for r in responses], [201, 400])
+                loser = next(r for r in responses if r.status_code == 400)
+                self.assertTrue(loser.json())
+                if original:
+                    self.assertIn("rectificada", str(loser.json()))
+                    original.refresh_from_db()
+                    self.assertEqual(str(original.value), "4.50")
+                self.assertEqual(metric.reviews.count(), 2 if rectify else 1)
+                effective = metric.reviews.filter(rectification__isnull=True)
+                self.assertEqual(effective.count(), 1)
+                self.assertEqual(evaluate_plan(plan)["metrics"][0]["review_id"], effective.get().pk)

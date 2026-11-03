@@ -4,6 +4,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.db.models import Count, Q
 from django.db.models.deletion import ProtectedError
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from rest_framework.response import Response
@@ -41,7 +42,7 @@ class SellerViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         seller = self.get_object()
         data = self.get_serializer(seller).data
-        recorded = set(seller.metrics.values_list("policy__code", flat=True).distinct())
+        recorded = set(seller.metrics.filter(period_start__lte=timezone.localdate(), period_end__lte=timezone.localdate()).values_list("policy__code", flat=True).distinct())
         data["missing_indicators"] = [{"code": code, "label": label} for code, label in MetricCode.choices if code not in recorded]
         return Response(data)
 

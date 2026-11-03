@@ -49,7 +49,7 @@ class PlanReviewSerializer(ValidatedModelSerializer):
 
     class Meta:
         model = PlanReview
-        fields = ["id", "plan_metric", "reviewed_on", "recorded_by_name", "recorded_at", "value", "period_start", "period_end", "order_count", "comments", "assessment", "next_steps"]
+        fields = ["id", "supersedes", "correction_reason", "plan_metric", "reviewed_on", "recorded_by_name", "recorded_at", "value", "period_start", "period_end", "order_count", "comments", "assessment", "next_steps"]
         read_only_fields = ["id", "recorded_at"]
         # full_clean() aplica unicidad una vez resueltas las relaciones autorizadas.
         validators = []
@@ -57,6 +57,8 @@ class PlanReviewSerializer(ValidatedModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["plan_metric"].queryset = PlanMetric.objects.filter(plan=self.context["plan"])
+        self.fields["supersedes"].validators = []  # El modelo informa cómo recuperar una rectificación concurrente.
+        self.fields["supersedes"].queryset = PlanReview.objects.filter(plan_metric__plan=self.context["plan"])
 
 
 class MetricInputSerializer(serializers.Serializer):

@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from django.db.models import OuterRef, Subquery
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from quality.models import QualityMetric
@@ -9,7 +10,8 @@ from sellers.models import visible_sellers
 
 def latest_metrics(sellers):
     latest = QualityMetric.objects.filter(seller_id=OuterRef("seller_id"),
-        policy__code=OuterRef("policy__code"), channel=OuterRef("channel")).order_by("-period_end", "-id")
+        policy__code=OuterRef("policy__code"), channel=OuterRef("channel"),
+        period_start__lte=timezone.localdate(), period_end__lte=timezone.localdate()).order_by("-period_end", "-id")
     return QualityMetric.objects.filter(seller__in=sellers, pk=Subquery(latest.values("pk")[:1]))
 
 

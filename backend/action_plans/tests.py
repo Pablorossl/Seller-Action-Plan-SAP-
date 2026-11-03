@@ -458,3 +458,45 @@ class PlanTests(TestCase):
     def test_demo_is_blocked_in_production(self):
         with self.assertRaises(CommandError):
             call_command("seed_plan_demo", owner=self.agent.username)
+
+class RectificationTests(PlanTests):
+    def test_missing_measurement_and_typo_preserve_chain(self):
+        plan, metric, _ = self.ready_plan()
+        original = self.review(metric, value=None, order_count=None, assessment="no_data")
+        measured = self.review(metric, supersedes=original, correction_reason="Llegan los datos", value=2)
+        corrected = self.review(metric, supersedes=measured, correction_reason="Errata: era 4", value=4)
+        self.assertEqual(evaluate_metric(metric)["review_id"], corrected.pk)
+        self.assertFalse(evaluate_metric(metric)["achieved"])
+        original.refresh_from_db()
+        self.assertIsNone(original.value)
+        self.assertEqual(metric.reviews.count(), 3)
+        self.assertEqual(corrected.recorded_by, self.agent)
+        self.assertIsNotNone(corrected.recorded_at)
+        for changes in ({}, {"supersedes": original, "correction_reason": "Reintento"},
+                        {"supersedes": corrected},
+                        {"supersedes": corrected, "correction_reason": "Otro periodo", "period_start": date(2026, 8, 2)}):
+            with self.subTest(changes=changes), self.assertRaises(ValidationError):
+                self.review(metric, **changes)
+        close_plan(plan_id=plan.pk, actor=self.agent, notes="Cierre")
+        with self.assertRaises(ValidationError):
+            self.review(metric, supersedes=corrected, correction_reason="Después del cierre")
+
+    def test_api_rectification_permissions_and_history(self):
+        from rest_framework.test import APIClient
+        plan, metric, _ = self.ready_plan()
+        original = self.review(metric)
+        data = dict(plan_metric=metric.pk, supersedes=original.pk, correction_reason="Errata", value="3.00",
+                    period_start="2026-08-01", period_end="2026-08-31", reviewed_on="2026-09-01",
+                    order_count=100, comments="Corregido", assessment="on_track")
+        client = APIClient()
+        url = f"/api/plans/{plan.pk}/reviews/"
+        client.force_authenticate(self.other)
+        self.assertEqual(client.post(url, data, format="json").status_code, 404)
+        client.force_authenticate(self.outsider)
+        self.assertEqual(client.post(url, data, format="json").status_code, 403)
+        client.force_authenticate(self.agent)
+        response = client.post(url, data, format="json")
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(len(response.data["reviews"]), 2)
+        self.assertEqual(response.data["evaluation"]["result"], "achieved")
+        self.assertEqual(client.post(url, data, format="json").status_code, 400)

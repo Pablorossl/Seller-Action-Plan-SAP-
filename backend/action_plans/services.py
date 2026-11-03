@@ -1,4 +1,6 @@
 """Evaluación sin efectos externos y cierre autorizado de planes."""
+from copy import deepcopy
+
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.db.models import Prefetch
@@ -23,7 +25,9 @@ def plans_with_history(queryset):
 def evaluate_metric(metric: PlanMetric) -> dict:
     baseline = metric.baseline
     reviews = list(metric.reviews.all())  # Orden de medición, también con prefetch.
-    latest = reviews[0] if reviews else None
+    superseded = {review.supersedes_id for review in reviews}
+    effective = [review for review in reviews if review.pk not in superseded]
+    latest = effective[0] if effective else None
     initial_classification = classify(baseline)
     classification = classify(latest) if latest else "not_evaluable"
     evaluable = latest is not None and classification not in ("not_evaluable", "insufficient_orders")
@@ -42,6 +46,14 @@ def evaluate_metric(metric: PlanMetric) -> dict:
 
 
 def evaluate_plan(plan: ImprovementPlan) -> dict:
+    if plan.status in FINAL_STATUSES:
+        snapshot = deepcopy(plan.closure_evaluation)
+        # No reconstruir información que no se registró en cierres antiguos.
+        snapshot.setdefault("result", "not_evaluable")
+        snapshot.setdefault("metrics", [])
+        snapshot["actions"] = {status: snapshot.get("actions", {}).get(status) for status in ActionStatus.values}
+        snapshot.setdefault("overdue_actions", None)
+        return snapshot
     metrics = [evaluate_metric(metric) for metric in plan.metrics.all()]
     actions = list(plan.actions.all())
     if not metrics or any(metric["achieved"] is None for metric in metrics):
@@ -52,6 +64,7 @@ def evaluate_plan(plan: ImprovementPlan) -> dict:
         "result": result, "metrics": metrics,
         "actions": {status: sum(action.status == status for action in actions) for status in ActionStatus.values},
         "overdue_actions": sum(action.is_overdue for action in actions),
+        "action_overdue": {str(action.pk): action.is_overdue for action in actions},
     }
 
 

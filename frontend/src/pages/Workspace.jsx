@@ -378,6 +378,7 @@ export function Dashboard({ user }) {
                           </td>
                           <td>
                             <Badge status={m.classification} />
+                                    {m.is_future && <small>Observación futura · excluida del resumen actual</small>}
                           </td>
                         </tr>
                       ))}
@@ -683,6 +684,7 @@ export function SellerDetail({ id, user }) {
                               <td>{m.order_count ?? "Sin datos"}</td>
                               <td>
                                 <Badge status={m.classification} />
+                                    {m.is_future && <small>Observación futura · excluida del resumen actual</small>}
                               </td>
                               {canCreate && (
                                 <td>

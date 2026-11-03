@@ -174,6 +174,8 @@ class PlanMetric(PlanChild):
         baseline = QualityMetric.objects.select_related("policy").filter(pk=self.baseline_id).first()
         if not plan or not baseline:
             return  # full_clean informa las FK inexistentes.
+        if baseline.is_future:
+            raise ValidationError({"baseline": "Una observación futura no puede utilizarse como diagnóstico del plan."})
         if baseline.seller_id != plan.seller_id:
             raise ValidationError({"baseline": "El indicador debe pertenecer al vendedor del plan."})
         if (baseline.period_start, baseline.period_end) != (plan.period_start, plan.period_end):
@@ -235,6 +237,8 @@ class PlanAction(PlanChild):
 
     @property
     def is_overdue(self):
+        if self.plan.status in FINAL_STATUSES:
+            return self.plan.closure_evaluation.get("action_overdue", {}).get(str(self.pk))
         return self.status in (ActionStatus.PENDING, ActionStatus.IN_PROGRESS) and self.due_date < timezone.localdate()
 
     def __str__(self):
@@ -260,6 +264,8 @@ class PlanAction(PlanChild):
 
 
 class PlanReview(PlanChild):
+    supersedes = models.OneToOneField("self", null=True, blank=True, on_delete=models.PROTECT, related_name="rectification")
+    correction_reason = models.TextField(blank=True)
     plan_metric = models.ForeignKey(PlanMetric, on_delete=models.PROTECT, related_name="reviews", verbose_name="objetivo evaluado")
     reviewed_on = models.DateField("fecha de revisión", default=timezone.localdate)
     recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="plan_reviews", editable=False)
@@ -282,7 +288,7 @@ class PlanReview(PlanChild):
             models.CheckConstraint(condition=models.Q(period_end__gte=models.F("period_start")), name="review_valid_period"),
             models.CheckConstraint(condition=models.Q(reviewed_on__gte=models.F("period_end")), name="review_after_measurement"),
             models.CheckConstraint(condition=models.Q(assessment__in=["on_track", "at_risk", "no_progress", "no_data"]), name="review_valid_assessment"),
-            models.UniqueConstraint(fields=["plan_metric", "period_start", "period_end"], name="unique_review_measurement"),
+            models.UniqueConstraint(fields=["plan_metric", "period_start", "period_end"], condition=models.Q(supersedes__isnull=True), name="unique_review_measurement"),
         ]
 
     @property
@@ -305,6 +311,17 @@ class PlanReview(PlanChild):
         self.validate_open_plan()
         if self.pk:
             raise ValidationError("Las revisiones son históricas: registra una nueva revisión.")
+        if self.supersedes_id:
+            previous = type(self).objects.filter(pk=self.supersedes_id).first()
+            if previous:
+                if (previous.plan_metric_id, previous.period_start, previous.period_end) != (self.plan_metric_id, self.period_start, self.period_end):
+                    raise ValidationError({"supersedes": "La rectificación debe conservar objetivo y periodo."})
+                if type(self).objects.filter(supersedes=previous).exists():
+                    raise ValidationError({"supersedes": "Esta revisión ya está rectificada. Recarga el historial."})
+            if not self.correction_reason.strip():
+                raise ValidationError({"correction_reason": "Documenta el motivo de la rectificación."})
+        elif self.correction_reason:
+            raise ValidationError({"supersedes": "Indica la revisión que rectificas."})
         metric = PlanMetric.objects.select_related("baseline__policy").filter(pk=self.plan_metric_id).first()
         if metric:
             try:

@@ -1,0 +1,631 @@
+{
+  "date": "2026-11-02",
+  "local_sha": "54ac2cd7614fb2b3bbf8328ff97a93a5e1f87d5f",
+  "report": "docs/auditoria-integral-2026-11-02.md",
+  "scope": "Read-only external audit; local temporary fictitious databases; no application changes, commit, push or deployment",
+  "academic_source": {
+    "url": "https://docs.google.com/document/d/1KhmvNgC4g9WI8suPOBjGFcUCQeA8rVPkoVS53fYLOkQ/edit",
+    "read_entirely_this_session": true,
+    "provider_modified_time": "2026-10-08T17:36:18.872Z"
+  },
+  "user_confirmations": {
+    "prework_frontend_backend_approved": true,
+    "teacher_authorization": true,
+    "basis": "User statement in this audit; no administrative record inspected",
+    "video_exists": false,
+    "alternative_app_url_exists": false
+  },
+  "repository": {
+    "html_url": "https://github.com/Pablorossl/Seller-Action-Plan-SAP-",
+    "private": false,
+    "default_branch": "main",
+    "pushed_at": "2026-10-28T19:25:06Z",
+    "visibility": "public"
+  },
+  "remote_commit": {
+    "remote_sha": "57d296f1a9cee56c925acec485b3d1bae5953cef",
+    "date": "2026-10-28T19:24:59Z",
+    "message": "docs(fase-4): preparar memoria técnica, evidencias y defensa del TFM"
+  },
+  "ci_runs": [
+    {
+      "sha": "57d296f1a9cee56c925acec485b3d1bae5953cef",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/40754122404"
+    },
+    {
+      "sha": "49ee19800e35ae72602e6cc7f76e1e6c374ae0d6",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/40747706230"
+    },
+    {
+      "sha": "0ec5a253f03a38920f782e0a882893cf70b69e25",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/40562240904"
+    },
+    {
+      "sha": "39a6d076dff5f2477d2e2df283a9ed271e93969b",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/39982045621"
+    },
+    {
+      "sha": "f84497438b3b358f5a1115607a22d82c73de4664",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/39848590343"
+    }
+  ],
+  "public_routes": {
+    "/": {
+      "status": 404,
+      "vercel_error": "NOT_FOUND"
+    },
+    "/accounts/login/": {
+      "status": 404,
+      "vercel_error": "NOT_FOUND"
+    },
+    "/healthz/": {
+      "status": 404,
+      "vercel_error": "NOT_FOUND"
+    },
+    "/api/plans/": {
+      "status": 404,
+      "vercel_error": "NOT_FOUND"
+    }
+  },
+  "sqlite_tests": {
+    "discovered": 79,
+    "passed": 71,
+    "skipped": 8,
+    "skip_reason": "Concurrency requires PostgreSQL"
+  },
+  "javascript_tests": {
+    "passed": 7,
+    "node": "22.19.0",
+    "direct_execution": "node frontend/src/services/api.test.js"
+  },
+  "postgres_tests": {
+    "passed": 79,
+    "concurrency_included": 8
+  },
+  "qa_default": {
+    "environment": "local isolated; not a public deployment",
+    "vercel_settings": false,
+    "database": "postgres (PostgreSQL) 14.24 (Ubuntu 14.24-0ubuntu0.22.04.1)",
+    "browser": {
+      "url": "https://127.0.0.1:50917",
+      "environment": "local TLS de prueba",
+      "plan_id": 5,
+      "flow": "6 → 4.5 → 3",
+      "status": "closed",
+      "result": "achieved",
+      "reload": true,
+      "logout": true,
+      "csrf": true,
+      "other_agent_denied": true,
+      "mobile_width": 390,
+      "page_errors": [],
+      "critical_responses": []
+    },
+    "postgres_restart_persistence": true,
+    "gunicorn_restart_persistence": true,
+    "release_repeat_persistence": true,
+    "backup_restored_separately": true,
+    "benchmark": {
+      "/api/overview/": {
+        "queries": 25,
+        "median_ms": 114.44,
+        "max_ms": 189.74
+      },
+      "/api/sellers/": {
+        "queries": 6,
+        "median_ms": 16.24,
+        "max_ms": 23.08
+      },
+      "/api/plans/": {
+        "queries": 10,
+        "median_ms": 38.06,
+        "max_ms": 46.86
+      },
+      "/api/plans/?status=open": {
+        "queries": 10,
+        "median_ms": 19.71,
+        "max_ms": 32.57
+      },
+      "sellers": 125,
+      "observations": 857
+    }
+  },
+  "qa_vercel_settings": {
+    "environment": "local isolated; not a public deployment",
+    "vercel_settings": true,
+    "database": "postgres (PostgreSQL) 14.24 (Ubuntu 14.24-0ubuntu0.22.04.1)",
+    "browser": {
+      "url": "https://127.0.0.1:57213",
+      "environment": "local TLS de prueba",
+      "plan_id": 5,
+      "flow": "6 → 4.5 → 3",
+      "status": "closed",
+      "result": "achieved",
+      "reload": true,
+      "logout": true,
+      "csrf": true,
+      "other_agent_denied": true,
+      "mobile_width": 390,
+      "page_errors": [],
+      "critical_responses": []
+    },
+    "postgres_restart_persistence": true,
+    "gunicorn_restart_persistence": true,
+    "release_repeat_persistence": true,
+    "backup_restored_separately": true,
+    "benchmark": {
+      "/api/overview/": {
+        "queries": 25,
+        "median_ms": 109.67,
+        "max_ms": 161.76
+      },
+      "/api/sellers/": {
+        "queries": 6,
+        "median_ms": 15.48,
+        "max_ms": 18.11
+      },
+      "/api/plans/": {
+        "queries": 10,
+        "median_ms": 27.72,
+        "max_ms": 30.94
+      },
+      "/api/plans/?status=open": {
+        "queries": 10,
+        "median_ms": 26.88,
+        "max_ms": 28.17
+      },
+      "sellers": 125,
+      "observations": 857
+    }
+  },
+  "static_production_check": "passed",
+  "migration_drift": "none",
+  "pip_check": "passed",
+  "build": "passed",
+  "isolated_vercel_package": {
+    "passed": true,
+    "static_files": 157,
+    "remote_builder_verified": false
+  },
+  "fresh_install": {
+    "source": "git archive HEAD",
+    "temporary_directory": "/tmp/sap-audit-clean-fe4z1dyr",
+    "new_python_venv": true,
+    "requirements_install": "passed after network approval",
+    "pip_check": "passed",
+    "django_check": "passed",
+    "migrations": "passed",
+    "root_npm_ci": "passed",
+    "frontend_npm_ci_build": "passed after sandbox EPERM retry"
+  },
+  "dependency_audits": {
+    "python": {
+      "dependencies": 12,
+      "vulnerabilities": 0,
+      "skipped": 0
+    },
+    "npm_root": {
+      "known_vulnerabilities": 0
+    },
+    "npm_frontend": {
+      "known_vulnerabilities": 0
+    }
+  },
+  "secrets_review": {
+    "scope": "All reachable historical blobs; matches against local secrets and narrow private-key/GitHub/AWS patterns, not a comprehensive secret scanner",
+    "historical_blobs_checked": 229,
+    "local_secret_matches": [],
+    "token_pattern_candidates": [],
+    "environment_structure_only": {
+      "DATABASE_URL_present": true,
+      "DATABASE_URL_is_pooled": false,
+      "DATABASE_URL_UNPOOLED_present": false,
+      "legacy_DATABASE_URL_POOLED_present": true,
+      "debug_enabled": true
+    }
+  },
+  "neon_read_only": {
+    "direct_select_1": true,
+    "direct_tls": true,
+    "pooled_select_1": true,
+    "pooled_tls": true,
+    "sap_tables_found": [],
+    "searched_tables": [
+      "django_migrations",
+      "auth_user",
+      "django_session",
+      "sellers_seller",
+      "action_plans_improvementplan"
+    ],
+    "project_branch_verified": false,
+    "script_exit_code": 1,
+    "local_http": "unreachable, no resident local server",
+    "migration_plan": "rejected before connection; DATABASE_URL_UNPOOLED missing"
+  },
+  "domain_probes": {
+    "missing_data_then_actual_same_period": {
+      "initial_status": 201,
+      "replacement_status": 400,
+      "error": {
+        "__all__": [
+          "Revisión del plan con este Objetivo evaluado, Inicio de medición y Fin de medición ya existe."
+        ]
+      },
+      "stored_reviews": 1
+    },
+    "separate_global_and_plan_observations": {
+      "global_value": "6.00",
+      "global_period_end": "2026-07-31",
+      "global_classification": "suspension_threshold",
+      "plan_latest_value": "3.00",
+      "plan_result": "achieved"
+    },
+    "closed_overdue_counts": {
+      "at_closure": 0,
+      "computed_later": 1,
+      "stored_snapshot_later": 0
+    },
+    "future_observation": {
+      "accepted": true,
+      "selected_as_latest": true,
+      "period_end": "2027-01-31",
+      "classification": "ok"
+    }
+  },
+  "pdf": {
+    "pages": 30,
+    "sha256": "33c765b53ceb1f062d13cf9ca5e37f83362fe9c95ce1a655b010ab7c1f73f7ad",
+    "images": 13,
+    "links": 26,
+    "mentions": {
+      "Render": 7,
+      "Vercel": 0,
+      "Neon": 0,
+      "49ee198": 3,
+      "77": 5,
+      "57d296f": 0
+    },
+    "empty_pages": []
+  },
+  "historical_hashes_checked": 38,
+  "historical_hash_mismatches": 0,
+  "artifacts": {
+    "artifacts/audit-2026-11-02/checks.json": {
+      "sha256": "2f7b943e81ccb21c7b614c4f6620a3fc36ae4ec07171d5af086e09177560cfec"
+    },
+    "artifacts/audit-2026-11-02/clean-django-check.log": {
+      "sha256": "277e5892d612a44858868df5039f03019a53cabe5d0d69b2ff107458da4e5b1c"
+    },
+    "artifacts/audit-2026-11-02/clean-migrate.log": {
+      "sha256": "a9dcd6cfe759aacc4f362fd678b08a531434467fbbc48537f5acea35d8d432dc"
+    },
+    "artifacts/audit-2026-11-02/clean-migrations-check.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/clean-npm-frontend.log": {
+      "sha256": "67616b1f538328c07d10e1e1befba30a6e582b970c04261b8f5848b69e7400f0"
+    },
+    "artifacts/audit-2026-11-02/clean-npm-root.log": {
+      "sha256": "38b4fdec98f3057c58760ab73c99acc097c9915ed64256d31bb330fe60efb3a8"
+    },
+    "artifacts/audit-2026-11-02/clean-pip-check.log": {
+      "sha256": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09"
+    },
+    "artifacts/audit-2026-11-02/clean-python-install-network.log": {
+      "sha256": "09aae6f8664bbb77980f18d99ce68c1c802ea8ca2d90721774e521acc9a71067"
+    },
+    "artifacts/audit-2026-11-02/clean-python-install.log": {
+      "sha256": "5c0530c7c6e55b3ade33e88be9ee1da2bdff92eae606ddd3f7c02ef2303de07d"
+    },
+    "artifacts/audit-2026-11-02/clean-venv.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/django-check.log": {
+      "sha256": "277e5892d612a44858868df5039f03019a53cabe5d0d69b2ff107458da4e5b1c"
+    },
+    "artifacts/audit-2026-11-02/domain-probes.json": {
+      "sha256": "80353a2c4cc9ceeba4d7a2b94708ab79ed13e12c7bf9b8cb2657e1b02375a2a7"
+    },
+    "artifacts/audit-2026-11-02/model-drift.log": {
+      "sha256": "a2bfa7b376c38062f77ce2b1e703876aaa04662f96355cdf5dc9d0d075302b05"
+    },
+    "artifacts/audit-2026-11-02/pdf-page-1.png": {
+      "sha256": "fc6d23ee7a6a46b39e017108c273ab092ba0d9d9c290cdf70108bedd745ed8ec"
+    },
+    "artifacts/audit-2026-11-02/pdf-page-15.png": {
+      "sha256": "4cf2a48da421e0c50812d19d644cc564f2b9142610923a9b09eb84b5e2768ef4"
+    },
+    "artifacts/audit-2026-11-02/pdf-page-30.png": {
+      "sha256": "564939cb4532be895024379a823341f5224ceedab73a1a02ca1992c296551c02"
+    },
+    "artifacts/audit-2026-11-02/pdf-page-8.png": {
+      "sha256": "ee77bc2b7a8f75318b5597eaeb6439634310413893a0e20724a04a363a0305e2"
+    },
+    "artifacts/audit-2026-11-02/pdf.json": {
+      "sha256": "5816895079aa781cecef2ffe916c467a8239f8b5e39d5fe9ae86fa4f0bc662fc"
+    },
+    "artifacts/audit-2026-11-02/pip-check.log": {
+      "sha256": "7660f995dfd2b0b978a24ba774edb4e7a4df05b878a36723861dfab33c325975"
+    },
+    "artifacts/audit-2026-11-02/postgres/backup.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/accion.png": {
+      "sha256": "4b3bdf404b3708e842c26eb54c1e8b43d9bd551a1cdb274b57acae4047312dd6"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/browser-result.json": {
+      "sha256": "a988d8f67bd8dfc3d2a56b5821d085883f870d0b3dd4857155d13734b4c06c6f"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/cierre.png": {
+      "sha256": "61423e8346553991981b6580aa5706b0b993e2691936b9d7d32a9cec74e73bef"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/confirmacion-cierre.png": {
+      "sha256": "d6b962f1d3bcb266711f5494729776327cbc7163846525ff0df5b858b382e026"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/dashboard.png": {
+      "sha256": "fbce2150558a345c3555cd9a84511c3cc9212d08c1827a9d66585f9a2cdf2b45"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/detalle-plan.png": {
+      "sha256": "57a6a0f953a3614df7717b786a85b3548aa4baa7b4b611164145cb8965139cf6"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/evaluacion.png": {
+      "sha256": "e24f0a785237634eb8b0278da7788ba5a5c5b102dd538cb06ef873641c783400"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/formulario-plan.png": {
+      "sha256": "1c0fc3cfe062b79b651f6cc901be007a7fce5fe47584b3e0238ddbe144a9790d"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/historial-revisiones.png": {
+      "sha256": "5122129e3c184de426dbb35874414a6ff9fcf39fb202b98fd5e65eedab6ed54a"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/indicadores.png": {
+      "sha256": "663978de390007f1d56ed7824a8c599c6e40925d9d0dcd7bc86dec05f3874c59"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/login.png": {
+      "sha256": "4bceb3dce7751c3b127b3642ee2710d35c529ef5a09fa621951dbeefc934192c"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/movil.png": {
+      "sha256": "5ab46ae1935114fff03b7fce2aaffd13924f67ecb8f28deb33cbf34f74ee7a82"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/planes.png": {
+      "sha256": "9e4646d774a1434aaa664a74147832ad74d2a0d782e86d33462eb848093c8ffc"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/react-django.json": {
+      "sha256": "e55acf8455e65df57b879c6818104109b4cb7ee5ed990a82862150929fd3a070"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/resultado-cierre.png": {
+      "sha256": "bf6d40281ccd00c5e24c9998fd529e83860d82e21672ce5ac4dae33fb5cd22ed"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/revisiones.png": {
+      "sha256": "102a3eb315e2cc69a198718a2b90238a9a8d7611aef91b60bad5ad0c634fcdb0"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/vendedor.png": {
+      "sha256": "91239d47b3a740d634c8516a29b9de8cfa429554e2e7ecf3c37808ee98889e24"
+    },
+    "artifacts/audit-2026-11-02/postgres/browser/vendedores.png": {
+      "sha256": "2bdbb1debd196dafcb85798241cb9ede9b435005a785e458c061a365117015aa"
+    },
+    "artifacts/audit-2026-11-02/postgres/collectstatic-repeat.log": {
+      "sha256": "dfa89b0d83621e6b71e9b5630f6a583b7bf9c8cab6c55da69eda3590ab9fafe0"
+    },
+    "artifacts/audit-2026-11-02/postgres/collectstatic.log": {
+      "sha256": "b9c9f905b55cf351659c7d8699f6cfa1303f1bf637f7b88f44f48d75d6674fa2"
+    },
+    "artifacts/audit-2026-11-02/postgres/database-create.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/postgres/gunicorn.log": {
+      "sha256": "b086ccee90435d2ed691b2b2937c7a9ca1f4456ed1fd34abacecab1e0cf05c8d"
+    },
+    "artifacts/audit-2026-11-02/postgres/local-certificate.log": {
+      "sha256": "6631ef29c88b96ad5016d2c035e217b7e89a138bfe1951dc2f1c36abae76710b"
+    },
+    "artifacts/audit-2026-11-02/postgres/migrations-check.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/postgres/migrations-fresh.log": {
+      "sha256": "a9dcd6cfe759aacc4f362fd678b08a531434467fbbc48537f5acea35d8d432dc"
+    },
+    "artifacts/audit-2026-11-02/postgres/model-drift.log": {
+      "sha256": "a2bfa7b376c38062f77ce2b1e703876aaa04662f96355cdf5dc9d0d075302b05"
+    },
+    "artifacts/audit-2026-11-02/postgres/postgres-init.log": {
+      "sha256": "2062f8d3f63ef2238726eefa03e512d9d834195f2bc5aafcd123a8bcc026c5ec"
+    },
+    "artifacts/audit-2026-11-02/postgres/postgres-restart.log": {
+      "sha256": "66afd0411ccc09366e99fdd99b85f21899c8d2d064f5835126859618802153ad"
+    },
+    "artifacts/audit-2026-11-02/postgres/postgres-server.log": {
+      "sha256": "7046329c007803c94a5d661500ca73fff58c565a14fa41a59b614ab298e8691b"
+    },
+    "artifacts/audit-2026-11-02/postgres/postgres-start.log": {
+      "sha256": "66afd0411ccc09366e99fdd99b85f21899c8d2d064f5835126859618802153ad"
+    },
+    "artifacts/audit-2026-11-02/postgres/postgres-stop.log": {
+      "sha256": "ca19178a35ab4153b75b494963b66ce8243e1b94c173107c87b44d09db23652d"
+    },
+    "artifacts/audit-2026-11-02/postgres/postgres-tests.log": {
+      "sha256": "a6d6661c97764f60bb3caee20385ce75dfbe12a2765564a54c93af9e4ef85f6b"
+    },
+    "artifacts/audit-2026-11-02/postgres/production-check.log": {
+      "sha256": "277e5892d612a44858868df5039f03019a53cabe5d0d69b2ff107458da4e5b1c"
+    },
+    "artifacts/audit-2026-11-02/postgres/release-repeat.log": {
+      "sha256": "9559f2f04fe91824a9955c8008dfc3ed83ac4c39a88f2f586c2b598598128ea9"
+    },
+    "artifacts/audit-2026-11-02/postgres/restore-database-create.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/postgres/restore.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/postgres/restored-migrations.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/postgres/result.json": {
+      "sha256": "ae3e8c7f0f4467cdce852f563554623df92c306479de5e7989d9b8d4e68ce136"
+    },
+    "artifacts/audit-2026-11-02/postgres/seed-evaluation.log": {
+      "sha256": "219f42b8018eb7e1e46b85611ff63f3a035a3cf5d360fd2ac0955b7b48979a49"
+    },
+    "artifacts/audit-2026-11-02/postgres/seed-repeat.log": {
+      "sha256": "0917d1be547f0309346a648465223647a5e497c1621e6dd477b5a16556f47734"
+    },
+    "artifacts/audit-2026-11-02/probe_domain.py": {
+      "sha256": "6843014f9cef66ea2c79b41b227987b1205042db5ea794e720941df341e96c4d"
+    },
+    "artifacts/audit-2026-11-02/production-check.log": {
+      "sha256": "2ca39746bc2a29aeb3f02ef7f37bc64d85a30ae7dc28567f2f42aeff819feeb6"
+    },
+    "artifacts/audit-2026-11-02/python-audit.json": {
+      "sha256": "22790f4de142bcfee0d64ed0ac5ac81f61ff5a48f625142ed2d727265275954f"
+    },
+    "artifacts/audit-2026-11-02/remote.json": {
+      "sha256": "87742d2c0138e416a9fa0c7d3788c4021ec52ca0e241436f64ba694de1be43c4"
+    },
+    "artifacts/audit-2026-11-02/secret-scan.json": {
+      "sha256": "006296eec8219d4be65ca1c0b3841e3ccacd533cf892ba002532d734f0a5abd6"
+    },
+    "artifacts/audit-2026-11-02/sqlite-migrate.log": {
+      "sha256": "a9dcd6cfe759aacc4f362fd678b08a531434467fbbc48537f5acea35d8d432dc"
+    },
+    "artifacts/audit-2026-11-02/sqlite-migration-check.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/sqlite-tests.log": {
+      "sha256": "5c5c33e4c4d48035df8220c9c2226d91f16df5ec514ea1e10659f867e09007f7"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/backup.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/accion.png": {
+      "sha256": "03b2aad5f0b198c305bc7aa6901226c737b4a23f7d5618719df8c2dee19e92b4"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/browser-result.json": {
+      "sha256": "b7411597297d4b0574b519929db08264412d3b5d47e962a7a1c39c7c00ba2984"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/cierre.png": {
+      "sha256": "ee74965a061abf8c978bcbc981b92a6af0e1d45780442edaf1d43f532ad54639"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/confirmacion-cierre.png": {
+      "sha256": "478cc1d36c431e3947706de07681dc832d3ed1b5b08a7ba2e0749b0e0684cf32"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/dashboard.png": {
+      "sha256": "98ad9fe57c49044b714bc58bc1886952ff04c9605733842370db49c12e0cc92a"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/detalle-plan.png": {
+      "sha256": "970789d125d5d5ccc6bcf3f04cb09836da11e2d2ad47a57bc3b033c606fa3536"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/evaluacion.png": {
+      "sha256": "ba8c50155c7163becd6298859fee5d696908ab38914627ecb2490eb20cf40fca"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/formulario-plan.png": {
+      "sha256": "c6c8aafd6d7ca0cfca01949a1b44f7fb9a035bcf808231c51986809b182748b9"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/historial-revisiones.png": {
+      "sha256": "894911d876b71ec539c364e6234a71a745f12504bdd3eb3e689cbfbc75263205"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/indicadores.png": {
+      "sha256": "512e9c0db8f3f115137d5b9b5ab5f443f5cdb89a8a1365f2fe38b269c4cdc974"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/login.png": {
+      "sha256": "4bceb3dce7751c3b127b3642ee2710d35c529ef5a09fa621951dbeefc934192c"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/movil.png": {
+      "sha256": "44deabf351fc47da01eea5331dd59829f2b598afee095c1e467f6ba3d3a37edc"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/planes.png": {
+      "sha256": "e1a886cae197b94fcc424407af8eba24e80eb6a763881fcd78dba593fdeecdc3"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/react-django.json": {
+      "sha256": "e55acf8455e65df57b879c6818104109b4cb7ee5ed990a82862150929fd3a070"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/resultado-cierre.png": {
+      "sha256": "a9e1938e49ce33ef1f88f3dfeef472f38baa23d9a78456529f547ba54b193dae"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/revisiones.png": {
+      "sha256": "d326bc8d1e5ca8d447b9217a979c19d31fdf51bced3ec98796fbf6b0a2fa9d75"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/vendedor.png": {
+      "sha256": "7ba049cdd05cea441d60019c826ed3dda5fb7884e9263c624c93901ec3951ed9"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/browser/vendedores.png": {
+      "sha256": "ae3975c9885505df39bacbb94bec68841bdee64d3a2ce2a2abae126a278667bb"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/collectstatic-repeat.log": {
+      "sha256": "bc423063df410c84c4086fb50e6b3efe7566fcc928707190cee33f8ab13fbc2f"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/collectstatic.log": {
+      "sha256": "bc423063df410c84c4086fb50e6b3efe7566fcc928707190cee33f8ab13fbc2f"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/database-create.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/gunicorn.log": {
+      "sha256": "38b0e4dc15a0caf9171b4e1703427a3ca87022a26bc2d52b0288655b658c3431"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/local-certificate.log": {
+      "sha256": "3f4c1679a1f33e590dfcb2826eff143a49d60e103a1f031b9a2379d671e2eb09"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/migrations-check.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/migrations-fresh.log": {
+      "sha256": "a9dcd6cfe759aacc4f362fd678b08a531434467fbbc48537f5acea35d8d432dc"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/model-drift.log": {
+      "sha256": "a2bfa7b376c38062f77ce2b1e703876aaa04662f96355cdf5dc9d0d075302b05"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/postgres-init.log": {
+      "sha256": "eddc42b7dfb066573e00c0507d5eba79424aee6ab3bc62f426f00c96ea2a60cb"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/postgres-restart.log": {
+      "sha256": "66afd0411ccc09366e99fdd99b85f21899c8d2d064f5835126859618802153ad"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/postgres-server.log": {
+      "sha256": "2a702a702e56f1207cf7d4a88b237f68a4fa17ba944293706a8514017ec5b48c"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/postgres-start.log": {
+      "sha256": "66afd0411ccc09366e99fdd99b85f21899c8d2d064f5835126859618802153ad"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/postgres-stop.log": {
+      "sha256": "ca19178a35ab4153b75b494963b66ce8243e1b94c173107c87b44d09db23652d"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/postgres-tests.log": {
+      "sha256": "b9ae9d86f2107c52298b0f456b5e29ce0e6123dbf97793da580f9fb3dc95b5e4"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/production-check.log": {
+      "sha256": "277e5892d612a44858868df5039f03019a53cabe5d0d69b2ff107458da4e5b1c"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/release-repeat.log": {
+      "sha256": "9559f2f04fe91824a9955c8008dfc3ed83ac4c39a88f2f586c2b598598128ea9"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/restore-database-create.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/restore.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/restored-migrations.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/result.json": {
+      "sha256": "e0099f1f8c69a368ea21c8e7f4628f354287c8daf3196daaf028f8fe9dddde42"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/seed-evaluation.log": {
+      "sha256": "219f42b8018eb7e1e46b85611ff63f3a035a3cf5d360fd2ac0955b7b48979a49"
+    },
+    "artifacts/audit-2026-11-02/vercel-runtime/seed-repeat.log": {
+      "sha256": "0917d1be547f0309346a648465223647a5e497c1621e6dd477b5a16556f47734"
+    }
+  }
+}

@@ -314,7 +314,7 @@ function ActionForm({ plan, action, done, close }) {
   );
 }
 
-function ReviewForm({ plan, user, done, close }) {
+function ReviewForm({ plan, user, done, close, previous }) {
   const mutation = useMutation(done);
   const [form, setForm] = useState({
     plan_metric: plan.metrics[0]?.id || "",
@@ -326,6 +326,9 @@ function ReviewForm({ plan, user, done, close }) {
     comments: "",
     assessment: "on_track",
     next_steps: "",
+    ...(previous ? Object.fromEntries(["plan_metric", "value", "period_start", "period_end", "order_count", "comments", "assessment", "next_steps"].map(key => [key, previous[key] ?? ""])) : {}),
+    supersedes: previous?.id ?? null,
+    correction_reason: "",
   });
   const bind = (name) => ({
     name,
@@ -334,7 +337,7 @@ function ReviewForm({ plan, user, done, close }) {
     onChange: (e) => setForm((f) => ({ ...f, [name]: e.target.value })),
   });
   return (
-    <Modal title="Registrar revisión" close={close} busy={mutation.busy}>
+    <Modal title={previous ? "Rectificar revisión" : "Registrar revisión"} close={close} busy={mutation.busy}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -347,6 +350,7 @@ function ReviewForm({ plan, user, done, close }) {
         }}
       >
         <FormError error={mutation.error} />
+        {previous && <label>Motivo de rectificación<textarea required {...bind("correction_reason")} /></label>}
         <p className="info-note">
           La evaluación utiliza las reglas del indicador. Para MQC se necesita
           un periodo mensual y volumen suficiente de pedidos.
@@ -673,9 +677,9 @@ export function PlanDetail({ id, user, params }) {
                         </span>
                       </h2>
                       <p className="muted">
-                        {plan.evaluation.actions.completed} completadas ·{" "}
-                        {plan.evaluation.overdue_actions} vencidas
-                        {closed ? " en el histórico" : ""}
+                        {plan.evaluation.actions.completed ?? "No registrado"} completadas ·{" "}
+                        {plan.evaluation.overdue_actions ?? "No registrado"} vencidas
+                        {closed ? " al cierre" : ""}
                       </p>
                     </div>
                     {!closed && user.permissions.add_planaction && (
@@ -719,7 +723,7 @@ export function PlanDetail({ id, user, params }) {
                               <span
                                 className={a.is_overdue ? "text-danger" : ""}
                               >
-                                {a.is_overdue ? "Vencida · " : "Plazo · "}
+                                {a.is_overdue === null ? "Vencimiento al cierre no registrado · Plazo · " : a.is_overdue ? (closed ? "Vencida al cierre · " : "Vencida · ") : (closed ? "No vencida al cierre · Plazo · " : "Plazo · ")}
                                 {date(a.due_date)}
                               </span>
                             </div>
@@ -812,8 +816,11 @@ export function PlanDetail({ id, user, params }) {
                             )}
                             <small>
                               Revisión del {date(r.reviewed_on)} · Registrada
-                              por {r.recorded_by_name}
+                              por {r.recorded_by_name} · {new Date(r.recorded_at).toLocaleString("es-ES")}
                             </small>
+                            {r.supersedes && <p>Rectifica #{r.supersedes}: {r.correction_reason}</p>}
+                            <p>{plan.reviews.some(item => item.supersedes === r.id) ? "Sustituida" : "Medición efectiva"}</p>
+                            {!closed && user.permissions.add_planreview && !plan.reviews.some(item => item.supersedes === r.id) && <button onClick={() => setModal({ type: "review", previous: r })}>Rectificar revisión #{r.id}</button>}
                           </article>
                         );
                       })}
@@ -841,11 +848,9 @@ export function PlanDetail({ id, user, params }) {
                     </small>
                     <p>
                       Acciones al finalizar:{" "}
-                      {plan.closure_evaluation.actions?.completed ?? 0}{" "}
+                      {plan.evaluation.actions.completed ?? "No registrado"}{" "}
                       completadas ·{" "}
-                      {(plan.closure_evaluation.actions?.pending ?? 0) +
-                        (plan.closure_evaluation.actions?.in_progress ??
-                          0)}{" "}
+                      {plan.evaluation.actions.pending == null || plan.evaluation.actions.in_progress == null ? "No registrado" : plan.evaluation.actions.pending + plan.evaluation.actions.in_progress}{" "}
                       abiertas.
                     </p>
                   </section>
@@ -964,6 +969,7 @@ export function PlanDetail({ id, user, params }) {
             {modal?.type === "review" && (
               <ReviewForm
                 plan={plan}
+                previous={modal.previous}
                 user={user}
                 done={done}
                 close={() => setModal(null)}
