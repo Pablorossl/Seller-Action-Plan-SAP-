@@ -1,51 +1,53 @@
-# Guion del vídeo PFM — 4 minutos y 50 segundos
+# Vídeo académico SAP — guion de 4:20
 
-**Estado: guion preparado; grabación y enlace pendientes.** No existe un vídeo explicativo generado por esta fase. La guía oficial admite un máximo de cinco minutos. El objetivo es 4:50, dejando diez segundos de margen; comprobar la duración del archivo exportado, no sólo la del ensayo.
+**Preparado; vídeo no grabado ni enlace comprobado.** Objetivo: 260 segundos, con 40 segundos de margen respecto al máximo de cinco minutos. El tiempo real se debe medir con un ensayo; la tabla es un presupuesto, no la duración de un archivo existente.
 
-## Preparación
+Usar [SAP público](https://sap-bice.vercel.app), código desplegado `97b4bff55a07b8fd3c71b05740748db5bf63438b`. La evidencia documental `575c6c9` y esta revisión local son versiones posteriores de documentación. No redesplegar para grabar ni mostrar un localhost como sustituto de la URL exigida.
 
-Grabar la versión que se entregue, preferiblemente tras completar el [acta pública](verificacion-publica.md). Abrir SAP con un agente de evaluación sin Admin, datos exclusivamente ficticios y permisos de planes. Preparar el vendedor `SAP-DEMO-PLAN`, observación inicial de julio de 2026 al 6%, 100 pedidos y canal `ficticio-es`. Crear un **nuevo** plan durante la demo: la semilla contiene un ejemplo ya cerrado y no debe presentarse como una creación en directo.
+## Preparación antes de grabar
 
-Ensayar una vez el flujo completo. Tener preparados en un archivo local los textos breves del diagnóstico, acciones y cierre para pegarlos; no usar automatización que simule la grabación. Dejar las fechas de revisión en el día real y el plazo del plan treinta días después. Las mediciones de agosto y septiembre son históricas. Si el ensayo no cabe, recortar la narración y mostrar una segunda acción ya preparada en un plan de apoyo, explicando ese salto; no ocultar un cambio de plan como si fuera el mismo recorrido.
+- Entrar por canal privado con el agente de evaluación; ocultar el acceso mientras se introduce la contraseña. Cerrar paneles de proveedores, terminales con entornos, gestor de claves y cabeceras de cookies.
+- Preparar, mediante el flujo normal, un plan ficticio nuevo y abierto: observación inicial de incidencias al 6 %, meta 3 %, dos acciones y una revisión de agosto de 2026 al 4,5 %. Conservar los planes 5 y 6 de aceptación; no reabrirlos ni modificar sus evidencias.
+- Elegir fechas previstas válidas en el momento de grabar. Los meses de la muestra son históricos y ficticios; no narrarlos como actividad empresarial actual.
+- Dejar la acción correctiva pendiente y la preventiva pendiente, para completar una durante la demostración. Tener a mano textos breves para pegar en los formularios, sin contraseñas ni comandos con secretos.
+- Preparar una segunda pestaña con DevTools abierto en una respuesta JSON de API. Mostrar únicamente URL/ruta y Response; no Headers con cookies, CSRF o autorización.
+- Abrir el diagrama de arquitectura y la referencia al SHA como apoyo. Comprobar el servicio y hacer una prueba de diez segundos de audio. El ensayo puede revelar que hay que reducir narración; no superar el límite para conservar detalles secundarios.
 
-Preparar tres pestañas: SAP, diagrama de arquitectura y código `frontend/src/services/api.js` junto a `Workspace.jsx`. Abrir Network con filtro `api/` en otra ventana; ocultar Request Headers, cookies y tokens. Mostrar sólo URL relativa, estado y respuesta JSON ficticia. Desactivar notificaciones del escritorio. No mostrar consola de Render, variables de entorno ni credenciales.
+Decir expresamente que el plan se preparó para la demo. Las acciones que se muestren ejecutándose deben guardarse realmente en SAP. No editar una respuesta JSON para simular un resultado ni utilizar las capturas como sustituto de una demostración funcional.
 
-## Guion cronometrado
+## Secuencia y locución propuesta
 
-| Tiempo | Pantalla y acción | Texto orientativo |
+| Tiempo | Pantalla/acción | Explicación con palabras propias |
 | --- | --- | --- |
-| 0:00–0:35 · 35 s | Portada con nombre y dashboard | «Soy Pablo Rosales y presento Seller Action Plan. El proyecto nace de mi experiencia en soporte de marketplace. Detectar una desviación en un indicador no basta: necesitamos organizar causas, compromisos y revisiones. SAP centraliza ese seguimiento. Es un proyecto académico independiente que complementa Mirakl; no está conectado a su API y todos los datos de esta demo son ficticios.» |
-| 0:35–1:05 · 30 s | Diagrama de arquitectura; volver al dashboard | «Django gestiona modelos, autenticación, permisos y persistencia. React presenta el espacio operativo y consume la API mediante Fetch. PostgreSQL conserva los datos y permite comprobar transacciones y bloqueos. Django sirve la aplicación compilada con Gunicorn y WhiteNoise bajo un mismo origen. El login y el portal también utilizan plantillas Django.» |
-| 1:05–1:40 · 35 s | Mostrar contadores; buscar `SAP-DEMO-PLAN`; abrir vendedor e indicador | «El agente ve su cartera y sus prioridades. Desde el directorio busco un vendedor y consulto sus indicadores con canal y periodo. Aquí las incidencias son del seis por ciento en un mes histórico. El dato inicia el análisis, pero SAP no suspende tiendas ni modifica pagos. Voy a documentar un plan con objetivo del tres por ciento.» |
-| 1:40–2:10 · 30 s | Crear plan: pegar diagnóstico, meta 3, plazo; guardar borrador | «Registro problema, causa raíz y evidencia, fijo una meta medible y asigno responsable y plazo. El servidor valida que la observación pertenece a este vendedor y que el objetivo mejora el valor inicial. El borrador y sus objetivos se guardan juntos.» |
-| 2:10–2:45 · 35 s | Añadir correctiva y preventiva; activar; completar correctiva con evidencia | «Las acciones concretan el trabajo, quién lo realiza y cuándo. Activo el plan y completo la acción correctiva con su fecha y evidencia. Mantengo la preventiva pendiente para distinguir la ejecución de tareas del resultado medido.» |
-| 2:45–3:20 · 35 s | Registrar agosto 4,5 y septiembre 3, cada mes con 100 pedidos; mostrar comparación | «Las revisiones conservan autor, periodo y comentarios. Cuatro coma cinco mejora respecto al inicio, pero aún no cumple la meta. La revisión posterior del tres por ciento sí la alcanza. La evaluación la calcula Django; el comentario del agente no reemplaza el resultado.» |
-| 3:20–3:40 · 20 s | Cerrar con razones y confirmación; recargar | «Documento las razones y confirmo el cierre. La evaluación queda guardada como instantánea, junto al histórico. Al recargar persisten las dos revisiones y el resultado, incluida la acción preventiva que quedó pendiente.» |
-| 3:40–4:20 · 40 s | Network: recargar directorio, seleccionar GET `/api/sellers/`, Response; mostrar api.js y vista | «Esta petición demuestra la integración: React solicita vendedores a Django y recibe JSON con los registros permitidos para la sesión. En el código, Fetch utiliza el mismo origen y devuelve la respuesta que representa la vista. Para escribir también envía CSRF. Los datos que vemos proceden de la base, no de una lista fija dentro del componente.» |
-| 4:20–4:50 · 30 s | Resumen de pruebas y cierre sobre SAP | «SAP aplica permisos por vendedor, validación y transacciones. Se han aprobado 77 pruebas Django en PostgreSQL local, incluidas ocho de concurrencia, y el recorrido de navegador. Su valor esperado es mantener seguimiento y trazabilidad; no he medido ahorros empresariales. Como evolución estudiaría importación autorizada de indicadores. La prioridad actual es un flujo coherente que puedo explicar y comprobar.» |
+| 0:00–0:25 | Título y URL pública | «Soy Pablo Rosales. SAP aborda el seguimiento posterior a detectar un problema de calidad de un vendedor. Una métrica no explica por sí sola qué se acordó, quién debe actuar y por qué se cerró el caso. Todos los datos de esta demo son ficticios.» |
+| 0:25–0:45 | Dashboard | «El usuario objetivo es un Account Manager o Marketplace Support Agent. Este espacio reúne su cartera, prioridades y planes. Es un proyecto académico independiente, sin conexión con Mirakl ni datos corporativos.» |
+| 0:45–1:20 | Vendedores → buscar referencia → ficha | «React consulta a Django los vendedores permitidos para la sesión. En la ficha vemos un indicador inicial del seis por ciento, su periodo y el contexto del seguimiento. Un agente no recibe la cartera del otro.» |
+| 1:20–2:00 | Abrir el plan ficticio preparado | «He preparado este plan para centrar la demostración en el seguimiento. Conserva problema, causa y evidencia, con una meta del tres por ciento. El estado del plan describe el proceso; alcanzar la meta es una evaluación distinta.» |
+| 2:00–2:35 | Editar la correctiva y completarla con fecha/evidencia | «Esta acción concreta el compromiso, responsable y plazo. Registro evidencia y la completo; la preventiva queda pendiente. Completar una tarea no demuestra por sí solo que el indicador haya mejorado.» |
+| 2:35–3:15 | Mostrar agosto 4,5 %; añadir septiembre 3 %, 100 pedidos ficticios | «Cuatro coma cinco mejora respecto al seis inicial, pero no alcanza la meta. Añado una medición posterior del tres por ciento. Django calcula el resultado con periodo y datos evaluables, mientras React presenta la respuesta persistida.» |
+| 3:15–3:40 | Finalizar con razones y confirmación; recargar | «Documento el cierre y confirmo la operación. Se conservan evaluación, revisiones y acciones, incluida la preventiva pendiente. Una rectificación crearía una nueva revisión con motivo, en lugar de borrar la anterior.» |
+| 3:40–4:05 | Network, respuesta de /api/plans/ID/ y diagrama | «Django aporta modelos, plantillas, autenticación y reglas. React obtiene y muestra JSON del mismo origen y usa CSRF al escribir. PostgreSQL en Neon conserva los registros; Vercel ejecuta Django y sirve los estáticos.» |
+| 4:05–4:20 | Cierre sobre SAP y evidencia | «Se verificaron permisos, historial, persistencia tras redesplegar y restauración aislada. El valor esperado es mejorar la trazabilidad; no he medido ahorro empresarial. El código servido es 97b4bff y puedo explicar sus decisiones y límites.» |
 
-Total: **290 segundos**. De los dos minutos de demostración, reservar tiempo para cargar y comprobar cada respuesta; no narrar más rápido para compensar un flujo sin ensayar. Si el vídeo se graba antes de publicar, decir expresamente «entorno local»; ese vídeo no acredita el requisito de despliegue. Tras completar producción, ajustar únicamente las frases que cuenten con evidencia remota.
+Total previsto: **4 minutos y 20 segundos**. Si la latencia consume el margen, recortar la narración secundaria o editar pausas dejando claros los saltos, sin falsear acciones. No acelerar hasta volver ilegible la interfaz.
 
-## Textos breves para la demostración
+## Textos ficticios breves
 
-| Campo | Contenido ficticio |
+| Campo | Texto de apoyo |
 | --- | --- |
-| Título | Reducir incidencias de la tienda ficticia |
-| Problema | Incidencias del 6% en el periodo de julio de 2026. |
-| Causa | Embalaje insuficiente y falta de control previo. |
-| Evidencia | Revisión de una muestra de 100 pedidos ficticios. |
-| Objetivo | Alcanzar un máximo del 3% de incidencias. |
-| Correctiva | Revisar preparación y expedición de pedidos. |
-| Preventiva | Control previo de incidencias recurrentes. |
-| Responsable de acciones | Equipo ficticio de logística |
+| Plan | DEMO vídeo: reducir incidencias ficticias |
+| Problema | Incidencias del 6 % en una muestra ficticia de julio de 2026. |
+| Causa | Embalaje insuficiente y falta de revisión previa. |
+| Evidencia | 100 pedidos ficticios; sin información de clientes reales. |
+| Correctiva | Revisar preparación y expedición. |
 | Evidencia de ejecución | Protocolo aplicado a una muestra ficticia. |
-| Revisión | Mejora observada en la muestra ficticia del periodo. |
-| Cierre | Objetivo del 3% alcanzado; se conserva la acción preventiva pendiente. |
+| Revisión | Mejora observada en el periodo ficticio. |
+| Cierre | Objetivo del 3 % alcanzado; se conserva la preventiva pendiente. |
 
-## Grabación y entrega
+## Comprobación del archivo y del enlace — pendiente
 
-Utilizar OBS, Loom o una herramienta disponible de captura de pantalla y micrófono. Elegir 1920×1080 o resolución legible, comprobar audio con una toma de diez segundos y grabar una sesión real. Se puede editar pausas, manteniendo la secuencia y explicando los saltos. No utilizar capturas animadas como sustituto de la demostración real.
+Reproducir el vídeo completo, comprobar una duración máxima de 300 segundos, audio entendible, texto legible, uso real de React con backend y ausencia de credenciales. Confirmar que la introducción, demostración, tecnologías y límites son correctos. La locución es una ayuda de preparación: el autor debe adaptarla a lo que efectivamente haga y comprenda.
 
-Reproducir el archivo completo: duración ≤300 s, texto legible, audio comprensible, ejemplo React-Django visible y sin credenciales. Si se dispone de FFmpeg, `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 video-pfm.mp4` permite obtener la duración; el comando no afirma que exista ese archivo.
+Si se dispone de FFmpeg, `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 video-pfm.mp4` permite medir la duración. El comando no afirma que ese archivo exista.
 
-Subir sólo después de revisión y autorización del autor. Guardar enlace real, duración y fecha en el checklist de entrega. Probar el acceso con la misma configuración que tendrá el tribunal, desde sesión privada u otra cuenta autorizada. No se ha publicado ningún vídeo ni se han enviado materiales.
+Después, el autor debe alojarlo con permisos adecuados, guardar la URL real y probar el enlace como lo abrirá el tribunal, sin depender de la sesión del propietario. Esa comprobación de permisos no debe presentarse como la prueba de la aplicación desde una segunda red independiente. Registrar duración, fecha y resultado en checklist-entrega.md. **Grabación, subida y enlace siguen pendientes de intervención personal.**

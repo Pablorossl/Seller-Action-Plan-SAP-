@@ -1,0 +1,201 @@
+{
+  "review_date": "2026-11-03",
+  "deployed_code_sha": "97b4bff55a07b8fd3c71b05740748db5bf63438b",
+  "public_documentation_baseline": "575c6c942318885d6b7427ccedabc1eea7cc5887",
+  "current_academic_revision": "local_changes_not_pushed",
+  "pdf_pages": 24,
+  "pdf_format": "A4",
+  "hashes_sha256": {
+    "memoria-pfm.md": "0faea61cc6ae1f72f6344b5379031406e6bbb9fad9a83a20f96b52c30717b105",
+    "memoria-pfm.docx": "ab414a3cb7a4e62eec4c8ee447b3a965935fd30bba17920b3f33346a8e8adf9a",
+    "memoria-pfm.pdf": "58d8386b36a84ec4929aa59887b813d213406a95c43b524fb1fab6e98b4324ca"
+  },
+  "visual_review": {
+    "all_pages_inspected": true,
+    "pages": [
+      {
+        "page": 1,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 2,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 3,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 4,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 5,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 6,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 7,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 8,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 9,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 10,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 11,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 12,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 13,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 14,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 15,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 16,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 17,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 18,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 19,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 20,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 21,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 22,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 23,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      },
+      {
+        "page": 24,
+        "visual_review": "passed",
+        "body_within_margins": true,
+        "footer_number_verified": true
+      }
+    ],
+    "tables_headers_repeated": true,
+    "images_and_diagrams_reviewed": true,
+    "blank_pages": 0,
+    "clipped_text_or_tables_found": false,
+    "correction": "Full-length mobile image was too small; replaced by an actual public viewport capture. Only page 23 changed; reviewed again. Other 23 page rasters identical to reviewed export."
+  },
+  "links": {
+    "internal_valid": 20,
+    "invalid": 0,
+    "external_unique": 6,
+    "targets": [
+      "https://docs.google.com/document/d/1KhmvNgC4g9WI8suPOBjGFcUCQeA8rVPkoVS53fYLOkQ/edit",
+      "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/41722300443",
+      "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/blob/575c6c942318885d6b7427ccedabc1eea7cc5887/docs/verificacion-publica.md",
+      "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/tree/575c6c942318885d6b7427ccedabc1eea7cc5887",
+      "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/tree/97b4bff55a07b8fd3c71b05740748db5bf63438b",
+      "https://sap-bice.vercel.app/"
+    ],
+    "file_links": 0,
+    "scope": "Destinations and internal page targets checked; not a full click-through from a teacher account."
+  },
+  "docx": {
+    "zip_integrity": true,
+    "all_source_blocks_present": true,
+    "embedded_images": 9,
+    "external_links_match_pdf": true,
+    "visual_pagination_in_word_or_libreoffice": "not_tested; no compatible editor installed; PDF is the visually reviewed fixed-layout deliverable"
+  },
+  "secrets": {
+    "known_private_values_in_extracted_pdf_and_docx": 0,
+    "private_connections_or_keys": 0,
+    "scope": "Known local private values, DSNs and private-key patterns; not a universal secret detector."
+  },
+  "limits": [
+    "Second independent network pending.",
+    "Video has not been recorded or shared.",
+    "Personal academic submission and defense pending.",
+    "Current documentation has not been pushed or deployed."
+  ],
+  "passed": true
+}

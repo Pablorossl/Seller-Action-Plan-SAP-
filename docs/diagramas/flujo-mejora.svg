@@ -16,8 +16,8 @@
 <text x="766" y="173" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Activar el plan</text>
 <rect x="750" y="345" width="280" height="102" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
 <text x="766" y="375" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">4. Seguimiento</text>
-<text x="766" y="403" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Revisiones: 4,5% y 3%</text>
-<text x="766" y="428" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Periodos mensuales</text>
+<text x="766" y="403" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Revisiones y rectificaciones</text>
+<text x="766" y="428" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Periodo + autor + motivo</text>
 <rect x="390" y="345" width="300" height="102" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
 <text x="406" y="375" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">5. Evaluación</text>
 <text x="406" y="403" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">Valor inicial / meta / actual</text>
@@ -33,4 +33,5 @@
 <polyline points="390,395 330,395" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
 <text x="30" y="555" font-family="Arial,sans-serif" font-size="18" font-weight="400" fill="#173b35">Borrador → en progreso ⇄ en revisión → cerrado. Cancelación posible desde estados abiertos.</text>
 <text x="30" y="595" font-family="Arial,sans-serif" font-size="18" font-weight="400" fill="#173b35">Cerrar no exige éxito: puede conservar acciones pendientes o resultados no evaluables.</text>
-<text x="30" y="635" font-family="Arial,sans-serif" font-size="18" font-weight="400" fill="#173b35">La evaluación es interna e informativa. SAP no cambia el estado de tiendas ni pagos en Mirakl.</text></svg>
+<text x="30" y="635" font-family="Arial,sans-serif" font-size="18" font-weight="400" fill="#173b35">F01: historial de rectificación · F02: fechas observadas válidas · F03: cierre histórico estable.</text>
+<text x="30" y="675" font-family="Arial,sans-serif" font-size="18" font-weight="400" fill="#173b35">SAP no cambia el estado de tiendas ni pagos en Mirakl.</text></svg>

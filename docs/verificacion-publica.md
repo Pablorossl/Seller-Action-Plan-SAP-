@@ -1,6 +1,6 @@
 # Acta de verificación pública — 03/11/2026
 
-**Publicación y aceptación técnica ejecutadas** contra [SAP](https://sap-bice.vercel.app), hasta las **21:51 UTC / 22:51 Europe/Madrid**. Las pruebas se realizaron con Chromium headless desde el equipo de ejecución contra HTTPS público, con datos exclusivamente ficticios. No equivalen a una calificación académica ni a una garantía de disponibilidad futura.
+**Publicación y aceptación técnica ejecutadas** contra [SAP](https://sap-bice.vercel.app). Aceptación inicial hasta las **21:51 UTC / 22:51 Europe/Madrid**; ampliación de filtros/paginación a las **22:09 UTC / 23:09 Europe/Madrid**, el 03/11/2026. Las pruebas se realizaron con Chromium headless desde el equipo de ejecución contra HTTPS público, con datos exclusivamente ficticios. No equivalen a una calificación académica ni a una garantía de disponibilidad futura.
 
 | Identidad | Resultado |
 | --- | --- |
@@ -26,7 +26,7 @@ La conexión Git antigua se sustituyó tras conceder el titular acceso a la GitH
 | R01 | HTTPS y proxy | Certificado aceptado por clientes con validación TLS; HTTP redirige a HTTPS; login 200 y HSTS. No se probó desde una segunda red independiente |
 | R02 | Login/logout | Acceso real, dashboard, logout POST y API 403 tras salir; cookies Secure/HttpOnly/SameSite comprobadas |
 | R03 | Dashboard y API | Dashboard React visible, workspace autenticado y consumo de API sin errores del navegador |
-| R04 | Vendedores | Búsqueda por referencia, listado y acceso a ficha verificados. Filtros y navegación entre páginas no se recorrieron públicamente |
+| R04 | Vendedores, filtros y paginación | Búsqueda, ficha, filtros con/sin planes abiertos y estados de planes contrastados con API. Directorio con 50 + 1 vendedores en dos páginas reales, sin duplicados; Anterior/Siguiente, límites, reinicio al buscar/filtrar y páginas inválidas comprobados. Solo vendedores se recorrió en dos páginas; filtros de planes con registros existentes |
 | R05 | Indicadores | Ficha con observación ficticia inicial del 6%, periodo/política y datos consumidos por React |
 | R06 | Plan | Objetivo inválido rechazado sin perder el formulario; creación válida de borrador al 3%, edición y activación |
 | R07 | Acciones | Dos acciones, una completada con evidencia y otra pendiente. Plan adicional con plazos ayer/hoy/mañana |
@@ -46,6 +46,12 @@ La aceptación adicional rechazó revisiones y periodos futuros, duplicados, rec
 
 Las evidencias posteriores al despliegue se versionan en la rama `docs/sap-publicacion-2026-11-03`. `main` y Production conservan el candidato aprobado `97b4bff`; la rama documental no cambia código de aplicación ni constituye otro candidato publicado.
 
+## Ampliación para la entrega académica
+
+El [JSON adicional de filtros y paginación](evidencias-filtros-paginacion-2026-11-03.json) registra ocho comprobaciones aprobadas. Se crearon 51 vendedores exclusivamente ficticios en la cartera del segundo agente y se eliminaron exactamente esos 51 al terminar, verificando conservación de los IDs y recuentos anteriores. La cartera principal no pudo acceder a esos registros. Se capturó la segunda página antes de retirarlos; no se interceptaron respuestas para simular paginación.
+
+El alias mantuvo `dpl_DVtuHFEv9eTba7V8ShdLASR9BBTi` y SHA `97b4bff` antes y después. No se hicieron cambios funcionales, push, redespliegues, migraciones ni semillas durante esta preparación. La prueba procede del mismo equipo/red: **segunda red independiente pendiente**. La documentación pública de partida es `575c6c9`; esta ampliación, memoria y guiones son cambios locales posteriores todavía sin publicar.
+
 ## Cuentas ficticias y copia privada
 
 Se crearon dos agentes no administrativos mediante `create_demo_agent`. Se ejecutó una vez `seed_evaluation_demo` con modo demo activado únicamente en el proceso administrativo y desactivado al terminar. La carga inicial dejó cinco vendedores, diecisiete indicadores y tres planes; la aceptación añadió los planes de control. No se cargó de nuevo tras desplegar.
@@ -57,9 +63,10 @@ La copia está en `backups/private/sap-production-97b4bff-20261103.dump`, modo 0
 ## Evidencias y límites
 
 - [JSON de resultados sin secretos](evidencias-publicacion-2026-11-03.json).
+- [Resultados adicionales de filtros/paginación](evidencias-filtros-paginacion-2026-11-03.json) y [capturas finales seleccionadas](evidencias-visuales.md).
 - Capturas públicas nuevas: [dashboard](screenshots/publicacion-dashboard.png), [rectificación](screenshots/publicacion-rectificacion.png), [cierre histórico](screenshots/publicacion-cierre-historico.png), [persistencia](screenshots/publicacion-persistencia.png) y [móvil](screenshots/publicacion-movil.png). Las capturas antiguas conservan su carácter de QA local.
 - Se ejecutaron antes del commit: prueba frontend aprobada, siete pruebas de configuración Django sobre SQLite aislado y validación del paquete Vercel (33 módulos React y 157 estáticos). La CI del candidato ejecutó el workflow completo.
 - El permiso GitHub App bloqueó inicialmente la conexión; el titular lo concedió y la sustitución del enlace terminó correctamente. La primera publicación por archivo del commit y la posterior desde Git conservan el mismo SHA aprobado.
 - Un selector del checker adicional coincidía con «Vencida» y «No vencida». Se precisó y se completó la comprobación sobre el mismo plan, sin crear otro. El comparador de recuperación se corrigió para tablas cuya clave no es `id`, antes de exportar la copia. No fueron fallos funcionales de SAP.
 
-Quedan pendientes la comprobación desde otra red, los filtros/paginación públicos y la operación continuada durante evaluación, además de actualizar memoria/PDF, revisar capturas seleccionadas por el autor, grabar el vídeo real accesible de hasta cinco minutos y ensayar la defensa personal. Las cuotas Hobby/Free y el estado de los servicios deben seguir revisándose. La publicación técnica no completa por sí sola la entrega académica.
+Filtros/paginación, actualización de memoria y exportaciones PDF/Word están completados; las 24 páginas del PDF se revisaron visualmente. Quedan pendientes la comprobación desde otra red independiente, la operación continuada durante evaluación, la lectura personal de memoria/capturas, grabar el vídeo real accesible de hasta cinco minutos, comprobar su enlace, ensayar la defensa y realizar la entrega formal. Las cuotas Hobby/Free y el estado de los servicios deben seguir revisándose. La publicación técnica no completa por sí sola la entrega académica.

@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="1030" viewBox="0 0 1120 1030" role="img"><title>Modelo entidad-relación · entidades y FK de dominio</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="1130" viewBox="0 0 1120 1130" role="img"><title>Modelo entidad-relación · entidades y FK de dominio</title>
 <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#387466"/></marker></defs>
-<rect width="1120" height="1030" fill="white"/>
+<rect width="1120" height="1130" fill="white"/>
 <text x="30" y="35" font-family="Arial,sans-serif" font-size="23" font-weight="700" fill="#173b35">Modelo entidad-relación · entidades y FK de dominio</text>
 <rect x="25" y="80" width="310" height="127" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
 <text x="41" y="110" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">auth.User</text>
@@ -42,12 +42,13 @@
 <text x="421" y="818" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">PK id · FK plan / baseline</text>
 <text x="421" y="843" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">target_value · revision</text>
 <text x="421" y="868" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">UNIQUE plan + baseline</text>
-<rect x="785" y="760" width="310" height="152" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
+<rect x="785" y="760" width="310" height="177" rx="10" fill="#f1f7f4" stroke="#83ad9c"/>
 <text x="801" y="790" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#173b35">PlanReview</text>
 <text x="801" y="818" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">PK id · FK plan_metric</text>
 <text x="801" y="843" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">FK recorded_by → User</text>
 <text x="801" y="868" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">period · value · order_count</text>
-<text x="801" y="893" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">comments · assessment</text>
+<text x="801" y="893" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">supersedes → PlanReview (1:1)</text>
+<text x="801" y="918" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">correction_reason · recorded_at</text>
 <polyline points="335,142 405,142" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
 <text x="350" y="130" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">1:N</text>
 <polyline points="470,207 470,320 190,320 190,385" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
@@ -64,5 +65,6 @@
 <text x="695" y="610" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">1:N</text>
 <polyline points="715,822 785,822" fill="none" stroke="#387466" stroke-width="2" marker-end="url(#arrow)"/>
 <text x="733" y="808" font-family="Arial,sans-serif" font-size="15" font-weight="400" fill="#173b35">1:N</text>
-<text x="25" y="960" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">FK de dominio: PROTECT. User tiene dos relaciones 1:N con ImprovementPlan y una con PlanReview.</text>
-<text x="25" y="987" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">* PlanAction.responsible es texto (persona/equipo), no FK. User–Group–Permission: relaciones M:N nativas.</text></svg>
+<text x="25" y="1010" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">PlanReview: una original por objetivo/periodo; las rectificaciones conservan el periodo y forman una cadena.</text>
+<text x="25" y="1050" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">FK de dominio: PROTECT. User tiene dos relaciones 1:N con ImprovementPlan y una con PlanReview.</text>
+<text x="25" y="1080" font-family="Arial,sans-serif" font-size="16" font-weight="400" fill="#173b35">* PlanAction.responsible es texto (persona/equipo), no FK. User–Group–Permission: relaciones M:N nativas.</text></svg>

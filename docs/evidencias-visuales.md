@@ -1,4 +1,21 @@
-# Evidencias visuales de Fase 4
+# Evidencias visuales — entrega académica de SAP
+
+## Selección final de memoria y ampliación de aceptación
+
+Capturas directas de Chromium contra [SAP público](https://sap-bice.vercel.app), SHA `97b4bff`, tomadas el 03/11/2026. Se seleccionaron para la memoria cinco encuadres; el filtro de vendedores queda como evidencia adicional. No se reconstruyó ni retocó la interfaz. Todos los datos son ficticios.
+
+| Evidencia | Archivo y alcance |
+| --- | --- |
+| Dashboard actual | [Dashboard](screenshots/entrega-dashboard-publico.png), figura 6 de memoria |
+| Filtro de vendedores | [Sin planes abiertos](screenshots/entrega-filtro-vendedores.png), evidencia adicional |
+| Historial legible de F01 | [Rectificaciones](screenshots/entrega-historial-rectificaciones.png), captura directa de sección DOM, figura 3 |
+| Resultado histórico de F03 | [Cierre](screenshots/entrega-instantanea-cierre.png), sección DOM, figura 4 |
+| Paginación real | [Página 2](screenshots/entrega-paginacion-publica.png), figura 7; 51 vendedores temporales del segundo agente, retirados al terminar |
+| Móvil legible | [Encuadre 390 × 844](screenshots/entrega-movil-publico.png), figura 9, plan 5, captura de solo lectura; sin desbordamiento horizontal global |
+
+Los [resultados adicionales](evidencias-filtros-paginacion-2026-11-03.json) acreditan filtros, paginación, aislamiento y retirada de los 51 registros creados. La figura de paginación conserva el estado real antes de la limpieza. No se afirma que esos registros permanezcan disponibles. El deployment no cambió; no se repitió una prueba de redespliegue ni se obtuvo acceso a una segunda red.
+
+Las capturas completas se conservan para ampliar detalles. El PDF usa un encuadre móvil, porque reducir toda la página larga a una sola figura hacía ilegible el texto. La vista móvil larga inicial se mantiene más abajo como evidencia complementaria. La [revisión del PDF](revision-memoria-pdf-2026-11-03.json) identifica la exportación final. Ninguna imagen muestra credenciales, tokens, cookies o paneles de proveedores.
 
 ## Capturas públicas añadidas el 03/11/2026
 
@@ -12,7 +29,7 @@ Origen: Chromium contra [SAP público](https://sap-bice.vercel.app), candidato `
 | Mismo plan después del redespliegue desde Git | [Persistencia](screenshots/publicacion-persistencia.png) |
 | Vista móvil pública a 390 px | [Móvil](screenshots/publicacion-movil.png) |
 
-No contienen contraseñas, claves, cookies ni paneles de proveedores. El autor debe seleccionar las que incorporará a memoria/PDF y vídeo, actualizar arquitectura Vercel/CDN/Django/Neon y consignar SHA, CI, fechas y alcance de las pruebas. El vídeo real accesible de hasta cinco minutos sigue pendiente.
+No contienen contraseñas, claves, cookies ni paneles de proveedores. La memoria ya incorpora la selección final y arquitectura Vercel/CDN/Django/Neon con SHA y alcance. El autor debe revisar personalmente el material y grabar su vídeo: la grabación y su enlace siguen pendientes.
 
 ## Evidencias históricas de QA local
 
@@ -45,13 +62,13 @@ Los fragmentos de indicadores, revisiones, evaluación y resultado son capturas 
 
 | Diagrama | Fuente y correspondencia |
 | --- | --- |
-| [Arquitectura](diagramas/arquitectura.svg) | Ajustes, vistas, build/release, DRF, ORM y destino propuesto |
-| [Modelo de datos](diagramas/modelo-datos.svg) | Siete modelos de dominio más auth.User; FK reales; grupos/permisos nativos resumidos |
+| [Arquitectura](diagramas/arquitectura.svg) | Un origen público, función Django WSGI/CDN en Vercel Hobby y PostgreSQL 18 pooled en Neon Free; no migraciones/semillas en build |
+| [Modelo de datos](diagramas/modelo-datos.svg) | Siete modelos de dominio más auth.User; FK reales, vínculo supersedes y campos de rectificación; grupos/permisos nativos resumidos |
 | [Casos de uso](diagramas/casos-uso.svg) | Agente y superusuario; no existe vendedor externo |
 | [Flujo de mejora](diagramas/flujo-mejora.svg) | Estados, seguimiento y separación entre cierre y resultado |
 
-Se generan como SVG vectoriales mediante `python3 scripts/render_pfm_diagrams.py`, sin imágenes sintéticas ni servicios externos. Son diagramas explicativos del código, no capturas del producto. El ER resume campos; los modelos y migraciones siguen siendo la especificación completa. La memoria incorpora los cuatro y trece capturas seleccionadas; las dieciséis están disponibles en este índice.
+Se generan como SVG vectoriales mediante `python3 scripts/render_pfm_diagrams.py`, sin imágenes sintéticas ni servicios externos. Son diagramas explicativos del código, no capturas del producto. El ER resume campos; los modelos y migraciones siguen siendo la especificación completa. La memoria final incorpora **cuatro diagramas y cinco capturas públicas**, nueve figuras. Las dieciséis capturas históricas siguen disponibles con su alcance local.
 
-## Reproducción
+## Reproducción de la evidencia histórica local
 
 Compilar React y ejecutar `python3 scripts/verify_phase3.py --pg-bin /usr/lib/postgresql/14/bin --artifacts artifacts/phase4-evidence`. El comando exige herramientas QA disponibles y puede requerir permiso para sockets locales. Revisar imágenes y JSON antes de copiar evidencias a `docs/`; no copiar automáticamente logs, certificados ni bases. Una nueva ejecución cambia IDs, fechas y títulos aleatorios; actualizar el índice y sus hashes conjuntamente.

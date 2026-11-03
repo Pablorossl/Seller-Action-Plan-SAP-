@@ -1,0 +1,23 @@
+{
+  "checked_at_utc": "2026-11-03T22:09:42.069376+00:00",
+  "url": "https://sap-bice.vercel.app",
+  "sha": "97b4bff55a07b8fd3c71b05740748db5bf63438b",
+  "deployment_id": "dpl_DVtuHFEv9eTba7V8ShdLASR9BBTi",
+  "checks": {
+    "seller_open_plan_filters_ui_api": true,
+    "plan_status_filters_ui_api": true,
+    "real_server_pagination_50_plus_1_no_duplicates": true,
+    "ui_next_previous_and_boundary_buttons": true,
+    "filter_and_search_reset_page": true,
+    "invalid_and_out_of_range_pages_rejected": true,
+    "fixtures_isolated_from_main_agent": true,
+    "temporary_fixtures_cleaned_original_data_preserved": true
+  },
+  "created_test_records": 51,
+  "deleted_own_test_records": 51,
+  "second_independent_network_tested": false,
+  "network_limit": "Same execution host; extra browser sessions do not constitute an independent network.",
+  "plan_list_pagination_scope": "Status filters and current-page results verified; actual two-page navigation was exercised on sellers (shared Pagination component).",
+  "deployment_unchanged": true,
+  "passed": true
+}

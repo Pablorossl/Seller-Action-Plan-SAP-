@@ -1,12 +1,20 @@
 # Arquitectura de SAP
 
+## Versión pública entregada — 03/11/2026
+
+El código servido es `97b4bff55a07b8fd3c71b05740748db5bf63438b` en [SAP](https://sap-bice.vercel.app). Vercel Hobby construye React desde la raíz `backend` con acceso a fuentes externas mediante `python build_vercel.py`, ejecuta Django WSGI y sirve los estáticos desde CDN. No se ejecutan migraciones ni semillas en el build ni en el arranque. La persistencia y las sesiones están en PostgreSQL 18 de Neon Free, proyecto `empty-feather-02803695`, rama `production` predeterminada sin TTL, conexión pooled TLS con psycopg. La directa se reserva para administración y copias.
+
+La publicación comprobó persistencia tras redesplegar el mismo SHA y recuperación de una copia en PostgreSQL 18 aislado (21 tablas y esquema/datos coincidentes), sin restaurar Production. F01 añade rectificaciones enlazadas; F02 valida fechas observadas y filtra futuras antes de escoger la última; F03 conserva la instantánea histórica al cerrar. Véanse [memoria §§7–14](memoria-pfm.md), [diagramas actualizados](evidencias-visuales.md) y [acta pública](verificacion-publica.md).
+
+Los apartados de fases que siguen conservan su contexto histórico. La propuesta Render/Gunicorn y la falta de verificación remota descritas para Fase 3 **no representan el despliegue vigente**. El commit `575c6c9` documenta resultados posteriores al código publicado; la revisión académica actual permanece local, sin push ni redespliegue.
+
 ## Decisiones de esta base
 
 Monolito Django con API REST y React compilable como archivos estáticos. Mantener sesiones y servidor bajo un mismo origen reduce la configuración de cookies, CORS y despliegue. Vite se usa como herramienta de frontend; no sustituye Django.
 
 Las aplicaciones `sellers`, `quality` y `action_plans` separan vendedores, métricas y gestión de mejora. La Fase 1 incorpora modelos efectivos de planes, objetivos, acciones y revisiones. Se utiliza `auth.User`: los grupos nativos bastan para los roles actuales y no hay requisitos que justifiquen un modelo de usuario propio.
 
-SQLite permite arrancar y probar sin servicios. PostgreSQL se exige cuando `DEBUG=False`: el disco efímero de la web no debe almacenar la base. La Fase 3 verifica PostgreSQL 14.24 local y propone PostgreSQL 16 gestionado en Render; todavía no hay instancia remota verificada.
+SQLite permite arrancar y probar sin servicios. PostgreSQL se exige cuando `DEBUG=False`: el disco efímero de la web no debe almacenar la base. La Fase 3 verificó PostgreSQL 14.24 local y propuso PostgreSQL 16 en Render, sin instancia remota verificada en esa fase. La entrega actual usa Neon PostgreSQL 18, verificado según el apartado anterior.
 
 ## Modelo existente
 
@@ -70,7 +78,7 @@ La migración `action_plans/0001_initial.py` es aditiva: crea cuatro tablas con 
 El [documento de Fase 1](fase-1.md) contiene diagrama, estados, matriz de permisos, pasos de Admin, demo, decisiones sobre ventanas de medición y límites de integridad. La Fase 2 añade API y formularios React reutilizando estas reglas. La Fase 3 mantiene el monolito y añade las garantías de producción descritas a continuación.
 
 
-## Producción e integridad de Fase 3
+## Producción e integridad de Fase 3 — antecedente
 
 Render HTTPS → Gunicorn WSGI (dos workers) → Django/WhiteNoise → PostgreSQL por TLS. `scripts/build.sh` construye React y estáticos; `scripts/release.sh` migra una vez antes del arranque. No hay migraciones por worker, contenedores obligatorios ni datos en el disco de la web. `/healthz/` comprueba SQL y devuelve 503 ante indisponibilidad, sin detalles internos.
 

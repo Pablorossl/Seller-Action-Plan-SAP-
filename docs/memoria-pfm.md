@@ -1,327 +1,355 @@
 # Seller Action Plan (SAP)
 
-**Proyecto Final de Máster en Desarrollo Full Stack**
+**Memoria del Proyecto Final de Máster en Desarrollo Full Stack**
 
 ConquerBlocks · **Pablo Rosales**
 
-28 de octubre de 2026 · Versión documental 1.0 — Fase 4
+Revisión académica final · noviembre de 2026
 
-Código del producto auditado: `49ee19800e35ae72602e6cc7f76e1e6c374ae0d6`.
+Aplicación: [sap-bice.vercel.app](https://sap-bice.vercel.app)
 
-**Memoria preparada para revisión; entrega pendiente de despliegue público, vídeo y confirmación administrativa.** La preparación documental no acredita una publicación en producción. Las imágenes muestran ejecuciones reales de SAP con datos ficticios en QA local.
+Código desplegado: **97b4bff55a07b8fd3c71b05740748db5bf63438b**.
 
-Proyecto académico independiente inspirado en la experiencia profesional del autor como Marketplace Support Agent en PcComponentes. No es una herramienta oficial de PcComponentes ni de Mirakl y no utiliza datos corporativos.
+Documentación pública posterior: **575c6c942318885d6b7427ccedabc1eea7cc5887**. Esta revisión de memoria y sus exportaciones son cambios locales posteriores, todavía sin publicar.
+
+La publicación y la aceptación técnica están verificadas. El vídeo, la comprobación de su enlace, la entrega formal y la defensa personal siguen pendientes. Esta memoria no atribuye una nota ni acredita el expediente académico.
+
+Proyecto académico independiente para Account Managers y Marketplace Support Agents. No es una herramienta oficial de PcComponentes o Mirakl. Todos los datos de demostración son ficticios.
 
 ## Resumen ejecutivo
 
-Seller Action Plan aborda el seguimiento de acciones de mejora de vendedores de marketplace. Consultar un indicador permite detectar una desviación, pero no explica por sí solo su causa, quién realizará una acción, cuándo debe revisarse ni cómo quedará documentado el resultado. SAP reúne esas decisiones en un plan vinculado al vendedor y a sus observaciones de calidad.
+Seller Action Plan organiza el trabajo posterior a detectar una desviación de calidad de un vendedor de marketplace. Una cifra aislada no explica qué decisión se tomó, quién debe actuar, qué evidencia se conserva ni por qué se dio por terminado el seguimiento. SAP relaciona vendedores, observaciones, diagnósticos, objetivos, acciones y revisiones en un proceso consultable y protegido por permisos.
 
-La aplicación utiliza Django y Django REST Framework para autenticación, autorización, validación, API y persistencia; React para la interfaz operativa; y PostgreSQL como motor previsto para producción. Conserva plantillas Django para acceso y portal. Los datos se intercambian mediante JSON y sesiones del mismo origen, sin integrar la API de Mirakl.
+El backend Django conserva las reglas, la autenticación, las plantillas, la API y la persistencia; React ofrece el espacio de trabajo del agente y obtiene datos reales del servidor. PostgreSQL mantiene usuarios, sesiones e histórico. La aplicación se publica en Vercel Hobby y utiliza Neon Free, sin servicios de pago añadidos. El despliegue validado corresponde al SHA 97b4bff; el commit documental 575c6c9 registra evidencias posteriores y no debe confundirse con el código servido.
 
-El producto implementa dashboard, búsqueda y ficha de vendedores, políticas versionadas, planes con varios objetivos, acciones correctivas y preventivas, revisiones históricas, evaluación y cierre documentado. El ciclo ficticio de incidencias 6% → 4,5% → 3% se ha reproducido en Chromium con Django, Gunicorn y PostgreSQL. Las 77 pruebas Django, incluidas ocho de concurrencia, pasan en PostgreSQL local; siete casos JavaScript y la compilación React también pasan. Se ha comprobado persistencia tras reinicios y restauración en otra base. La CI de Fase 3 está aprobada en GitHub.
+La aceptación pública reprodujo un ciclo ficticio de incidencias del 6 % al 4,5 % y al 3 %, con acciones, evaluación y cierre. También verificó rectificaciones con historial, rechazo de fechas futuras, CSRF y denegación entre agentes. Un redespliegue del mismo candidato conservó registros y sesión. Una copia de Neon se restauró en PostgreSQL 18 aislado: coincidieron datos y esquema de 21 tablas. Las comprobaciones adicionales de filtros y paginación se documentan por separado con registros ficticios temporales.
 
-Estos resultados demuestran comportamiento técnico en el entorno ensayado. No demuestran una mejora empresarial ni disponibilidad en Internet. La publicación, la aceptación remota y el vídeo obligatorio siguen pendientes; se proporcionan procedimientos y guiones para completarlos.
+Estos resultados acreditan comportamientos técnicos en los entornos descritos. No constituyen una medición de ahorro de tiempo, productividad, satisfacción o impacto económico. La utilidad profesional propuesta debe validarse con usuarios y un procedimiento específico antes de cuantificar beneficios.
 
-## 1. Introducción y contexto
+## 1. Problema, contexto y necesidad
 
-En un marketplace, distintos vendedores comercializan productos a través de una plataforma común. La atención operativa necesita revisar la calidad del servicio y coordinar mejoras cuando aparecen desviaciones. El proyecto nace de la experiencia del autor en Marketplace Support: junto al dato cuantitativo, hace falta conservar diagnóstico, compromisos, responsables y evidencia de seguimiento.
+Los equipos de atención y gestión de vendedores necesitan convertir indicadores de calidad en decisiones de seguimiento. Consultar una tasa de incidencias o un tiempo de respuesta permite identificar una señal, pero no garantiza que el diagnóstico, las acciones y las revisiones queden relacionados. Si esa información se reparte entre notas y conversaciones, reconstruir el estado de un caso exige buscar su contexto y distinguir acuerdos, tareas y resultados.
 
-Mirakl sirve de contexto operativo. MQC permite supervisar determinados indicadores y sus límites; los criterios públicos de PcComponentes describen cinco métricas automatizadas, mientras que NPS y eficiencia de entrega tienen un tratamiento independiente. SAP registra observaciones y clasifica sus valores según políticas guardadas, pero no obtiene pedidos de Mirakl ni reproduce sus procesos administrativos. [Criterios de calidad automatizados](https://marketplacehelp.pccomponentes.com/hc/es-es/articles/20561228339357-criterios-de-calidad-automatizados).
+SAP aborda esa discontinuidad documental. Su unidad de trabajo es un plan asociado a un vendedor y a una o varias observaciones iniciales. El agente registra el problema, la causa, la evidencia disponible y una meta; después concreta acciones y revisa mediciones posteriores. El cierre conserva las razones y la evaluación del momento, incluso cuando la meta no se ha alcanzado.
 
-La referencia pública sobre planes propone analizar causas, concretar acciones y revisar resultados. SAP materializa ese seguimiento en una aplicación independiente: ayuda a organizar el trabajo del agente, sin ejecutar suspensiones, bloquear pagos ni tramitar reaperturas. [Preparación de planes de acción](https://marketplacehelp.pccomponentes.com/hc/es-es/articles/38119386983965-como-mejorar-tus-indicadores-de-calidad-y-preparar-un-plan-de-accion).
+El contexto profesional procede del ámbito de Marketplace Support que presenta el autor. La necesidad se formula como análisis del proceso, no como conclusión de entrevistas, una encuesta o una investigación empresarial ejecutada. No se aportan registros corporativos ni se afirma que una organización haya adoptado SAP.
 
-## 2. Definición del problema
+Mirakl y las fuentes públicas sobre calidad sirven de contexto. SAP no consulta sus pedidos, no modifica tiendas, no emite sanciones y no reproduce una integración con esas plataformas. Las políticas de calidad guardadas representan reglas explícitas de esta aplicación; no se anuncian como una actualización automática de las condiciones de un tercero.
 
-La necesidad abordada es conservar un proceso coherente entre detectar una desviación y decidir cómo termina su seguimiento. Cuando el diagnóstico, los compromisos y las revisiones se guardan en lugares separados, resulta difícil reconstruir qué se acordó, qué plazo estaba vigente y qué dato respalda el cierre. Este es el problema de diseño de SAP; no se presenta como una auditoría de procedimientos internos de una empresa.
+## 2. Objetivos, alcance y criterios de éxito
 
-El usuario afectado es el agente que gestiona una cartera de vendedores. Necesita identificar prioridades, consultar el contexto de cada observación y mantener continuidad entre revisiones. El administrador debe poder asignar vendedores, habilitar permisos y registrar políticas y observaciones iniciales.
+El objetivo general es construir y explicar una aplicación Full Stack que transforme una desviación registrada en un proceso de mejora trazable, persistente y autorizado por cartera de vendedores.
 
-SAP propone una unidad de trabajo explícita: el plan de mejora. Cada plan conecta vendedor, problema, periodo, causa raíz, evidencia, objetivo, responsable y fechas. Dentro de él se registran acciones y revisiones; la evaluación compara mediciones con metas y el cierre conserva una instantánea del resultado. Así, una cifra deja de estar aislada y pasa a formar parte de un seguimiento consultable.
+Los objetivos específicos son conservar el diagnóstico y sus metas, asignar responsables y plazos, registrar mediciones sin destruir las anteriores, distinguir tareas de resultados, impedir accesos entre carteras y comprobar la conservación del histórico al cerrar, redesplegar y recuperar una copia.
 
-Mirakl continúa siendo el sistema externo de referencia para la operativa real. SAP no intenta sustituirlo: no gestiona catálogo, pedidos, cobros ni sanciones, y tampoco necesita acceso a su API para demostrar su alcance académico.
+El MVP incluye login y logout, dashboard, búsqueda y filtros, directorio y ficha de vendedores, políticas versionadas, observaciones globales, planes con varios objetivos, acciones, revisiones, rectificaciones y cierre. La API permite altas de vendedores propios; React se concentra en consultar vendedores y gestionar el seguimiento. La configuración de políticas, observaciones y asignaciones se realiza mediante administración autorizada.
 
-## 3. Aportación y eficiencia
+Quedan fuera integración con marketplaces, cuentas de vendedores externos, correo, adjuntos binarios, sanciones, pagos, inteligencia artificial y exportaciones del producto. El exportador de esta memoria es una herramienta documental local y no una funcionalidad de SAP.
 
-El valor funcional reside en centralizar información relacionada y hacer explícitas las decisiones. El dashboard reúne tareas pendientes, vencimientos y planes por revisar. La ficha del vendedor conecta observaciones e histórico. El detalle del plan mantiene diagnóstico, ejecución y evaluación en el mismo contexto.
+El criterio técnico de éxito es reproducir el ciclo con datos persistidos, ver errores de validación y permisos, mantener los registros tras un redespliegue y recuperar una copia sin sobrescribir Production. Los criterios académicos incluyen también documento, vídeo y comprensión personal; la publicación por sí sola no completa la entrega.
 
-| Necesidad | Respuesta implementada | Alcance de la evidencia |
+## 3. Aportación y reflexión sobre eficiencia
+
+La aportación de SAP consiste en reunir el contexto del indicador y el seguimiento del plan, manteniendo una relación explícita entre cada medición y la decisión de cierre. La interfaz muestra qué se sabe, qué falta y qué registro está vigente, sin convertir una valoración del agente en un resultado numérico favorable.
+
+| Proceso | Capacidad implementada | Alcance de la evidencia |
 | --- | --- | --- |
-| Localizar compromisos | Acciones con responsable, fecha, estado y evidencia | Datos persistidos y visibles en React |
-| Mantener continuidad | Revisiones con autor, periodo y fecha de registro | Histórico conservado por las rutas soportadas |
-| Priorizar trabajo | Contadores, próximas acciones y planes por revisar | Resultado calculado por el backend |
-| Evaluar con criterio | Inicial, objetivo, última revisión y dirección de mejora | Casos de prueba y demostración ficticia |
-| Justificar el cierre | Razones e instantánea de evaluación | Cierre transaccional y consultable |
+| Localizar una cartera | Búsqueda, filtros y paginación autorizados | Comprobación pública; no estudio de tiempos de agentes |
+| Preparar un seguimiento | Diagnóstico, metas, responsables y plazos relacionados | Formularios, reglas y persistencia verificadas |
+| Comparar mediciones | Evaluación del valor inicial, meta y revisión efectiva | Ejemplos ficticios reproducidos mediante API e interfaz |
+| Corregir una captura | Nueva revisión enlazada, motivo, autor y fecha | Cadena histórica pública conservada |
+| Justificar una finalización | Razones e instantánea de evaluación | Cierre y recuperación verificados |
 
-Se espera reducir la dispersión de información y facilitar la preparación de seguimientos. No se han medido tiempos de trabajo, productividad, satisfacción de agentes ni impacto económico. Las mediciones de latencia local describen rendimiento del software y no son una medición de eficiencia laboral.
+Se espera reducir la dispersión de información y facilitar la preparación de seguimientos. No se han medido minutos ahorrados, reducción de errores humanos, satisfacción ni retorno económico. El cambio ficticio del 6 % al 3 % ilustra una regla de evaluación; no es una mejora real obtenida en un marketplace.
 
-Una evaluación futura podría comparar un mismo escenario ficticio con y sin SAP, registrando tiempo, errores y facilidad para recuperar evidencias. Sería necesario describir participantes, procedimiento y limitaciones antes de atribuir mejoras. En esta entrega el valor aportado se fundamenta en funcionalidades comprobadas y en su adecuación al problema.
+Una validación posterior podría comparar un escenario equivalente con y sin SAP, definir participantes y tareas, registrar tiempo y errores de recuperación del histórico y recoger dificultades de uso. Haría falta controlar el aprendizaje, describir la muestra y reconocer sus límites. Esta propuesta no se presenta como investigación ya realizada.
 
-## 4. Objetivos y alcance
+La eficiencia técnica también tiene límites: la paginación evita devolver todo un listado y las precargas reducen consultas repetidas, pero no se ha ejecutado una prueba de carga representativa de producción. La evidencia disponible permite defender coherencia e integridad, no capacidad ilimitada.
 
-El objetivo general es desarrollar una aplicación Full Stack que convierta desviaciones de calidad registradas en un proceso de mejora documentado, medible y protegido por permisos.
+## 4. Tecnologías y decisiones justificadas
 
-Los objetivos específicos son relacionar vendedores y observaciones; conservar diagnóstico y metas; organizar responsables y plazos; registrar revisiones sin sobrescribir las anteriores; separar ejecución de acciones y cumplimiento de objetivos; permitir un cierre razonado; y comprobar que otro agente no puede acceder a una cartera ajena.
-
-El MVP incluye autenticación, administración inicial, lectura de indicadores, dashboard, listados y formularios de planes, acciones, revisiones y cierre. La API permite gestionar vendedores propios; la interfaz React se centra en consultarlos y gestionar planes. Las políticas, observaciones globales y asignaciones se mantienen mediante administración autorizada. No existe formulario React de importación de indicadores.
-
-Quedan fuera del alcance integración con Mirakl, cuentas de vendedores externos, sanciones automáticas, notificaciones, adjuntos binarios, informes exportables del producto, inteligencia artificial y analítica avanzada. La exportación de esta memoria es una herramienta documental, no una funcionalidad de SAP.
-
-## 5. Tecnologías utilizadas
-
-| Tecnología del repositorio | Uso y justificación |
+| Tecnología | Uso efectivo y justificación |
 | --- | --- |
-| Python 3.12; Django 5.2.18 | Modelos, migraciones, vistas, plantillas, ORM y autenticación en una base coherente |
-| Django REST Framework 3.18.3 | Serializadores, permisos, respuestas JSON y paginación de la API |
-| React / React DOM 19.3.1 | Formularios y vistas operativas que presentan datos reales de Django |
-| JavaScript, HTML y CSS | Interacción, estructura semántica, estados de interfaz y adaptación a móvil |
-| Vite 7.3.7; Node 22 en QA | Desarrollo y compilación del frontend; Node no sirve el backend en producción |
-| PostgreSQL; psycopg 3.3.6 | Persistencia externa al disco web, transacciones y bloqueos reales de fila |
-| SQLite | Arranque local sencillo; no acredita concurrencia PostgreSQL |
-| Gunicorn 26.2.0 | Servidor WSGI de la aplicación, con dos workers por defecto |
-| WhiteNoise 6.12.0 | Entrega de estáticos Django y React compilados desde el mismo origen |
-| django-environ 0.14.0; tzdata 2026.5 | Configuración por entorno y fechas en Europe/Madrid |
-| django-axes 8.3.1 | Bloqueo persistente de intentos de autenticación repetidos |
-| Git y GitHub Actions | Evolución por fases y verificación automática con SQLite y PostgreSQL 16 |
-| Django TestCase / TransactionTestCase; node:test | Pruebas de dominio, API, seguridad, concurrencia y cliente HTTP |
-| Playwright / Chromium; herramientas PostgreSQL | QA de navegador, reinicios, copia y restauración aisladas |
-| Render, propuesto | Receta de despliegue con PostgreSQL y HTTPS gestionado; aún no aplicado |
+| Python 3.12 y Django 5.2.18 | Modelos, ORM, migraciones, vistas, plantillas y autenticación integrados; backend exigido por la guía |
+| Django REST Framework 3.18.3 | Serializadores, permisos, validación de API y paginación; contrato JSON consumido por React |
+| React y React DOM 19.3.1 | Dashboard, listados y formularios operativos con datos reales del backend |
+| JavaScript, HTML y CSS | Interacción, estructura de interfaz, estados de carga/error y adaptación a móvil |
+| Vite 7.3.7 y Node 22.x | Compilación del frontend; Node no sustituye al runtime Python de Django |
+| PostgreSQL 18 y psycopg 3.3.6 | Persistencia externa al proceso web, transacciones y bloqueo de filas |
+| django-environ y tzdata | Configuración por entorno y fechas coherentes con Europe/Madrid |
+| django-axes | Límite persistente de intentos de login en PostgreSQL, sin añadir Redis |
+| Vercel Hobby y Neon Free | Función Django, CDN y base persistente para la demostración académica gratuita |
+| Git, GitHub y Actions | Historial progresivo y CI del SHA exacto publicado |
+| Playwright, Chromium y clientes PostgreSQL 18 | Pruebas y exportación documental; herramientas de QA fuera del runtime |
 
-Las versiones proceden de los archivos fijados y del entorno revisado. PostgreSQL local es 14.24; Render y CI utilizan o proponen 16 según su contexto. Las herramientas de QA y exportación no se añaden a las dependencias de ejecución del producto. El diseño evita incorporar servicios adicionales cuando las capacidades de Django resuelven el alcance.
+Las versiones proceden de los archivos fijados del candidato y de los entornos comprobados. La CI utiliza PostgreSQL 16, mientras que Neon y la restauración usan 18; no se trata de la misma prueba. SQLite sigue disponible para desarrollo sencillo, pero no acredita bloqueos concurrentes de PostgreSQL.
 
-## 6. Arquitectura del sistema
+Gunicorn, WhiteNoise y la receta Render pertenecen a ejecución local o antecedentes conservados. En el despliegue entregado, Vercel ejecuta WSGI y sirve los estáticos recogidos desde su CDN. No se utiliza Gunicorn como comando de arranque en Vercel ni se ha contratado Render.
 
-SAP es un monolito Django con una interfaz React compilada. La división en aplicaciones `sellers`, `quality` y `action_plans` separa responsabilidades de dominio sin distribuir el sistema en varios servicios. `config` contiene ajustes, rutas y vistas generales.
+Se mantiene un solo origen para acceso, dashboard y API. Con ello se aprovechan sesiones y CSRF de Django y se evita añadir una arquitectura de autenticación distribuida que el alcance no necesita. No se requiere un dominio comprado ni Docker; la guía los permite como decisiones técnicas, no los impone.
 
-![Figura 1. Arquitectura real y destino de despliegue propuesto.](diagramas/arquitectura.svg)
+## 5. Usuarios, permisos y límites de acceso
 
-El navegador inicia sesión mediante una plantilla Django. Después, `/dashboard/` entrega el índice generado por Vite. React consulta `/api/workspace/` para conocer sesión, capacidades y token CSRF enmascarado, y obtiene el resumen de `/api/overview/`. El cliente Fetch de `frontend/src/services/api.js` mantiene `credentials: same-origin` y envía `X-CSRFToken` en escrituras.
+| Actor | Acciones permitidas | Límite relevante |
+| --- | --- | --- |
+| Visitante sin sesión | Acceder al login y consultar salud sin datos de negocio | Dashboard redirige al acceso y API de dominio deniega la petición |
+| Usuario autenticado sin rol | Mantener una sesión de Django | La sesión no concede por sí sola permiso de marketplace |
+| Agente autorizado | Consultar vendedores propios y ejecutar operaciones de seguimiento concedidas | La cartera se deriva del propietario del vendedor y cada operación exige permisos |
+| Agente con acceso a Admin | Entrar en las funciones administrativas expresamente concedidas | is_staff habilita entrada, no acceso global ni todos los permisos |
+| Superusuario | Configurar usuarios, grupos, políticas, observaciones y asignaciones globales | Cuenta privilegiada, no utilizada como cuenta de evaluación |
 
-En una petición de detalle, React solicita `/api/plans/ID/`; DRF comprueba la sesión y el rol, `PlanViewSet` exige permisos y filtra por vendedores visibles, el ORM consulta el plan con relaciones precargadas y el serializador devuelve JSON con su evaluación. React presenta esa respuesta. En una escritura, Django valida datos y relaciones dentro de la transacción antes de devolver el estado persistido. La interfaz no decide por su cuenta si un objetivo se ha alcanzado.
+Las dos cuentas de evaluación son agentes no administrativos. El vendedor externo no es un usuario del MVP. El campo responsable de un plan describe el trabajo, pero no concede acceso automáticamente; la propiedad del vendedor determina la cartera visible. Una reasignación administrativa transfiere ese acceso y conserva la autoría histórica.
 
-La navegación React usa fragmentos como `#/sellers` y `#/plans/ID`, conservando una única vista Django de entrada. En desarrollo Vite reenvía API y acceso a Django; en la compilación integrada WhiteNoise entrega los recursos de `/static/react/`. No se necesita CORS ni un segundo servidor de frontend en producción.
+La autorización se ejecuta en el backend. Ocultar botones evita confusión, pero no sustituye IsMarketplaceAgent, visible_sellers, visible_plans y los permisos específicos. Tampoco basta con conocer el ID de un plan: las consultas de detalle y las referencias de los formularios se limitan al ámbito autorizado.
 
-El build instala dependencias fijadas, compila y recoge estáticos. El release ejecuta migraciones una vez; Gunicorn únicamente arranca WSGI. Los datos permanecen en PostgreSQL. Esta separación evita ejecutar migraciones por cada worker o guardar la base en un disco web efímero. Véanse `scripts/build.sh`, `scripts/release.sh` y `backend/gunicorn.conf.py`.
+## 6. Casos de uso representativos
 
-## 7. Modelo de datos
+### CU01. Acceder y cerrar sesión — visitante y agente
 
-![Figura 2. Modelo entidad-relación; nombres y relaciones del código.](diagramas/modelo-datos.svg)
+El visitante abre el login, introduce sus credenciales por un canal seguro y Django autentica la cuenta. El resultado correcto es una sesión y el dashboard; una contraseña incorrecta no habilita acceso y los intentos repetidos se limitan. El agente sale mediante POST con CSRF. Tras salir, la API de dominio vuelve a denegar el acceso. El resultado del navegador se comprobó públicamente; el bloqueo repetido se cubre además por pruebas de configuración.
 
-| Entidad | Responsabilidad y relaciones |
+### CU02. Localizar un vendedor — agente
+
+El agente abre su directorio, busca una referencia o aplica el filtro de planes abiertos. La API devuelve una página de su cartera y React representa sus filas. El resultado es una ficha autorizada con indicadores y planes. Una búsqueda sin coincidencias muestra un estado vacío; un ID ajeno devuelve 404. La paginación se contrastó con resultados reales de servidor y navegación Siguiente/Anterior, no con respuestas simuladas.
+
+### CU03. Crear el diagnóstico — agente con permisos
+
+Desde una observación válida del vendedor, el agente define problema, causa, evidencia, objetivo y fechas. Django valida pertenencia, periodo y meta y guarda plan y objetivos en una transacción. En el ejemplo, una meta del 7 % para incidencias iniciales del 6 % es rechazada; la meta del 3 % sí es válida. Una observación futura no puede usarse como diagnóstico. Un error se presenta en el formulario y no obliga a perder el contenido introducido.
+
+### CU04. Gestionar acciones — agente con permisos
+
+El agente añade una acción correctiva o preventiva, su responsable textual y plazo, activa el plan y registra su ejecución. Completar una acción exige la información de finalización y evidencia correspondiente. El resultado es un compromiso persistido, separado de la medición del objetivo. Una fecha incompatible, una edición obsoleta o un plan finalizado impiden guardar el cambio por las rutas soportadas.
+
+### CU05. Revisar y rectificar — agente con permisos
+
+Se añade una medición posterior con periodo, pedidos cuando proceden y comentario. Si falta una medición, SAP muestra que no es evaluable. Una rectificación crea otra revisión vinculada a la anterior y exige motivo; conserva objetivo y periodo. El resultado es una cadena consultable con autor y fecha, sin sobrescribir registros. Se rechazan duplicados, fechas futuras, ramificaciones y rectificaciones de planes finalizados.
+
+### CU06. Evaluar y cerrar — agente con permiso de cierre
+
+La API compara observación inicial, objetivo y medición efectiva. El agente revisa el resultado, aporta razones y confirma la finalización. Django conserva una instantánea y retira las operaciones de edición del flujo. Cerrar no exige éxito ni completar todas las tareas: el ejemplo puede concluir como no alcanzado o no evaluable. Un cierre sin confirmación o razones, sin permiso o sobre un plan ya finalizado se rechaza.
+
+### CU07. Configurar el ámbito — administrador
+
+El administrador mantiene usuarios, permisos, vendedores y políticas mediante Django Admin autorizado. Las asignaciones controlan la cartera y las políticas versionadas conservan la referencia histórica. La operación correcta deja relaciones válidas y auditables; datos incompatibles muestran errores de validación. Esta capacidad se contrastó con código y pruebas de Admin; no se entregó una cuenta privilegiada ni se expuso Admin durante la aceptación de agentes.
+
+### CU08. Recuperar una copia — responsable técnico
+
+El responsable exporta una copia consistente por conexión directa y la restaura en una base aislada compatible. Después compara esquema, datos de control y lectura funcional. El resultado verificado fue una restauración PostgreSQL 18 con 21 tablas coincidentes. Una versión incompatible del cliente o una discrepancia debe detener la aceptación de esa copia. Nunca se prueba la restauración encima de Production.
+
+## 7. Arquitectura e integración Django–React
+
+SAP es un monolito modular. Las aplicaciones sellers, quality y action_plans separan vendedores, observaciones y seguimiento; config reúne rutas y ajustes. Esa organización mantiene las reglas cerca de los datos sin introducir comunicación entre varios servicios de negocio.
+
+![Figura 1. Arquitectura entregada: un origen Vercel y PostgreSQL persistente en Neon.](diagramas/arquitectura.svg)
+
+El login y el portal son plantillas Django. La vista protegida dashboard renderiza el índice compilado de React. La navegación usa fragmentos como #/sellers y #/plans/6, de modo que Django conserva el control de entrada y React gestiona las vistas operativas.
+
+Una lectura típica empieza en frontend/src/pages/PlanDetail.jsx. Fetch solicita /api/plans/6/ en el mismo origen con la cookie de sesión. DRF autentica, exige permisos y filtra por vendedores visibles. El ORM obtiene las relaciones y el serializador devuelve el estado y su evaluación; React representa la respuesta. La interfaz no decide por su cuenta que un objetivo se ha alcanzado.
+
+En una escritura, frontend/src/services/api.js añade la cabecera X-CSRFToken. La vista valida la solicitud, las relaciones y la operación; los modelos y servicios aplican las reglas de negocio dentro de la transacción. El cliente utiliza la respuesta persistida y muestra errores de campo, conflictos o fallos de conexión. No se necesita CORS para este despliegue del mismo origen.
+
+El build compila React, lo copia a backend/frontend_dist y permite a Vercel ejecutar collectstatic. El CDN publica los assets; la función WSGI ejecuta Django. Ni el build ni la importación de WSGI migran, crean cuentas o cargan semillas. La base no reside en el disco efímero de la función.
+
+## 8. Modelo de datos e integridad
+
+![Figura 2. Entidades, relaciones y cadena de rectificaciones del modelo implementado.](diagramas/modelo-datos.svg)
+
+| Entidad | Responsabilidad principal |
 | --- | --- |
-| `auth.User` | Usuario Django, grupos y permisos; se conserva el modelo nativo |
-| `Seller` | Nombre y referencia única; `owner` identifica al agente con acceso |
-| `ThresholdPolicy` | Código y versión únicos; unidad, operador, límites y condiciones MQC |
-| `QualityMetric` | Observación de vendedor, política, canal, periodo, pedidos y valor |
-| `ImprovementPlan` | Vendedor, autor, responsable, diagnóstico, fechas, estado y cierre |
-| `PlanMetric` | Une plan y observación inicial (`baseline`) con una meta decimal |
-| `PlanAction` | Acción del plan; responsable textual, plazo, estado y evidencia |
-| `PlanReview` | Revisión de un objetivo: valor, periodo, autor, comentarios y valoración |
+| auth.User | Identidad, grupos y permisos nativos Django; autores y responsables relacionados |
+| Seller | Referencia única, nombre y propietario de la cartera |
+| ThresholdPolicy | Código y versión, unidad, dirección, límites y condiciones de evaluación |
+| QualityMetric | Observación de vendedor y política con canal, periodo, pedidos y valor |
+| ImprovementPlan | Diagnóstico, fechas, estado, autor, responsable, revisión y cierre |
+| PlanMetric | Objetivo que une el plan con su observación inicial protegida |
+| PlanAction | Compromiso, responsable textual, plazo, estado y evidencia de ejecución |
+| PlanReview | Medición histórica, autor, fecha y posible vínculo con la revisión que rectifica |
 
-Las revisiones derivan indicador, unidad y canal de la observación inicial. No actualizan `QualityMetric`: una revisión del plan no transforma automáticamente el indicador global del vendedor. Esta separación conserva el significado de las dos fuentes de observación y explica por qué el dashboard puede seguir mostrando una desviación histórica global tras cerrar un plan.
+Las FK de dominio protegidas evitan borrar referencias necesarias para explicar el histórico. Las restricciones de PostgreSQL cubren unicidad y coherencia estructural; clean y save añaden validaciones de dominio que dependen de otras entidades o de la fecha actual. No se supone que toda regla esté expresada como una restricción SQL.
 
-Las FK de dominio usan `PROTECT`. Las políticas utilizadas y las observaciones iniciales vinculadas a objetivos quedan protegidas frente a cambios mediante las rutas soportadas. Se utilizan decimales para metas y valores. Las restricciones SQL cubren, entre otras condiciones, periodos válidos, unicidades y coherencia de estados finales. `full_clean()` y los servicios validan relaciones entre entidades y transiciones.
+Las escrituras del seguimiento bloquean primero el vendedor autorizado y después el plan, dentro de transaction.atomic. Los hijos y el cierre comparten ese ámbito. revision detecta formularios obsoletos y produce conflicto; las claves de idempotencia de creación de planes y acciones permiten reconocer un reintento del mismo contenido. Son mecanismos distintos. Los clientes que omiten revisión o clave no reciben todas sus garantías adicionales.
 
-La inmutabilidad no equivale a una base invulnerable a un administrador SQL. `QuerySet.update()`, cargas masivas y SQL directo pueden saltarse validaciones de aplicación; no forman parte de las rutas de escritura admitidas para este flujo. La unicidad de observaciones entre versiones de políticas también requiere validación de aplicación. No se implementa una auditoría general de todos los cambios.
+El acceso SQL privilegiado, QuerySet.update y bulk_create pueden eludir validaciones de modelo. No son vías de entrada del producto ni deben emplearse como atajo de importación. La aplicación no afirma inmutabilidad criptográfica de toda la base.
 
-## 8. Tipos de usuarios y permisos
+## 9. F01–F03: correcciones y conservación del significado
 
-Los perfiles funcionales son administrador y agente. «Account Manager» describe un posible usuario profesional, pero no es un grupo distinto implementado. No existe un rol de vendedor externo.
+### F01. Rectificación sin pérdida de historial
 
-| Operación | Anónimo / sin rol | Marketplace Agent | Superusuario |
-| --- | --- | --- | --- |
-| Datos de negocio | No | Vendedores asignados | Todos |
-| CRUD de vendedores por API | No | Propios; propietario impuesto por servidor | Todos |
-| Reasignar vendedores | No | No | Django Admin |
-| Leer indicadores | No | De vendedores visibles | Todos |
-| Registrar políticas/observaciones globales | No | No | Django Admin |
-| Consultar planes | No | Además requiere `view_improvementplan` | Sí |
-| Crear/editar objetivos, planes y acciones | No | Permisos específicos y plan accesible | Sí, con validación de dominio |
-| Registrar revisiones | No | `add_planreview` y acceso al plan | Sí |
-| Cerrar/cancelar | No | Cambio y permiso específico de cierre | Sí, con reglas de cierre |
-| Editar histórico final por API/Admin | No | No | No mediante esas rutas |
-| Acceder a Admin | No | Sólo si tiene `is_staff` y permisos | Cuenta activa con `is_staff` |
+Cada corrección es una PlanReview nueva. supersedes apunta a la revisión efectiva anterior; correction_reason exige el motivo y recorded_at conserva el instante de alta. El autor se obtiene de la sesión. Objetivo y periodo no cambian dentro de una cadena. La unicidad parcial conserva una original por objetivo/periodo y la relación uno a uno evita dos sucesoras del mismo registro.
 
-`is_staff` no concede acceso a los datos por sí solo. El campo `responsible` de un plan tampoco cambia permisos: el ámbito deriva de `Seller.owner`. La reasignación administrativa transfiere el acceso al histórico, conservando los autores. Las revisiones se añaden y no se editan ni borran por la API.
+La evaluación elimina primero las revisiones sustituidas y elige después el periodo efectivo más reciente. Corregir un periodo antiguo no desplaza por fecha de captura una medición posterior. La interfaz identifica registros sustituidos y efectivos, junto con vínculo, motivo, autor y fecha. El permiso sigue siendo añadir revisión; el agente no puede editar la fila original.
 
-![Figura 3. Casos de uso y actores implementados.](diagramas/casos-uso.svg)
+![Figura 3. Cadena pública de rectificaciones del plan 6: original sin datos, medición y corrección posterior.](screenshots/entrega-historial-rectificaciones.png)
 
-## 9. Casos de uso
+La migración 0003 incorporó los campos y la restricción parcial sin una operación de modificación de datos. En Production está aplicada junto con las otras 32 migraciones; no volvió a ejecutarse durante la publicación ni durante esta preparación académica.
 
-### CU01. Iniciar sesión
+### F02. Observaciones y revisiones con fechas válidas
 
-Actor: usuario activo. Precondición: cuenta creada administrativamente. Flujo: abrir login, introducir credenciales y enviar el formulario con CSRF. Resultado: sesión Django y navegación al dashboard. Alternativas: credenciales incorrectas; bloqueo tras cinco fallos durante quince minutos; cuenta sin rol que no puede acceder a datos. El logout usa POST y termina la sesión.
+Las fechas de observación no pueden superar la fecha local de Europe/Madrid. Hoy es admisible; exigir un mes completo para evaluar determinados indicadores es otra regla. Las fechas previstas de acciones y planes sí pueden estar en el futuro.
 
-### CU02. Consultar dashboard
+La selección de la observación actual excluye periodos futuros antes de elegir la última observación. Los registros futuros heredados permanecen en el histórico, identificados y no evaluables, en lugar de borrarse o esconder la observación válida anterior. Tampoco se permite utilizarlos como base de un objetivo nuevo. No se añadió una migración de limpieza automática.
 
-Actor: agente con permisos de consulta de planes. Precondición: sesión válida. Flujo: React consulta el resumen y muestra vendedores, planes abiertos, acciones pendientes/vencidas y revisiones. Resultado: vista priorizada de su cartera. Alternativas: estado vacío, falta de permisos o error de red. Una acción pendiente de un plan ya finalizado no aparece como trabajo pendiente de planes abiertos.
+La API de observaciones globales es de solo lectura. La aceptación pública comprobó el rechazo de revisiones y periodos futuros; los casos de observaciones heredadas, Admin y fronteras de fecha tienen evidencia de código y pruebas locales/CI. No se afirma haber introducido datos futuros inválidos en Production para ensayarlos.
 
-### CU03. Buscar vendedor
+### F03. Estado histórico al finalizar
 
-Actor: agente. Precondición: vendedor asignado. Flujo: abrir directorio, buscar por referencia o nombre y acceder a la ficha. Resultado: indicadores e histórico del vendedor autorizado. Alternativas: búsqueda vacía o ID inexistente/ajeno; el backend devuelve 404 en el detalle ajeno.
+El cierre conserva la evaluación, el recuento de acciones y su situación de vencimiento en ese momento. La consulta posterior de un plan finalizado utiliza esa instantánea en vez de recalcular el pasado con la fecha del día. Cuando un cierre antiguo no guardó un detalle, la aplicación muestra desconocido y no inventa una reconstrucción.
 
-### CU04. Identificar desviación
+![Figura 4. Resultado y cierre conservados en la aplicación pública.](screenshots/entrega-instantanea-cierre.png)
 
-Actor: agente. Precondición: observación registrada por administrador. Flujo: consultar valor, periodo, canal, volumen y clasificación. Resultado: contexto para decidir un plan. Alternativas: ausencia de datos, periodo no mensual o volumen insuficiente para MQC; SAP no deduce una evaluación válida cuando faltan condiciones.
-
-### CU05. Crear plan
-
-Actor: agente con permisos de creación de plan y objetivo. Precondición: vendedor y observación accesibles. Flujo: completar título, problema, causa, evidencia, objetivo, responsable, plazo y meta numérica; guardar. Resultado: borrador y objetivos creados atómicamente. Alternativas: meta que no mejora el valor inicial, fechas incoherentes o relación ajena; la operación se rechaza sin dejar un plan parcial.
-
-### CU06. Gestionar acciones
-
-Actor: agente con permiso de acción. Precondición: plan abierto. Flujo: añadir descripción, tipo, responsable textual y plazo; activar el plan cuando tenga al menos un objetivo y una acción; completar una acción con fecha y evidencia. Resultado: compromiso y ejecución persistidos. Alternativas: plazo fuera del plan, falta de evidencia o revisión obsoleta; se valida o devuelve conflicto 409 para recargar.
-
-### CU07. Registrar revisión
-
-Actor: agente con permiso de revisión. Precondición: objetivo accesible de plan abierto. Flujo: indicar fecha, periodo, medición, pedidos, comentarios, valoración y próximos pasos. Resultado: nueva revisión con autor impuesto por el servidor. Alternativas: periodo repetido, fechas inválidas, plan cerrado o datos insuficientes. Una revisión válida como registro puede quedar no evaluable para MQC.
-
-### CU08. Evaluar resultado
-
-Actor: agente. Precondición: objetivo con sus revisiones disponibles. Flujo: consultar comparación inicial/meta/actual. Resultado: mejora respecto al inicio y cumplimiento de meta calculados por Django. Alternativas: sin medición evaluable, resultado `not_evaluable`; con varios objetivos, todos deben ser evaluables y alcanzarse para éxito global. La última revisión se elige por periodo medido, fecha e ID.
-
-### CU09. Cerrar plan
-
-Actor: agente con cambio y cierre. Precondición: estado que permita finalizar. Flujo: consultar evaluación y acciones, indicar razones y confirmar. Resultado: fecha, razones e instantánea guardadas en una transacción; histórico consultable. Alternativas: sin permiso, sin razones, revisión obsoleta o doble cierre. Puede cerrarse sin alcanzar metas si se documenta la decisión; no se completan acciones automáticamente. Un borrador debe activarse antes de cerrarlo, aunque puede cancelarse.
-
-![Figura 4. Flujo funcional de mejora y significado del cierre.](diagramas/flujo-mejora.svg)
+En el plan 6 se verificó una acción vencida al cierre y otras dos no vencidas. Esa información sobrevivió al redespliegue. El calendario se avanzó noventa días únicamente en la base restaurada aislada, donde la lectura Django conservó la misma evaluación y los mismos indicadores históricos. No se cambió el reloj del servicio público ni se modificaron sus fechas para producir la evidencia.
 
 ## 10. Seguridad y protección de datos
 
-La autenticación utiliza sesiones Django y contraseñas almacenadas con el hashing predeterminado del framework, PBKDF2, además de validadores de contraseña. No se almacenan claves en el frontend ni se usa JWT. Las sesiones duran ocho horas. Django-axes registra intentos en base de datos y aplica el bloqueo por usuario, de modo que cambiar cookies o User-Agent no evade esa clave de bloqueo.
+La autenticación utiliza contraseñas con los hashers de Django y sesiones persistidas en PostgreSQL. React no almacena contraseñas ni un token de acceso de larga duración. Las dos cuentas de evaluación no tienen privilegios administrativos; sus credenciales se custodian fuera de Git y de los entregables.
 
-La autorización se ejecuta en el servidor. `IsMarketplaceAgent` comprueba rol, `visible_sellers()` limita la cartera y `visible_plans()` deriva ese alcance. Los endpoints del módulo exigen permisos específicos; una relación válida por ID sigue siendo inválida si pertenece a otro agente. La autoría y el propietario de nuevas altas se imponen desde la sesión.
+| Riesgo | Control implementado y evidencia |
+| --- | --- |
+| Acceso a cartera ajena | Rol, permisos por operación y consultas filtradas por propietario; lectura y cierre ajenos devolvieron 404 |
+| Escritura inducida desde otro origen | CSRF de Django; pruebas públicas sin token y con origen ajeno rechazadas |
+| Manipulación de relaciones | Querysets autorizados y autor/propietario impuestos por el servidor |
+| XSS e inyección | Texto escapado por React/plantillas y ORM parametrizado; no se interpreta HTML del usuario |
+| Intercepción de sesión | HTTPS, cookies Secure, sesión HttpOnly y SameSite=Lax; cabeceras de seguridad verificadas |
+| Intentos de login repetidos | Django-axes persistido por usuario, con pruebas de bloqueo y rotación de señales cliente |
+| Pérdida o sobrescritura de histórico | Validación, transacciones, bloqueos, revisiones enlazadas e instantánea de cierre |
+| Exposición de secretos y copias | Variables Production privadas, archivos locales excluidos de Git y directorios de custodia restringidos |
 
-CSRF protege login, logout y escrituras autenticadas. El token no sustituye la sesión ni el permiso. React envía el token en una cabecera y las plantillas incluyen el campo de formulario. Django y React escapan el texto mostrado; no se utiliza HTML proporcionado por el usuario. El ORM evita construir SQL con texto de entrada. Estas medidas reducen riesgos, sin constituir una auditoría de penetración completa.
+En Vercel, settings.py utiliza las variables del proyecto y no lee el .env local. DEBUG está desactivado, los hosts y orígenes CSRF son exactos y PostgreSQL requiere TLS. Se reconoce el protocolo del proxy de Vercel y no se confía en un Host reenviado arbitrario. El endpoint de salud devuelve estado mínimo, sin configuración ni registros de negocio.
 
-Con `DEBUG=False`, la configuración exige secreto adecuado, hosts exactos y PostgreSQL con TLS. Activa cookies `Secure`, sesión `HttpOnly`, `SameSite=Lax`, HSTS, redirección HTTPS, `nosniff` y bloqueo de iframes. La confianza en `X-Forwarded-Proto` debe habilitarse sólo detrás de un proxy confiable. `/healthz/` permite el probe HTTP interno y únicamente informa si la consulta SQL funciona.
+Las medidas se comprobaron mediante pruebas y recorrido público, no mediante una auditoría de penetración completa. Persisten riesgos de acceso privilegiado a la base, denegación temporal por bloqueo de una cuenta atacada, errores operativos de configuración y dependencia de proveedores. No se declara certificación de seguridad, accesibilidad o cumplimiento legal.
 
-Las escrituras del flujo bloquean primero el vendedor autorizado y después el plan, dentro de `transaction.atomic()`. La revisión numérica detecta formularios obsoletos y produce 409. Las claves UUID de idempotencia deduplican reintentos de creación de planes y acciones. Las revisiones históricas tienen unicidad por objetivo/periodo. Los clientes antiguos que omiten revisión o clave no reciben todas esas garantías adicionales; no se afirma una deduplicación universal.
+Los datos usados en capturas y aceptación son ficticios. Una copia de seguridad puede contener hashes de contraseña y sesiones; por ello permanece privada y no acompaña al PDF, Word o repositorio. Las evidencias públicas muestran resultados, no contraseñas, cookies, claves ni cadenas de conexión.
 
-El cierre comparte bloqueos con las revisiones: si una revisión se confirma primero, puede formar parte de la evaluación; si gana el cierre, la revisión posterior se rechaza. Ante una excepción, la transacción revierte el cambio y no deja un cierre parcial. Las ocho pruebas de concurrencia utilizan conexiones independientes a PostgreSQL.
+## 11. Implementación y recorrido de datos
 
-| Medida | Verificación disponible | Límite pendiente |
+![Figura 5. Ciclo implementado: medición, diagnóstico, acciones, seguimiento y finalización.](diagramas/flujo-mejora.svg)
+
+La evolución del repositorio conserva base Django/React, gestión de planes, interfaz operativa, controles de concurrencia y correcciones posteriores. F01–F03 son decisiones de integridad de SAP que refuerzan el proceso; la guía no exige nominalmente esos tres identificadores.
+
+| Hito | Referencia conservada |
+| --- | --- |
+| Base Django/React | f844974 |
+| Planes y dominio | 39a6d07 |
+| Interfaz operativa | 0ec5a25 |
+| Seguridad, PostgreSQL y concurrencia | 49ee198 |
+| Preparación Vercel/Neon | 54ac2cd |
+| Rectificaciones, fechas y cierre histórico | 160fc4c |
+| Candidato desplegado y aprobado | 97b4bff |
+| Acta y evidencias posteriores | 575c6c9 |
+
+El flujo central comprobado parte de una observación ficticia del 6 % y una meta del 3 %. La revisión del 4,5 % representa mejora respecto al inicio, pero no alcanza esa meta. La revisión del 3 % sí la alcanza. Una tarea pendiente no se transforma en completada al cerrar y una valoración narrativa del agente no sustituye a la comparación numérica.
+
+Una selección de campos comprobados del plan público 5 ilustra el resultado; no es la respuesta completa de la API:
+
+```json
+{
+  "id": 5,
+  "status": "closed",
+  "closure_evaluation": {"result": "achieved"}
+}
+```
+
+El plan 6 muestra el caso complementario: una corrección cambia la medición efectiva al 4 % y el resultado es no alcanzado. Mantener ambos ejemplos evita confundir la finalización administrativa con un éxito impuesto por el sistema.
+
+![Figura 6. Dashboard público con datos obtenidos del backend.](screenshots/entrega-dashboard-publico.png)
+
+## 12. Estrategia de pruebas y resultados observados
+
+| Entorno | Evidencia realmente disponible | Qué no demuestra por sí solo |
 | --- | --- | --- |
-| Sesión, rol, aislamiento y CSRF | Suite y Chromium locales | Repetir desde dominio público |
-| Bloqueos y conflictos | PostgreSQL 14.24 local; CI PostgreSQL 16 | Validación operativa en proveedor |
-| Configuración segura y cookies | QA con DEBUG=False y TLS local | Certificado público y proxy real |
-| Backup | pg_dump y restauración separada coincidente | PITR, retención y recuperación remotos |
-| Secretos | Revisión acotada de archivos e historial sin secretos reales detectados | No es garantía exhaustiva |
+| Pruebas de configuración y frontend | Siete pruebas Django de configuración y ejecución node:test aprobadas antes del candidato | Todos los escenarios de usuario en producción |
+| CI de 97b4bff | Workflow aprobado con checks, build, SQLite y PostgreSQL 16 | Que Neon sea PostgreSQL 16 o que el servicio no pueda caer |
+| Chromium público | Login, flujo central, errores, CSRF, permisos, recarga y móvil a 390 px | Uso desde un dispositivo físico o una segunda red independiente |
+| Aceptación F01–F03 | Historial, rechazo de futuras, cierre y bloqueo de cambios posteriores | Escrituras SQL privilegiadas fuera de las rutas soportadas |
+| Redespliegue del candidato | JSON íntegro de planes de control y sesión conservados | Migración hacia una versión futura incompatible |
+| Restauración aislada PostgreSQL 18 | Datos y esquema coincidentes; lectura funcional e histórico con calendario avanzado | Un servicio de copias automáticas o PITR de varios días |
 
-Los datos de demostración son ficticios. Las evidencias son textos, no archivos subidos. Las contraseñas de evaluación se comparten por canal privado, nunca en GitHub. Los backups incluyen hashes y sesiones y requieren custodia privada. El runbook propone recuperación del proveedor y exportaciones, pero no se afirma que estén configuradas remotamente.
+El acta de publicación identifica planes 5 y 6 y los dos deployments del mismo SHA. El primero procede de una copia exacta del commit; el final se generó desde Git tras corregir el permiso de la GitHub App y la conexión al repositorio ID 1430152684. El alias fue comprobado antes y después.
 
-Riesgos residuales: acceso privilegiado directo a la base; indisponibilidad temporal por bloqueo de una cuenta atacada; ausencia de recuperación de contraseña por correo; históricos grandes sin paginación en el detalle; dependencia de la correcta configuración del proveedor. No se declara certificación de seguridad, accesibilidad ni cumplimiento legal a partir de estas pruebas.
+La preparación académica completó filtros de vendedores por planes abiertos y filtros de planes por estado, contrastando interfaz y API. Para la paginación se utilizaron registros ficticios temporales del segundo agente hasta disponer de 51 vendedores: dos páginas reales de 50 y 1 resultados. Se comprobaron límites, ausencia de duplicados, navegación, reinicio de página al filtrar/buscar y aislamiento. Se eliminaron solo los registros creados para la prueba y se verificó la conservación de los existentes. El JSON específico registra el resultado y su alcance; no representa una simulación con datos interceptados.
 
-## 11. Desarrollo e implementación
+![Figura 7. Segunda página real del directorio durante la prueba ficticia; los registros temporales se retiraron al terminar.](screenshots/entrega-paginacion-publica.png)
 
-La base funcional separó vendedores y calidad. La Fase 1 incorporó `ImprovementPlan`, `PlanMetric`, `PlanAction` y `PlanReview`, servicios de evaluación y cierre, y gestión por Admin. La Fase 2 añadió el flujo operativo en React y su API, reutilizando reglas de dominio. La Fase 3 reforzó configuración, PostgreSQL, concurrencia, reintentos, autenticación y recuperación local. La Fase 4 audita la entrega y prepara documentación, capturas, vídeo y defensa; el cierre público aún depende de publicación autorizada.
+La navegación entre dos páginas se ejercitó en vendedores, que comparte el componente Pagination con otros listados. Los filtros de planes se probaron con sus registros existentes; no se generaron veintiún planes únicamente para forzar una segunda página. Esa distinción limita correctamente la cobertura afirmada.
 
-| Hito | Commit conservado |
+Las cifras de 77, 110 o 112 pruebas de informes anteriores identifican ejecuciones históricas diferentes, algunas con clases heredadas. No se suman ni se presentan como nuevos casos independientes. Para el candidato entregado se cita la CI de su SHA exacto y los resultados de los recorridos ejecutados.
+
+## 13. Despliegue real y operación gratuita
+
+La URL pública es [https://sap-bice.vercel.app](https://sap-bice.vercel.app). El código servido corresponde a 97b4bff55a07b8fd3c71b05740748db5bf63438b y el deployment final es dpl_DVtuHFEv9eTba7V8ShdLASR9BBTi. La documentación posterior está en 575c6c942318885d6b7427ccedabc1eea7cc5887; esta actualización académica todavía es local. Ninguno de esos identificadores se intercambia por la etiqueta ambigua «última versión».
+
+Vercel utiliza preset Django, raíz backend, acceso al frontend situado fuera de esa raíz, build python build_vercel.py y función WSGI en Frankfurt. El builder instala dependencias, compila React y recoge estáticos. En el deployment final se confirmó Node 22.x; Python ejecuta Django. Los datos y las sesiones permanecen en Neon, no en el sistema de archivos de Vercel.
+
+Neon utiliza el proyecto empty-feather-02803695 y la rama production, PostgreSQL 18. La rama es predeterminada y no tiene fecha de expiración. La aplicación usa DATABASE_URL pooled con TLS y psycopg, sin pool adicional local ni cursores que deban sobrevivir una transacción de PgBouncer. La conexión directa se reserva para administración y copias.
+
+Las variables de Production comprenden secreto Django estable, conexión, hosts exactos, orígenes CSRF y desactivación explícita de DEBUG y modo demo. No se comparten secretos con Preview. El secreto se conserva entre los dos deployments; la continuidad de sesión también quedó comprobada. Ni esta memoria ni el repositorio contienen sus valores.
+
+Vercel Hobby y Neon Free fueron confirmados al finalizar la publicación. No se añadieron medios de pago, pruebas de pago ni servicios contratados. La solución es adecuada para la demostración académica de bajo tráfico dentro de las condiciones y cuotas de esos planes. No se promete disponibilidad ilimitada: el autor debe revisar consumo, acceso y alojamiento durante la evaluación. Render permanece como antecedente, no como infraestructura vigente.
+
+## 14. Persistencia, copias y recuperación
+
+La comprobación de persistencia comparó los mismos IDs antes y después del redespliegue desde Git. Se conservaron el JSON completo del plan 6, sus acciones y revisiones, la instantánea y el aislamiento; el plan 5 mantuvo el resultado alcanzado. También sobrevivió la sesión. No se repitieron migraciones ni semillas para reconstruir ese estado.
+
+Para recuperar una copia se empleó pg_dump 18.6, compatible con el servidor 18. El cliente 14 inicialmente instalado no era adecuado para exportarlo. Las herramientas necesarias se extrajeron temporalmente desde paquetes oficiales verificados, sin sustituir otros servicios del sistema.
+
+Se exportó un snapshot repeatable-read de solo lectura a una copia privada. pg_restore creó su contenido exclusivamente en un PostgreSQL 18 local aislado, base sap_recovery_20261103. Coincidieron los conteos y huellas de las 21 tablas públicas, los índices, las restricciones y las 33 migraciones registradas. La aplicación Django pudo consultar los planes de control en esa base. El servidor temporal quedó detenido después.
+
+La copia y las credenciales están fuera de Git y de los entregables, en ubicaciones privadas con directorios 0700 y archivos 0600. No se restauró sobre Production. La prueba acredita recuperación de ese snapshot en un destino aislado, no la existencia de backups programados, un objetivo RPO/RTO garantizado o una ventana ilimitada de restauración del proveedor.
+
+## 15. Limitaciones y trabajo posterior
+
+SAP no ha sido evaluada por una muestra de agentes en un estudio de utilidad. Los ejemplos son ficticios; el autor no atribuye mejoras económicas o de productividad a sus resultados. No hay integración de datos, correo de recuperación de contraseña, notificaciones ni adjuntos. El detalle de un histórico extenso no está paginado como los listados generales.
+
+La validación de fechas y ciertas reglas entre entidades depende de las rutas de aplicación. Un acceso privilegiado directo puede eludirlas. Los escenarios de concurrencia probados no representan todas las intercalaciones posibles y las pruebas de seguridad no equivalen a una auditoría exhaustiva.
+
+La comprobación desde una segunda red independiente continúa pendiente. Cambiar de sesión, agente o navegador en el mismo equipo no resuelve ese pendiente. Las capturas móviles corresponden a emulación, no a un dispositivo físico. La continuidad durante revisión y defensa sigue siendo una responsabilidad operativa del autor.
+
+Las mejoras futuras razonables serían validar la utilidad con participantes, mejorar la navegación de históricos grandes y estudiar importaciones autorizadas que conserven procedencia y periodos. Son propuestas; no se han incorporado durante esta preparación. Antes de ampliar el producto debe definirse qué necesidad y prueba justifican cada cambio.
+
+## 16. Conclusiones
+
+SAP materializa un flujo de seguimiento coherente con Django y React: relaciona diagnóstico, compromisos y mediciones, conserva sus referencias y permite un cierre explicado. La separación entre tarea ejecutada, mejora observada, objetivo alcanzado y estado administrativo evita que la herramienta fabrique una conclusión favorable por el mero hecho de finalizar un caso.
+
+F01 refuerza la trazabilidad de las correcciones; F02 protege el significado temporal de las observaciones; F03 conserva la situación histórica del cierre. La publicación, el redespliegue y la restauración aportan evidencia técnica concreta, con un SHA y entornos identificables. No sustituyen un estudio de impacto profesional ni la comprensión personal del código.
+
+La memoria y sus materiales de apoyo preparan la entrega, pero quedan el vídeo real accesible de hasta cinco minutos, la revisión personal del autor y el procedimiento académico. La defensa debe explicar estas decisiones desde el código y reconocer los límites, sin memorizar afirmaciones que no se puedan justificar.
+
+## Anexo A. Correspondencia con la guía académica
+
+La guía original se releyó mediante Google Drive el 03/11/2026; su modificación indicada sigue siendo 08/10/2026. No se redistribuye una copia de la academia. La correspondencia se expresa en contenido propio de SAP:
+
+| Apartado explícito | Cobertura en esta memoria |
 | --- | --- |
-| Inicio | `048450c` |
-| Base Django y React | `f844974` |
-| Fase 1 | `39a6d07` |
-| Fase 2 | `0ec5a25` |
-| Fase 3 | `49ee198` |
+| Problema y contexto | Resumen y secciones 1–2: necesidad, impacto potencial, solución y exclusiones |
+| Aportación y eficiencia | Sección 3: capacidades observadas y beneficios esperados sin métricas inventadas |
+| Tecnologías justificadas | Secciones 4 y 7–8: Django, React, base, librerías y decisiones de arquitectura |
+| Tipos de usuarios | Sección 5: visitante, cuenta sin rol, agente y administración |
+| Casos de uso | Sección 6: actores, flujo, resultado y errores; sección 11 para el recorrido central |
+| Seguridad y protección de datos | Secciones 9–10 y 14: autenticación, validación, CSRF/XSS, hashing, secretos, HTTPS y copias |
 
-Una decisión central fue conservar sesiones y un único origen. Otra fue separar el resultado medido del estado administrativo del plan: cerrar no debe reescribir mediciones ni convertir acciones pendientes en completadas. Las políticas versionadas evitan evaluar un histórico con reglas cambiadas a posteriori.
+Los mínimos técnicos se localizan en modelos, vistas y plantillas Django, autenticación y persistencia, vistas React con API real, URL pública y repositorio con README e historial progresivo. Las figuras incluyen arquitectura, entidades, flujo y capturas reales; el ejemplo de API se vincula a un caso comprobado.
 
-PostgreSQL permitió comprobar bloqueos que SQLite no demuestra. La revisión de formulario se añadió para evitar que una edición antigua sobrescriba un cambio reciente, problema distinto del bloqueo simultáneo. La idempotencia resolvió el reintento de una creación cuya respuesta podía perderse. Las pruebas muestran estos comportamientos por separado.
+Los cuatro elementos de entrega son repositorio, aplicación, memoria PDF o Word y vídeo con enlace accesible. Los tres primeros tienen material preparado o comprobado; el vídeo sigue sin grabar. La guía limita el vídeo a cinco minutos y la defensa a veinte. La rúbrica pondera backend 30 %, React 15 %, arquitectura 15 %, seguridad 15 %, documentación 15 % y reflexión 10 %; no se deriva una calificación de estas pruebas.
 
-En Fase 4 no se modifican modelos, migraciones, umbrales ni funcionalidades. Se amplía el script de navegador para capturar pantallas intermedias y verificar logout. La revisión visual detectó capturas tomadas durante la carga; se añadieron esperas sobre los datos antes de obtener las imágenes definitivas. Los informes anteriores se conservan como evidencia histórica, incluso cuando describen pendientes ya resueltos.
+El autor debe contrastar las aprobaciones previas y la confirmación docente con sus justificantes. Una declaración previa no equivale a inspeccionar un expediente. Tras la revisión académica corresponde al equipo docente convocar la defensa. La memoria no afirma que se haya realizado una entrega formal o una evaluación.
 
-## 12. Testing y validación
+## Anexo B. Evidencias visuales y acceso
 
-La estrategia combina pruebas de reglas, integración HTTP, transacciones concurrentes y un recorrido de navegador. Cada nivel comprueba una propiedad distinta: aprobar el clasificador no prueba que un formulario llegue al servidor, y pasar un navegador local no acredita Internet.
+![Figura 8. Casos de uso y alcance de los roles implementados.](diagramas/casos-uso.svg)
 
-| Comprobación del 28/10/2026 | Resultado y entorno |
-| --- | --- |
-| Suite Django completa | 77/77 en PostgreSQL 14.24 temporal |
-| Concurrencia | Ocho pruebas incluidas en esas 77, no adicionales |
-| JavaScript | 7/7 casos node:test con Node 22.19.0 |
-| Compilación React | Vite correcta; recursos generados |
-| Dependencias Python | pip check sin incompatibilidades |
-| Migraciones | Base vacía, comprobación de aplicación y ausencia de deriva correctas |
-| Seguridad estática | check --deploy correcto; excepción axes.W006 documentada |
-| Navegador | Chromium, escritorio 1440 px y móvil emulado 390 px; flujo y logout correctos |
-| Permisos y CSRF en navegador | Agente ajeno rechazado; escritura sin CSRF rechazada |
-| Disponibilidad SQL | Salud 200 con DB y 503 al detenerla en QA |
-| Persistencia | Datos coincidentes tras reiniciar PostgreSQL, Gunicorn y repetir release |
-| Recuperación | pg_dump/pg_restore en otra base; huellas y migraciones coincidentes |
-| GitHub Actions | Run 40747706230, success, para `49ee198` |
-| Producción pública | No ejecutada; no existe URL confirmada |
+![Figura 9. Encuadre público móvil del plan 5, emulado a 390 × 844 px; la captura completa se conserva como evidencia.](screenshots/entrega-movil-publico.png)
 
-El resumen revisado se conserva en `docs/evidencias-fase-4.json`; los logs completos están en `artifacts/phase4-evidence/`, excluidos de Git por contener contexto operativo. El índice de evidencias registra hashes de capturas y logs para relacionarlos con la ejecución. Las auditorías de dependencias sin avisos son evidencia de Fase 3, fechada el mismo día; no se presentan como una nueva auditoría de vulnerabilidades de Fase 4.
+Las capturas públicas de la aceptación inicial y las tomadas para filtros/paginación se distinguen de las históricas de QA local. Ninguna muestra contraseñas, claves ni cabeceras de sesión. El índice visual, el acta y los JSON de evidencia conservan su procedencia y límites.
 
-Para reproducir la QA se compila React y se ejecuta `python3 scripts/verify_phase3.py --pg-bin /usr/lib/postgresql/14/bin --artifacts artifacts/phase4-evidence`. El script crea recursos temporales propios y los elimina al terminar. Requiere binarios PostgreSQL, OpenSSL y Python con Playwright/Chromium; no modifica la base de trabajo del autor. Las pruebas Django deben ejecutarse desde `backend/` para descubrir las aplicaciones.
+El material editable de esta memoria es memoria-pfm.md y su exportación memoria-pfm.docx; memoria-pfm.pdf es la versión paginada. Los guiones de vídeo y defensa y la checklist forman parte del paquete local de preparación. No se incluyen archivos privados, backups, datos de sesión ni una copia de sources/.
 
-No se han probado navegadores Safari/Firefox, dispositivos físicos, carga pública concurrente, recuperación del proveedor ni accesibilidad certificada. El histórico de un plan muy grande puede necesitar paginación. Los resultados locales no se extrapolan al tamaño mínimo de Render.
+## Anexo C. Referencias verificables
 
-## 13. Demostración práctica
+- [Guía original del Proyecto Final de Máster](https://docs.google.com/document/d/1KhmvNgC4g9WI8suPOBjGFcUCQeA8rVPkoVS53fYLOkQ/edit), consultada mediante Google Drive; apartados y límites contrastados en esta revisión.
+- [Aplicación pública SAP](https://sap-bice.vercel.app), con cuentas ficticias entregadas por canal privado.
+- [Código exacto desplegado, commit 97b4bff](https://github.com/Pablorossl/Seller-Action-Plan-SAP-/tree/97b4bff55a07b8fd3c71b05740748db5bf63438b).
+- [CI del candidato desplegado](https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/41722300443), resultado success.
+- [Documentación posterior 575c6c9](https://github.com/Pablorossl/Seller-Action-Plan-SAP-/tree/575c6c942318885d6b7427ccedabc1eea7cc5887), con acta y evidencias de publicación.
+- [Acta versionada de publicación](https://github.com/Pablorossl/Seller-Action-Plan-SAP-/blob/575c6c942318885d6b7427ccedabc1eea7cc5887/docs/verificacion-publica.md). Las pruebas adicionales de filtros y esta revisión académica son posteriores y permanecen locales hasta una publicación autorizada.
 
-El vendedor **Tienda Ficticia Envíos**, referencia `SAP-DEMO-PLAN`, tiene incidencias del 6% en julio de 2026, canal `ficticio-es` y cien pedidos ficticios. Se crea un nuevo plan con causa de ejemplo «embalaje insuficiente y falta de control previo» y meta del 3%. El plazo del plan es posterior a su creación; las mediciones de julio, agosto y septiembre son periodos históricos introducidos para la demostración.
-
-![Figura 5. Dashboard con datos reales del backend en QA local.](screenshots/fase-4-dashboard.png)
-
-![Figura 6. Indicadores del vendedor ficticio y contexto de medición.](screenshots/fase-4-indicadores.png)
-
-Se registran una acción correctiva de preparación y expedición y otra preventiva de control. Tras activar el plan, la primera se completa con fecha y evidencia. La segunda permanece pendiente deliberadamente. Se registra una revisión de agosto del 4,5% y otra de septiembre del 3%, ambas con cien pedidos; el autor y la fecha de registro los conserva el sistema.
-
-![Figura 7. Gestión real de una acción: estado, fecha y evidencia.](screenshots/fase-4-accion.png)
-
-![Figura 8. Revisiones de septiembre y agosto, ordenadas por periodo medido.](screenshots/fase-4-historial-revisiones.png)
-
-En incidencias, disminuir es mejorar. El 4,5% mejora respecto al 6%, pero no alcanza el objetivo del 3%; el 3% sí lo alcanza por igualdad. La clasificación informativa de calidad y el logro de la meta son cálculos relacionados pero distintos. La valoración escrita por el agente no sustituye esas comparaciones.
-
-![Figura 9. Evaluación calculada por Django: inicial, objetivo y último valor.](screenshots/fase-4-evaluacion.png)
-
-El cierre requiere razones y confirmación. Guarda `closure_evaluation.result=achieved` y conserva la acción preventiva pendiente. Después de recargar, el plan sigue cerrado y mantiene dos acciones y dos revisiones. Otro agente no puede consultarlo ni cerrarlo. El archivo de evidencia `react-django.json` guarda únicamente el endpoint y la evaluación ficticia, sin tokens ni cookies.
-
-![Figura 10. Razones y resultado del cierre persistido.](screenshots/fase-4-resultado-cierre.png)
-
-El caso demuestra funcionamiento de SAP, no un resultado conseguido por PcComponentes. No hay medición de pedidos reales ni conexión corporativa. La semilla y el recorrido permiten repetir el ejemplo con cuentas aisladas.
-
-## 14. Limitaciones y mejoras futuras
-
-El límite inmediato para entregar es la ausencia de una URL pública verificada. Existe una receta Render coherente con la arquitectura, pero faltan autorización de coste, provisión y acta de aceptación. El vídeo real tampoco está grabado y no se dispone de confirmación administrativa. Estos pendientes son obligatorios para declarar finalizada la fase.
-
-El producto registra observaciones manuales, no calcula métricas desde pedidos. Su convención de ventana mensual está documentada en `docs/dominio.md`; no se presenta como reproducción certificada del algoritmo interno de Mirakl. Las revisiones no actualizan observaciones globales. No hay adjuntos, correo, roles externos ni registro universal de auditoría.
-
-Como evolución posible, después de validar utilidad con usuarios, podrían estudiarse importación autorizada desde Mirakl API, notificaciones, informes, automatización de seguimientos y analítica. Son propuestas no implementadas. Una integración exigiría revisar procedencia, permisos, periodos, duplicados y límites operativos antes de ampliar el esquema. Ninguna de estas mejoras se trata como requisito añadido de aprobación.
-
-## 15. Conclusiones
-
-SAP aborda una necesidad concreta: relacionar desviaciones de calidad con decisiones y acciones de mejora que puedan revisarse. El producto desarrollado permite seguir ese ciclo de principio a fin y conservar el contexto de la decisión de cierre. Su aportación esperada es organizativa y de trazabilidad; el impacto profesional cuantitativo queda por medir.
-
-El trabajo demuestra integración de Django y React, diseño relacional, validación de reglas, autorización por objeto y operación, pruebas y preparación de despliegue. La comprobación con PostgreSQL permitió distinguir transacciones, bloqueo de filas, edición obsoleta e idempotencia, en lugar de atribuir todas esas garantías a un único mecanismo.
-
-El aprendizaje técnico debe poder explicarse desde el código: dónde se autoriza, qué se valida, cómo se evalúa y qué sucede ante un error. La defensa preparada propone preguntas y puntos de navegación para que el autor los ensaye con sus propias palabras. Los materiales de apoyo no sustituyen su comprensión ni acreditan autoría por sí mismos.
-
-La memoria documenta una aplicación funcional y comprobada localmente. Para culminar la entrega es necesario publicar y verificar el servicio, grabar el vídeo de hasta cinco minutos, confirmar requisitos académicos y revisar los enlaces finales. La transparencia sobre estos límites forma parte del rigor del proyecto.
-
-## Anexo A. Evidencias de interfaz
-
-Las siguientes capturas se tomaron durante la misma QA local, con datos ficticios. Se conservan los originales PNG y un índice con su procedencia. Las imágenes de móvil documentan emulación de 390 px, no una prueba sobre un dispositivo físico.
-
-![Figura 11. Login Django, antes de introducir credenciales.](screenshots/fase-4-login.png)
-
-![Figura 12. Directorio de vendedores autorizado.](screenshots/fase-4-vendedores.png)
-
-![Figura 13. Ficha del vendedor e histórico.](screenshots/fase-4-vendedor.png)
-
-![Figura 14. Listado de planes persistidos.](screenshots/fase-4-planes.png)
-
-![Figura 15. Formulario de creación con diagnóstico y objetivo.](screenshots/fase-4-formulario-plan.png)
-
-![Figura 16. Detalle del borrador recién creado.](screenshots/fase-4-detalle-plan.png)
-
-![Figura 17. Confirmación explícita del cierre.](screenshots/fase-4-confirmacion-cierre.png)
-
-## Anexo B. Referencias y acceso a evidencias
-
-La fuente académica obligatoria es [FS Proyecto Final - Máster en Desarrollo Full Stack](https://docs.google.com/document/d/1KhmvNgC4g9WI8suPOBjGFcUCQeA8rVPkoVS53fYLOkQ/edit), consultada el 28/10/2026. Su identificación, condiciones y contraste están en `docs/fuentes-pfm.md`; la matriz completa se encuentra en `docs/trazabilidad-requisitos.md`.
-
-Código público: [Seller Action Plan en GitHub](https://github.com/Pablorossl/Seller-Action-Plan-SAP-). Verificación remota de código: [CI de Fase 3](https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/40747706230). La documentación de Fase 4 permanece local hasta un push autorizado. **Aplicación pública: pendiente. Vídeo: pendiente.** No se presentan enlaces de ejemplo como entregables existentes.
-
-Referencias del repositorio: `backend/action_plans/models.py`, `services.py`, `views.py`, `concurrency.py`; `backend/quality/rules.py` y `services.py`; `backend/sellers/models.py`; `backend/config/settings.py`; `frontend/src/services/api.js`; `frontend/src/pages/`; `scripts/verify_browser.py`; `scripts/verify_phase3.py`. Informes históricos: `docs/fase-1.md`, `docs/fase-2.md`, `docs/fase-3.md`.
-
-Operación propuesta: [Blueprint Render](https://render.com/docs/blueprint-spec), [precios](https://render.com/pricing), [backups](https://render.com/docs/postgresql-backups) y `docs/despliegue.md`. La continuidad y recuperación reales se registrarán en `docs/verificacion-publica.md` cuando exista infraestructura autorizada.
+Los puntos de navegación del código son backend/config/settings.py y views.py; sellers/models.py y permissions.py; quality/models.py, services.py y views.py; action_plans/models.py, services.py, views.py, serializers.py y concurrency.py; frontend/src/services/api.js, components/ui.jsx y pages/. Los scripts de QA y los informes históricos se conservan en el repositorio. El checklist final separa lo comprobado de lo preparado y de lo que requiere intervención personal.
