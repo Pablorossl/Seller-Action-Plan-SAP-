@@ -6,6 +6,8 @@ código, enlaces e imágenes locales. No pretende ser un parser Markdown general
 """
 from html import escape
 from pathlib import Path
+import argparse
+import os
 import re
 
 from playwright.sync_api import sync_playwright
@@ -107,20 +109,20 @@ def render(markdown):
 CSS = '''
 @page { size: A4; margin: 18mm 18mm 20mm; }
 * { box-sizing: border-box; }
-body { font: 10.5pt/1.48 Arial, sans-serif; color: #253630; margin: 0; }
+body { font: 10.5pt/1.46 Arial, sans-serif; color: #253630; margin: 0; }
 p { orphans: 3; widows: 3; margin: 0 0 3.5mm; }
 h1 { color:#123c32; font-size: 34pt; line-height:1.12; margin: 0 0 15mm; }
 h2 { color:#123c32; font-size: 20pt; line-height:1.2; margin:8mm 0 5mm; }
-h2#section-0, h2#section-16, h2#section-17 { break-before:page; margin-top:0; }
+h2#section-0 { break-before:page; margin-top:0; }
 h3 { font-size:12pt; color:#176b50; margin:6mm 0 3mm; }
 h2,h3 { break-after:avoid; }
-.cover { padding-top:40mm; break-after:page; }
-.cover p { margin-bottom:8mm; }
+.cover { padding-top:24mm; break-after:page; }
+.cover p { margin-bottom:5mm; }
 .cover p:nth-of-type(1) { font-size:16pt; }
 .toc { break-after:page; }
 .toc h2 { margin-top:0; }
 .toc ol { list-style:none; padding:0; }
-.toc li { padding:2.4mm 0; border-bottom:1px solid #e2e8e4; }
+.toc li { padding:1.7mm 0; border-bottom:1px solid #e2e8e4; }
 a { color:#176b50; text-decoration:none; overflow-wrap:anywhere; }
 code { font:9pt/1.4 monospace; background:#f1f4f2; overflow-wrap:anywhere; }
 pre { white-space:pre-wrap; background:#f1f4f2; padding:4mm; font-size:9pt; }
@@ -130,18 +132,25 @@ th,td { padding:2.5mm; border:1px solid #cbd8d0; vertical-align:top; overflow-wr
 tr { break-inside:avoid; }
 thead { display:table-header-group; }
 figure { margin:6mm 0; break-inside:avoid; text-align:center; }
-figure img { display:block; max-width:100%; max-height:205mm; width:auto; height:auto; margin:0 auto; }
+figure img { display:block; max-width:100%; max-height:185mm; width:auto; height:auto; margin:0 auto; }
 figcaption { font-size:9pt; line-height:1.4; margin-top:3mm; color:#52665b; }
 '''
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--chromium", default=os.environ.get("SAP_CHROMIUM_EXECUTABLE"))
+    parser.add_argument("--docx", action="store_true", help="Exportar también una copia Word editable con python-docx.")
+    args = parser.parse_args()
     BUILD.mkdir(parents=True, exist_ok=True)
     html = '<!doctype html><html lang="es"><meta charset="utf-8"><title>Seller Action Plan — Memoria PFM</title><style>' + CSS + '</style><body>' + render(SOURCE.read_text()) + '</body></html>'
     path = BUILD / "memoria-pfm.html"
     path.write_text(html)
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True)
+        launch = {"headless": True}
+        if args.chromium:
+            launch["executable_path"] = args.chromium
+        browser = pw.chromium.launch(**launch)
         page = browser.new_page()
         page.route(re.compile(r"^https?://"), lambda route: route.abort())
         page.goto(path.as_uri())
@@ -149,7 +158,10 @@ def main():
         assert page.locator('img').count() == len(re.findall(r'^!\[', SOURCE.read_text(), re.M))
         page.pdf(path=str(DOCS / "memoria-pfm.pdf"), format="A4", print_background=True,
             prefer_css_page_size=True, display_header_footer=True, header_template='<span></span>',
-            footer_template='<div style="font:8px Arial;width:100%;margin:0 18mm;color:#52665b;display:flex;justify-content:space-between"><span>SAP · Pablo Rosales · Memoria para revisión</span><span><span class="pageNumber"></span> / <span class="totalPages"></span></span></div>')
+            footer_template='<div style="font:8px Arial;width:100%;margin:0 18mm;color:#52665b;display:flex;justify-content:space-between"><span>SAP · Pablo Rosales · Memoria académica</span><span><span class="pageNumber"></span> / <span class="totalPages"></span></span></div>')
+        if args.docx:
+            from export_docx import export_docx
+            export_docx(render(SOURCE.read_text()), browser, DOCS, BUILD)
         browser.close()
     print(f"PDF generado: {DOCS / 'memoria-pfm.pdf'}")
 

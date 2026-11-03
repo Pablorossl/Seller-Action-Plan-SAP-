@@ -2,11 +2,11 @@
 
 Aplicación web para documentar y seguir planes de mejora de vendedores de marketplace a partir de indicadores de calidad. Proyecto Final del Máster en Desarrollo Full Stack de ConquerBlocks.
 
-**Estado: Fase 4 preparada localmente; entrega oficial pendiente de URL pública, vídeo y confirmación académica.** Consulta el [informe actual](docs/fase-4.md), la [memoria PDF](docs/memoria-pfm.pdf) y la [matriz de cumplimiento](docs/trazabilidad-requisitos.md).
+**Estado: aplicación pública validada; entrega académica preparada, con vídeo real y entrega personal pendientes.** Consulta el [índice de entrega](docs/entrega-academica-final-2026-11-03.md), la [memoria PDF](docs/memoria-pfm.pdf), el [Word editable](docs/memoria-pfm.docx) y la [matriz de cumplimiento](docs/trazabilidad-requisitos.md).
 
-Incremento local del 03/11/2026: rectificación de revisiones con historial, protección frente a observaciones futuras y vencimientos conservados al cierre. Consulta la [trazabilidad actualizada](docs/trazabilidad-requisitos.md#vigencia-del-candidato-local--03112026) y el [diagnóstico de publicación](docs/diagnostico-publicacion-2026-11-03.md). Publicación, aceptación pública y vídeo siguen pendientes.
+Código desplegado: **`97b4bff55a07b8fd3c71b05740748db5bf63438b`**. Documentación pública posterior de partida: **`575c6c9`**. Esta revisión académica es local y no implica push ni redespliegue. Rectificaciones con historial (F01), fechas observadas válidas (F02) y cierre histórico (F03) están documentados en la [memoria](docs/memoria-pfm.md) y el [acta pública](docs/verificacion-publica.md).
 
-Dashboard operativo, vendedores con búsqueda y ficha individual, planes con varios indicadores, acciones, revisiones y cierre desde React integrado con Django. Los informes de [Fase 1](docs/fase-1.md), [Fase 2](docs/fase-2.md) y [Fase 3](docs/fase-3.md) conservan las decisiones y evidencias históricas. La [guía Vercel Hobby + Neon Free](docs/despliegue-vercel.md) prepara la publicación académica sin coste dentro de sus cuotas; todavía no existe un despliegue público verificado.
+Dashboard operativo, vendedores con búsqueda y ficha individual, planes con varios indicadores, acciones, revisiones y cierre desde React integrado con Django. Los informes de [Fase 1](docs/fase-1.md), [Fase 2](docs/fase-2.md) y [Fase 3](docs/fase-3.md) conservan las decisiones y evidencias históricas. [SAP público](https://sap-bice.vercel.app) utiliza Vercel Hobby + Neon Free, con presupuesto de 0 € dentro de sus condiciones y cuotas.
 
 Proyecto académico independiente: no es una aplicación oficial de PcComponentes ni de Mirakl. SAP no suspende tiendas, no bloquea pagos ni tramita reaperturas. Se utilizan exclusivamente datos ficticios y reproducibles.
 
@@ -53,22 +53,23 @@ SAP propone complementar estos sistemas con un registro de indicadores, planes c
 | Restringir cada agente a sus vendedores | Consultas filtradas y pruebas de acceso implementadas |
 | Mostrar datos persistidos en Django y React | Plantillas HTML y dashboard, vendedores y planes en React implementados |
 | Vincular cada plan con responsables, acciones y revisión | Implementado en React y Django Admin; demo 6% → 4,5% → 3% y pruebas del flujo completo |
-| Reproducir la instalación y demostrar el flujo completo | Dependencias fijadas y memoria PDF preparada; vídeo y URL pública pendientes |
+| Reproducir la instalación y demostrar el flujo completo | Dependencias fijadas, flujo público aceptado y memoria PDF/Word revisada; vídeo real pendiente |
 
 ## Funcionalidades y estado
 
 | Estado | Funcionalidades |
 | --- | --- |
 | Implementado | Login/logout, grupos, vendedores asignados, API y React de vendedores/indicadores, políticas versionadas, clasificación informativa, planes con varios indicadores, acciones, revisiones históricas, cierre autorizado y dos demos idempotentes, migraciones y pruebas |
-| Fase 3 | PostgreSQL probado localmente, concurrencia, seguridad, Gunicorn, receta Render y QA de producción; publicación y backups remotos pendientes; CI de Fase 3 verificada |
+| Fase 3, antecedente | PostgreSQL local, concurrencia, seguridad, Gunicorn y receta Render; sus evidencias conservan el alcance histórico |
+| Publicación validada | Vercel Hobby/Neon Free, CI del SHA exacto, flujo público, F01–F03, persistencia y restauración aislada; filtros y paginación públicos completados |
 | Fase 2 | Dashboard con datos persistidos, fichas de vendedores, búsqueda y paginación, API de planes, formularios React, acciones, revisiones y cierre autorizado |
-| Previsto | Trazabilidad general de cambios y validación de producción |
+| Pendiente académico | Vídeo accesible, segunda red independiente, revisión personal, entrega y defensa |
 
 Las métricas son observaciones registradas, **no cálculos sobre pedidos importados**. La interfaz indica su canal y periodo; una observación histórica no representa automáticamente la situación actual. Las reglas y el tratamiento del periodo se explican en [dominio](docs/dominio.md).
 
 ## Tecnologías
 
-Versiones del repositorio auditado el 28/10/2026:
+Dependencias fijadas del repositorio y entornos comprobados; la memoria distingue las pruebas históricas y la publicación del 03/11/2026:
 
 | Tecnología | Versión | Función y justificación |
 | --- | --- | --- |
@@ -80,9 +81,9 @@ Versiones del repositorio auditado el 28/10/2026:
 | Vite | 7.3.7 | Desarrollo y compilación; rama mantenida, compatible con npm disponible |
 | @vitejs/plugin-react | 5.2.0 | Soporte JSX y actualización durante el desarrollo |
 | SQLite | Incluida en Python | Base local sin servicios adicionales |
-| PostgreSQL / psycopg | PostgreSQL 14.24 local; 16 propuesto para Render / driver 3.3.6 | Persistencia y bloqueos reales; instancia remota pendiente |
-| WhiteNoise | 6.12.0 | Estáticos Django y React compilados bajo el mismo origen |
-| Gunicorn | 26.2.0 | Servidor WSGI de producción, dos workers |
+| PostgreSQL / psycopg | Neon y recuperación: 18; CI: 16; QA histórico: 14.24 / driver 3.3.6 | Persistencia externa y bloqueos reales, sin confundir entornos |
+| WhiteNoise | 6.12.0 | Ejecución local y receta histórica; en Vercel los estáticos se sirven desde CDN |
+| Gunicorn | 26.2.0 | QA local y receta Render histórica; Vercel ejecuta WSGI sin ese comando de arranque |
 | django-axes | 8.3.1 | Bloqueo persistente de intentos de login |
 | tzdata | 2026.5 | Zona horaria disponible también en Windows |
 | unittest Django / node:test | Incluidos | Pruebas sin instalar otro framework |
@@ -338,11 +339,11 @@ El agente habilitado puede crear planes propios, añadir objetivos y acciones, r
 
 ## Seguridad
 
-Sesiones persistidas, CSRF en login/logout y escrituras, permisos por vendedor y operación, ORM y escape de HTML, FK protegidas, histórico inmutable y transacciones. React valida los formularios y Django vuelve a validar cada escritura. La Fase 3 añade bloqueo persistente de login (cinco fallos, quince minutos), revisiones para detectar ediciones obsoletas y claves idempotentes para crear planes/acciones sin duplicarlos al reintentar.
+Sesiones persistidas, CSRF en login/logout y escrituras, permisos por vendedor y operación, ORM y escape de HTML, FK protegidas, histórico conservado por las rutas soportadas y transacciones. React valida los formularios y Django vuelve a validar cada escritura. La Fase 3 añade bloqueo persistente de login (cinco fallos, quince minutos), revisiones para detectar ediciones obsoletas y claves idempotentes para crear planes/acciones sin duplicarlos al reintentar. El acceso SQL privilegiado puede eludir controles de aplicación; no se afirma inmutabilidad criptográfica.
 
 Con `DEBUG=False` se exige clave privada, hosts exactos y PostgreSQL con TLS; se activan cookies Secure, HSTS, redirección HTTPS y protección de iframes. No se permite `sslmode=disable`. `/healthz/` sólo informa de disponibilidad SQL y admite el probe HTTP interno. `check --deploy` no silencia avisos Django; se justifica exclusivamente `axes.W006` porque el bloqueo global por usuario no depende de IP, cookies o User-Agent. Véanse pruebas y explicación en [Fase 3](docs/fase-3.md).
 
-La cadena HTTPS/proxy y los backups **remotos** siguen pendientes de verificar. Se ha preparado Render PostgreSQL de pago y una estrategia de recuperación; la ventana PITR depende del workspace (Hobby: tres días según documentación actual). Procedimiento, credenciales docentes y riesgos residuales en [despliegue](docs/despliegue.md).
+HTTPS/proxy, permisos, CSRF, persistencia tras redesplegar y recuperación de una copia real de Neon se verificaron según el [acta](docs/verificacion-publica.md). La copia se restauró únicamente en PostgreSQL 18 aislado; no se acredita un backup programado ni PITR ilimitado. Render queda como antecedente, sin contratación. La segunda red independiente y la continuidad durante evaluación siguen pendientes.
 
 ## Testing
 
@@ -389,26 +390,27 @@ Verificación del build y paquete sin publicar: `python scripts/verify_vercel.py
 1. **Base técnica:** vendedores, indicadores, roles, React y tests, implementada.
 2. **Fase 1:** planes, acciones, objetivos, revisiones y cierre documentado desde Admin, implementada y probada.
 3. **Fase 2:** dashboard, vendedores y gestión React de planes, implementados; pruebas y capturas en [fase-2.md](docs/fase-2.md).
-4. **Fase 3:** preparación y verificación local de producción; faltan publicación y aceptación remota.
-5. **Fase 4:** memoria Markdown/PDF, capturas, diagramas, guion de 4:50 y preparación de defensa disponibles; grabación, publicación y confirmaciones pendientes.
+4. **Fase 3:** preparación y verificación local de producción, conservada como antecedente.
+5. **Publicación:** candidato `97b4bff` con CI aprobada, aceptación pública, persistencia y restauración aislada; ampliación de filtros/paginación documentada.
+6. **Entrega académica:** memoria Markdown/PDF/Word, capturas, diagramas, guion de 4:20 y defensa preparados; vídeo real, segunda red y procedimiento personal pendientes.
 
 El [roadmap detallado](docs/hoja-de-ruta.md) define criterios de aceptación. No se prevén integraciones Mirakl en esta fase.
 
 ## Demo y documentación académica
 
-**Aplicación pública: pendiente de verificar en `sap-bice.vercel.app`.** La demo local se abre en `http://127.0.0.1:8000/dashboard/` después de instalar, migrar, crear una cuenta, cargar los datos ficticios y compilar siguiendo este README. La demo controlada de evaluación y el acceso privado del tribunal se preparan según [despliegue Vercel](docs/despliegue-vercel.md). Nunca publicar contraseñas de evaluación en GitHub.
+**Aplicación pública validada: [sap-bice.vercel.app](https://sap-bice.vercel.app).** Las cuentas ficticias del tribunal se comparten por canal privado. La demo local se abre en `http://127.0.0.1:8000/dashboard/` tras preparar un entorno local separado; no repetir migraciones ni semillas de la instalación en Production. Procedimiento en [despliegue Vercel](docs/despliegue-vercel.md). Nunca publicar contraseñas de evaluación en GitHub.
 
 | Material | Ubicación |
 | --- | --- |
-| Informe de Fase 4 y pendientes | [fase-4.md](docs/fase-4.md) |
-| Memoria técnica | [PDF](docs/memoria-pfm.pdf) · [Markdown](docs/memoria-pfm.md) · [Conversión](docs/exportacion-memoria.md) |
-| Capturas, diagramas y pruebas | [Índice visual](docs/evidencias-visuales.md) · [Resultados JSON](docs/evidencias-fase-4.json) |
-| Vídeo, todavía sin grabar | [Guion de 4:50](docs/guion-video-pfm.md) |
-| Defensa | [Exposición y 25 preguntas](docs/preparacion-defensa.md) |
+| Índice de entrega y pendientes | [Entrega académica](docs/entrega-academica-final-2026-11-03.md) · [Fase 4 histórica](docs/fase-4.md) |
+| Memoria técnica | [PDF, 24 páginas revisadas](docs/memoria-pfm.pdf) · [Word](docs/memoria-pfm.docx) · [Markdown](docs/memoria-pfm.md) · [Conversión](docs/exportacion-memoria.md) |
+| Capturas, diagramas y pruebas | [Índice visual](docs/evidencias-visuales.md) · [Publicación](docs/evidencias-publicacion-2026-11-03.json) · [Filtros y paginación](docs/evidencias-filtros-paginacion-2026-11-03.json) |
+| Vídeo, todavía sin grabar | [Guion de 4:20](docs/guion-video-pfm.md) |
+| Defensa | [Exposición y 26 preguntas](docs/preparacion-defensa.md) |
 | Requisitos oficiales | [Matriz](docs/trazabilidad-requisitos.md) · [Fuentes](docs/fuentes-pfm.md) |
-| Cierre externo | [Acta pública pendiente](docs/verificacion-publica.md) · [Checklist de entrega](docs/checklist-entrega.md) |
+| Cierre externo | [Acta pública ejecutada](docs/verificacion-publica.md) · [Checklist de entrega](docs/checklist-entrega.md) |
 
-El caso 6% → 4,5% → 3% utiliza datos ficticios y demuestra software, no resultados empresariales. La memoria reconoce los pendientes; el proyecto no se declara listo para entregar mientras falten URL, vídeo y confirmaciones obligatorias.
+El caso 6% → 4,5% → 3% utiliza datos ficticios y demuestra software, no resultados empresariales. La URL de aplicación ya está validada; faltan vídeo real accesible, revisión personal y trámite académico. La revisión documental actual sigue local y no sustituye el SHA desplegado.
 
 ## Cumplimiento académico
 
@@ -418,20 +420,20 @@ El caso 6% → 4,5% → 3% utiliza datos ficticios y demuestra software, no resu
 | Modelos, vistas, plantillas, autenticación y persistencia Django | Cumplido para vendedores, indicadores y planes |
 | React en una o dos vistas con datos reales | Dashboard, vendedores y planes integrados con datos y escrituras reales de Django |
 | Flujo funcional de datos | Caso completo 6% → 4,5% → 3% comprobado en API y navegador, con acciones, revisiones y cierre sin entrar en Admin |
-| GitHub, README e historial significativo | Fase 4 registrada en `57d296f`; adaptación Vercel/Neon con evidencias locales; publicación y CI del nuevo commit pendientes |
-| URL pública funcional | Pendiente |
-| Seguridad y protección de datos | Controles, PostgreSQL y concurrencia probados localmente; aceptación remota pendiente |
+| GitHub, README e historial significativo | Código desplegado `97b4bff` con CI aprobada; evidencias posteriores `575c6c9`; revisión académica actual todavía local |
+| URL pública funcional | Verificada en `https://sap-bice.vercel.app` |
+| Seguridad y protección de datos | CI, QA y aceptación pública, con límites explícitos en acta |
 | Arquitectura coherente | Cumplido para la base técnica |
-| Documentación del problema, aportación, usuarios y seguridad | Memoria completa y PDF para revisión; falta incorporar aceptación pública |
-| Memoria PDF/Word | [PDF generado](docs/memoria-pfm.pdf) y [fuente editable](docs/memoria-pfm.md) |
-| Vídeo ≤5 min | Grabación y enlace pendientes; [guion 4:50](docs/guion-video-pfm.md) preparado |
-| Actividades obligatorias aprobadas y autorización docente | No verificable a partir del repositorio |
+| Documentación del problema, aportación, usuarios y seguridad | Memoria actualizada con evidencia pública y beneficios esperados separados de lo medido |
+| Memoria PDF/Word | [PDF revisado](docs/memoria-pfm.pdf), [Word](docs/memoria-pfm.docx) y [Markdown](docs/memoria-pfm.md) |
+| Vídeo ≤5 min | Grabación y enlace pendientes; [guion 4:20](docs/guion-video-pfm.md) preparado |
+| Actividades obligatorias aprobadas y autorización docente | Declaración previa del autor; justificantes no inspeccionados, contrastar antes de entregar |
 
 La [matriz de requisitos](docs/trazabilidad-requisitos.md) vincula cada punto con evidencias y la rúbrica. No se puede garantizar una nota por instalar paquetes o aprobar estas pruebas. El README no sustituye a memoria, vídeo ni despliegue.
 
 ## Referencias
 
-- [Guía oficial del PFM](https://docs.google.com/document/d/1KhmvNgC4g9WI8suPOBjGFcUCQeA8rVPkoVS53fYLOkQ/edit), consultada íntegramente el 28/10/2026. [Registro de fuentes y requisitos](docs/fuentes-pfm.md); no se redistribuye la guía académica en GitHub.
+- [Guía oficial del PFM](https://docs.google.com/document/d/1KhmvNgC4g9WI8suPOBjGFcUCQeA8rVPkoVS53fYLOkQ/edit), releída íntegramente el 03/11/2026. [Registro de fuentes y requisitos](docs/fuentes-pfm.md); no se redistribuye la guía académica en GitHub.
 - [PcComponentes: criterios de calidad automatizados](https://marketplacehelp.pccomponentes.com/hc/es-es/articles/20561228339357-criterios-de-calidad-automatizados).
 - [PcComponentes: preparación de planes de acción](https://marketplacehelp.pccomponentes.com/hc/es-es/articles/38119386983965-como-mejorar-tus-indicadores-de-calidad-y-preparar-un-plan-de-accion).
 - [PcComponentes: NPS y eficiencia de entrega](https://marketplacehelp.pccomponentes.com/hc/es-es/articles/37487009483805-NPS-y-eficiencia-de-entrega).
