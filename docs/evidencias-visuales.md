@@ -1,5 +1,21 @@
 # Evidencias visuales de Fase 4
 
+## Capturas públicas añadidas el 03/11/2026
+
+Origen: Chromium contra [SAP público](https://sap-bice.vercel.app), candidato `97b4bff`, con datos ficticios y aceptación registrada en [el acta](verificacion-publica.md). Estas imágenes complementan las históricas de QA local:
+
+| Evidencia pública | Archivo |
+| --- | --- |
+| Dashboard y cartera ficticia | [Dashboard](screenshots/publicacion-dashboard.png) |
+| Cadena de revisiones con original, rectificaciones y medición efectiva | [Rectificación](screenshots/publicacion-rectificacion.png) |
+| Cierre e indicadores de vencimiento conservados | [Cierre histórico](screenshots/publicacion-cierre-historico.png) |
+| Mismo plan después del redespliegue desde Git | [Persistencia](screenshots/publicacion-persistencia.png) |
+| Vista móvil pública a 390 px | [Móvil](screenshots/publicacion-movil.png) |
+
+No contienen contraseñas, claves, cookies ni paneles de proveedores. El autor debe seleccionar las que incorporará a memoria/PDF y vídeo, actualizar arquitectura Vercel/CDN/Django/Neon y consignar SHA, CI, fechas y alcance de las pruebas. El vídeo real accesible de hasta cinco minutos sigue pendiente.
+
+## Evidencias históricas de QA local
+
 Origen: ejecución real del 28/10/2026, `artifacts/phase4-evidence/`, código de producto `49ee198` y script de navegador ampliado en Fase 4. Entorno aislado: PostgreSQL 14.24, Gunicorn, DEBUG=False y certificado TLS local de prueba. Chromium escritorio 1440×1060 y móvil emulado 390×844. Las capturas completas pueden superar la altura del viewport. **No son capturas de producción.**
 
 La cuenta `evaluador_qa` y todos los vendedores, acciones y mediciones son ficticios. La contraseña se generó en memoria; el login se capturó antes de introducirla. No se fotografiaron cabeceras de sesión, tokens ni el panel del proveedor. El entorno se eliminó al finalizar.

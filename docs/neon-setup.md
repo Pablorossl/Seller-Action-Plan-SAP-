@@ -2,6 +2,8 @@
 
 Actualizado el **03/11/2026**. Configuración completada y flujo funcional verificado desde la aplicación local contra PostgreSQL real en Neon.
 
+**Publicación posterior del mismo día:** [SAP público](https://sap-bice.vercel.app) utiliza este proyecto/rama. Vercel Hobby y Neon Free confirmados; 33 migraciones comprobadas sin repetirlas, dos agentes no administrativos y una carga exclusivamente ficticia mediante comandos existentes. Aceptación pública, persistencia tras redespliegue y restauración aislada con PostgreSQL 18 completadas: [acta](verificacion-publica.md). Los resultados locales siguientes conservan su alcance original.
+
 | Destino | Valor verificado mediante el CLI autenticado |
 | --- | --- |
 | Organización | `org-rough-thunder-87253091` |

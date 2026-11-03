@@ -1,0 +1,151 @@
+{
+  "checked_at_utc": "2026-11-03T21:51:19Z",
+  "environment": "public Vercel Hobby with Neon Free",
+  "deployment": {
+    "url": "https://sap-bice.vercel.app",
+    "project_id": "prj_1kARDqBB0eW17w9yWX1G3QNoA2gP",
+    "team_id": "team_QEO60SkY07InWgc6CX0nIb5J",
+    "vercel_plan": "hobby",
+    "neon_plan": "free",
+    "deployment_id": "dpl_DVtuHFEv9eTba7V8ShdLASR9BBTi",
+    "sha": "97b4bff55a07b8fd3c71b05740748db5bf63438b",
+    "git_repo_id": 1430152684,
+    "git_repo_url": "https://github.com/Pablorossl/Seller-Action-Plan-SAP-",
+    "production_branch": "main",
+    "root_directory": "backend",
+    "framework": "django",
+    "build_command": "python build_vercel.py",
+    "outside_root_sources": true,
+    "node_project_version": "22.x",
+    "deployment_node_version": "22.x",
+    "regions": [
+      "fra1"
+    ],
+    "production_variable_names": [
+      "DATABASE_URL",
+      "DJANGO_ALLOWED_HOSTS",
+      "DJANGO_CSRF_TRUSTED_ORIGINS",
+      "DJANGO_DEBUG",
+      "DJANGO_SECRET_KEY",
+      "SAP_DEMO_MODE"
+    ],
+    "paid_services_added": false,
+    "payment_method_added": false
+  },
+  "ci": {
+    "sha": "97b4bff55a07b8fd3c71b05740748db5bf63438b",
+    "runs": [
+      {
+        "id": 41722300443,
+        "head_sha": "97b4bff55a07b8fd3c71b05740748db5bf63438b",
+        "name": "Verificación SAP",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/Pablorossl/Seller-Action-Plan-SAP-/actions/runs/41722300443"
+      }
+    ]
+  },
+  "public_browser": {
+    "url": "https://sap-bice.vercel.app",
+    "environment": "public",
+    "plan_id": 5,
+    "flow": "6 → 4.5 → 3",
+    "status": "closed",
+    "result": "achieved",
+    "reload": true,
+    "logout": true,
+    "csrf": true,
+    "other_agent_denied": true,
+    "mobile_width": 390,
+    "page_errors": [],
+    "critical_responses": []
+  },
+  "extended_acceptance": {
+    "url": "https://sap-bice.vercel.app",
+    "passed": true,
+    "checks": {
+      "review_without_measurement": true,
+      "duplicate_review_rejected": true,
+      "future_review_and_period_rejected": true,
+      "correction_requires_reason": true,
+      "ui_rectification_chain_and_author_timestamps": true,
+      "original_retained_and_only_latest_measurement_effective": true,
+      "correction_branch_rejected": true,
+      "closed_snapshot_and_historical_action_flags": true,
+      "writes_after_closure_rejected": true,
+      "csrf_missing_and_foreign_origin_rejected": true,
+      "other_agent_read_and_write_denied": true
+    },
+    "plan_id": 6,
+    "review_ids": [
+      7,
+      8,
+      9
+    ],
+    "closure_result": "not_achieved",
+    "overdue_at_closure": 1,
+    "checker_selector_corrected": true
+  },
+  "redeployment_persistence": {
+    "passed": true,
+    "url": "https://sap-bice.vercel.app",
+    "sha": "97b4bff55a07b8fd3c71b05740748db5bf63438b",
+    "before_deployment": "dpl_Gupjfwd6kvY7QBRKngw8zJhx2HHR",
+    "after_deployment": "dpl_DVtuHFEv9eTba7V8ShdLASR9BBTi",
+    "git_repo_id": 1430152684,
+    "checks": {
+      "http_redirects_to_https": true,
+      "public_https_login_and_hsts": true,
+      "health_dashboard_and_anonymous_api": true,
+      "same_session_survives_redeployment": true,
+      "exact_plan_json_and_closed_snapshot_persist": true,
+      "main_flow_actions_reviews_and_result_persist": true,
+      "agent_isolation_after_redeployment": true
+    },
+    "migrations_or_seeds_repeated": false,
+    "plan_ids": [
+      5,
+      6
+    ]
+  },
+  "recovery": {
+    "passed": true,
+    "source": "Neon production via direct TLS connection",
+    "source_transaction": "repeatable-read read-only exported snapshot",
+    "tool_version": "pg_dump (PostgreSQL) 18.6 (Ubuntu 18.6-1.pgdg22.04+2)",
+    "backup_private_path": "backups/private/sap-production-97b4bff-20261103.dump",
+    "backup_mode": "0600",
+    "backup_sha256": "bc09b7278aa942d8e3318de510e0145dc7543948d0ee0c57a1efb5cd3f39b33c",
+    "restore_target": {
+      "host": "127.0.0.1",
+      "port": 55448,
+      "database": "sap_recovery_20261103"
+    },
+    "public_tables_compared": 21,
+    "all_row_counts_and_digests_match": true,
+    "constraints_match": true,
+    "indexes_match": true,
+    "migrations_recorded": 33,
+    "control_plans_read_via_django": true,
+    "historical_closure_unchanged_with_clock_plus_90_days": true,
+    "production_restore_attempted": false,
+    "migrations_or_seeds_executed": false
+  },
+  "local_candidate_checks": {
+    "frontend_tests_passed": 1,
+    "django_config_tests_passed": 7,
+    "vercel_package_passed": true,
+    "react_modules": 33,
+    "static_files": 157
+  },
+  "limits": [
+    "Acceptance was run from the execution host against the public HTTPS origin; a second independent network was not tested.",
+    "Clock advanced 90 days only against the isolated restored database, never against production.",
+    "Hobby and Free confirmed at verification time; future availability still depends on quotas and service operation."
+  ],
+  "academic_pending": [
+    "Update the narrative and regenerate the PFM PDF with the accepted architecture and SHA.",
+    "Record and publish the real video of at most five minutes.",
+    "Rehearse the personal defence and maintain availability during evaluation."
+  ]
+}

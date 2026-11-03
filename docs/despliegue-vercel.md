@@ -1,5 +1,7 @@
 # SAP en Vercel Hobby + Neon Free
 
+**Publicado el 03/11/2026:** [SAP](https://sap-bice.vercel.app), SHA `97b4bff55a07b8fd3c71b05740748db5bf63438b`, deployment `dpl_DVtuHFEv9eTba7V8ShdLASR9BBTi`. La [aceptación pública](verificacion-publica.md) confirma el recorrido, aislamiento, persistencia tras redespliegue y restauración local aislada con PostgreSQL 18. Vercel Hobby y Neon Free continúan activos. Esta guía contiene instrucciones para operaciones futuras: no repetir la carga ficticia ni migraciones ya aplicadas por redesplegar.
+
 Revisado el **29/10/2026** con documentación oficial. Objetivo: demo académica personal, no comercial y de poco tráfico, **0 € mientras se mantengan estos planes y sus cuotas**. No se ha contratado, publicado ni hecho push. La validación local no acredita un despliegue público.
 
 **Actualización del 03/11/2026:** se reutiliza Neon `empty-feather-02803695`, rama `production` (`br-divine-sky-b9hvdrte`), ya configurada y probada. La revisión actual de solo lectura confirma identidad, pooling, TLS, 33 migraciones registradas y cero usuarios/datos de negocio. No repetir migraciones ni cargar datos como parte de esta revisión. La rama es predeterminada y no tiene caducidad. Ver [Neon](neon-setup.md) y [preparación de publicación](preparacion-publicacion-vercel-2026-11-03.md).
