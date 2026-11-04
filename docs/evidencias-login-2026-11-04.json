@@ -1,0 +1,255 @@
+{
+  "checked_at_utc": "2026-11-04T19:24:29.523220+00:00",
+  "diagnosis": "The reported login identifier has no SAP account in production. Existing evaluation accounts authenticate successfully.",
+  "production": {
+    "checked_at_utc": "2026-11-04T19:24:29.523220+00:00",
+    "external_configuration_mutated": false,
+    "vercel": {
+      "project": "sap",
+      "framework": "django",
+      "root_directory": "backend",
+      "node_version": "22.x",
+      "build_command": "python build_vercel.py",
+      "source_outside_root": true,
+      "deployment_id": "dpl_f2TT2cSumwaoD73Bc585kJcohJV7",
+      "state": "READY",
+      "target": "production",
+      "url": "sap-k8rieqnj3-pablo-s-coding.vercel.app",
+      "sha": "d195b1c787d41a2ecb47f6575d3624ac503181d9",
+      "production_variable_names": [
+        "DATABASE_URL",
+        "DJANGO_ALLOWED_HOSTS",
+        "DJANGO_CSRF_TRUSTED_ORIGINS",
+        "DJANGO_DEBUG",
+        "DJANGO_SECRET_KEY",
+        "SAP_DEMO_MODE"
+      ]
+    },
+    "database": {
+      "transaction_read_only": true,
+      "tls": true,
+      "version": "PostgreSQL 18.6 (ac70818) on aarch64-unknown-linux-gnu",
+      "applied_migrations": 33,
+      "pending_migrations": 0,
+      "users": [
+        {
+          "username": "evaluador",
+          "active": true,
+          "staff": false,
+          "superuser": false,
+          "groups": [
+            "Marketplace Agent"
+          ],
+          "hasher": "pbkdf2_sha256",
+          "last_login": "2026-11-04 19:23:05.378410+00:00",
+          "saved_credential_matches": true,
+          "failure_records_remaining": 0
+        },
+        {
+          "username": "otro_agente",
+          "active": true,
+          "staff": false,
+          "superuser": false,
+          "groups": [
+            "Marketplace Agent"
+          ],
+          "hasher": "pbkdf2_sha256",
+          "last_login": "2026-11-04 19:23:11.844345+00:00",
+          "saved_credential_matches": true,
+          "failure_records_remaining": 0
+        }
+      ],
+      "reported_login_identifier_exists_as_username": false,
+      "reported_login_identifier_exists_as_email": false,
+      "reported_identifier_failure_record": {
+        "exists": true,
+        "failure_count": 1,
+        "last_attempt": "2026-11-04 19:22:43.972522+00:00"
+      }
+    },
+    "logs": {
+      "command_exit_code": 0,
+      "window": "last 1h, at most 100 records",
+      "records": 50,
+      "deployment_ids": [
+        "dpl_f2TT2cSumwaoD73Bc585kJcohJV7"
+      ],
+      "status_counts": {
+        "403": 10,
+        "200": 32,
+        "302": 8
+      },
+      "server_error_count": 0,
+      "login_status_counts": {
+        "200": 10,
+        "302": 2
+      },
+      "white_noise_static_directory_warning_count": 0
+    }
+  },
+  "browser": {
+    "checked_at_utc": "2026-11-04T19:23:03.384Z",
+    "base": "https://sap-bice.vercel.app",
+    "business_writes": false,
+    "accounts": [
+      {
+        "username": "evaluador",
+        "invalid_password_rejected": true,
+        "next_root_respected": true,
+        "react_dashboard": true,
+        "secure_session_cookie": true,
+        "workspace_identity": true,
+        "protected_navigation": true,
+        "reload_preserves_session": true,
+        "new_context_preserves_session": true,
+        "logout_revokes_access": true,
+        "logged_out_cookie_cannot_be_replayed": true,
+        "javascript_errors": 0,
+        "failed_responses": [],
+        "passed": true
+      },
+      {
+        "username": "otro_agente",
+        "next_root_respected": true,
+        "react_dashboard": true,
+        "secure_session_cookie": true,
+        "workspace_identity": true,
+        "protected_navigation": true,
+        "reload_preserves_session": true,
+        "new_context_preserves_session": true,
+        "logout_revokes_access": true,
+        "logged_out_cookie_cannot_be_replayed": true,
+        "javascript_errors": 0,
+        "failed_responses": [],
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "local_postgresql": {
+    "postgres_major": 14,
+    "isolated_local_database": true,
+    "production_database_used": false,
+    "commands": [
+      {
+        "command": [
+          "makemigrations",
+          "--check",
+          "--dry-run"
+        ],
+        "exit_code": 0
+      },
+      {
+        "command": [
+          "migrate",
+          "--noinput"
+        ],
+        "exit_code": 0
+      },
+      {
+        "command": [
+          "migrate",
+          "--check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "command": [
+          "test",
+          "--verbosity",
+          "1"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "passed": true
+  },
+  "local_checks": {
+    "django_sqlite": {
+      "tests": 114,
+      "skipped": 9,
+      "passed": true,
+      "database_url_overridden": true
+    },
+    "django_postgresql": {
+      "tests": 114,
+      "skipped": 0,
+      "passed": true,
+      "production_database_used": false
+    },
+    "new_authentication_regressions": {
+      "tests": 2,
+      "passed": true
+    },
+    "frontend_tests_passed": true,
+    "frontend_build_passed": true,
+    "react_modules": 33,
+    "django_checks_passed": true,
+    "dummy_production_settings_checks_passed": true,
+    "pip_check_passed": true,
+    "isolated_vercel_package_passed": true,
+    "collected_static_files": 157
+  },
+  "https_probe": {
+    "source": "Summary of the HTTPS probe output executed on 2026-11-04; no redirects followed automatically.",
+    "health": 200,
+    "anonymous_dashboard": 302,
+    "anonymous_workspace": 403,
+    "unknown_username": {
+      "status": 200,
+      "generic_form_error": true,
+      "session_created": false
+    },
+    "login_missing_csrf": 403,
+    "login_untrusted_origin": 403,
+    "valid_login": {
+      "status": 302,
+      "location": "/dashboard/"
+    },
+    "authenticated_dashboard": 200,
+    "authenticated_workspace": 200,
+    "authenticated_sellers": 200,
+    "authenticated_plans": 200,
+    "authenticated_overview": 200,
+    "react_js": 200,
+    "react_css": 200,
+    "session_secure": true,
+    "session_httponly": true,
+    "session_samesite": "Lax",
+    "logout_get": 405,
+    "logout_without_csrf": 403,
+    "logout_valid_post": 302,
+    "after_logout_dashboard": 302,
+    "after_logout_workspace": 403,
+    "after_logout_plans": 403
+  },
+  "changes": {
+    "authentication_runtime_changed": false,
+    "migrations_added": false,
+    "external_passwords_changed": false,
+    "external_accounts_created": false,
+    "business_data_changed": false,
+    "production_session_side_effects": [
+      "normal login/logout sessions",
+      "last_login",
+      "Axes failure records and success reset for test accounts"
+    ],
+    "commits_created": false,
+    "pushed": false,
+    "deployed": false,
+    "files": [
+      "README.md",
+      "backend/config/test_authentication.py",
+      "docs/auditoria-login-2026-11-04.md",
+      "docs/evidencias-login-2026-11-04.json"
+    ]
+  },
+  "limitations": [
+    "No manual successful login confirmation from the owner yet.",
+    "The personal email identifier remains unregistered; no account creation was authorized.",
+    "Full Django suite on local PostgreSQL 14, public browser flow on Neon PostgreSQL 18.6.",
+    "No redeployment or production business mutations to re-test persistence across deployments.",
+    "Log counts describe only the retrieved recent sample.",
+    "No independent second network tested."
+  ]
+}
