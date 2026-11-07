@@ -433,13 +433,14 @@ export function Field({
 }
 export function FormError({ error, labels }) {
   const ref = useRef();
+  const detail = messages(error?.fields, labels);
   useEffect(() => {
     if (error) ref.current?.focus();
   }, [error]);
   return error ? (
     <div ref={ref} tabIndex="-1" className="form-error" role="alert">
       {error.message}
-      <p>{messages(error.fields, labels)}</p>
+      {detail && detail !== error.message && <p>{detail}</p>}
     </div>
   ) : null;
 }

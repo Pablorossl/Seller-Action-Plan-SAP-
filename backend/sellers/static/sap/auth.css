@@ -57,7 +57,7 @@ input {
   width: 100%;
   font: inherit;
   padding: 12px;
-  border: 1px solid #d6e0cf;
+  border: 1px solid #748278;
   border-radius: 6px;
 }
 button,
@@ -98,7 +98,7 @@ button:focus-visible {
 }
 .auth-eyebrow {
   font-size: 10px;
-  color: #70865d;
+  color: #56685e;
   letter-spacing: 1.4px;
   margin-bottom: 12px;
 }
