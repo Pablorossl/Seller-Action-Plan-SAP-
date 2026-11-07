@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../services/api.js";
+import { useUnsavedChanges } from "../components/UnsavedChanges.jsx";
 import {
   Badge,
   Empty,
@@ -8,6 +9,7 @@ import {
   FormActions,
   FormError,
   Icon,
+  Loading,
   PageHeading,
   Pagination,
   Resource,
@@ -79,7 +81,7 @@ function RecordPicker({
   );
 }
 
-export function PlanForm({ user, params, existing, onSaved }) {
+export function PlanForm({ user, params, existing, onSaved, onCancel }) {
   const sellerId = existing?.seller || params.get("seller");
   const [selectedSeller, setSelectedSeller] = useState(null);
   const [responsible, setResponsible] = useState({
@@ -116,15 +118,29 @@ export function PlanForm({ user, params, existing, onSaved }) {
   const [selected, setSelected] = useState([]);
   const [metricPage, setMetricPage] = useState(1);
   const [initError, setInitError] = useState(null);
+  const [initializing, setInitializing] = useState(!!params.get("metric") && !existing);
   const metricResource = useResource(
     !existing && selectedSeller
       ? `/api/metrics/?seller=${selectedSeller.id}&page=${metricPage}`
       : null,
   );
   const mutation = useMutation((result) => {
+    guard.markSaved();
     if (onSaved) onSaved(result);
     else location.hash = planUrl(result.id);
   });
+  const guard = useUnsavedChanges({
+    form,
+    responsible: responsible.id,
+    seller: sellerId || selectedSeller?.id || "",
+    metrics: selected.map(({ baseline, target_value }) => ({ baseline, target_value })),
+  }, { busy: mutation.busy });
+  const backUrl = existing ? planUrl(existing.id) : sellerId ? sellerUrl(sellerId) : "#/plans";
+  const cancel = guard.close(() => {
+    if (onCancel) onCancel();
+    else location.hash = backUrl;
+  });
+  useEffect(() => { document.querySelector(".page-heading h1")?.focus(); }, [initializing]);
   useEffect(() => {
     if (!sellerId) return;
     const controller = new AbortController();
@@ -142,16 +158,25 @@ export function PlanForm({ user, params, existing, onSaved }) {
     api(`/api/metrics/${id}/`, { signal: controller.signal })
       .then((metric) => {
         if (String(metric.seller) !== String(sellerId)) return;
-        setSelected([{ baseline: metric.id, target_value: "", metric }]);
+        const metrics = [{ baseline: metric.id, target_value: "", metric }];
+        const initialForm = {
+          ...form,
+          period_start: metric.period_start,
+          period_end: metric.period_end,
+        };
+        setSelected(metrics);
         setForm((f) => ({
           ...f,
           period_start: metric.period_start,
           period_end: metric.period_end,
         }));
+        guard.resetBaseline({ form: initialForm, responsible: responsible.id, seller: sellerId,
+          metrics: metrics.map(({ baseline, target_value }) => ({ baseline, target_value })) });
       })
       .catch((error) => {
         if (error.name !== "AbortError") setInitError(error);
-      });
+      })
+      .finally(() => { if (!controller.signal.aborted) setInitializing(false); });
     return () => controller.abort();
   }, [sellerId, existing, params.get("metric")]);
   const change = (name) => ({
@@ -196,17 +221,13 @@ export function PlanForm({ user, params, existing, onSaved }) {
     );
   };
   if (initError) return <ErrorState error={initError} />;
+  if (initializing) return <Loading />;
   return (
     <>
       <a
         className="back-link"
-        href={
-          existing
-            ? planUrl(existing.id)
-            : sellerId
-              ? sellerUrl(sellerId)
-              : "#/plans"
-        }
+        href={backUrl}
+        onClick={existing ? (event) => { event.preventDefault(); void cancel(); } : undefined}
       >
         ←{" "}
         {existing
@@ -484,6 +505,7 @@ export function PlanForm({ user, params, existing, onSaved }) {
           </p>
           <FormActions
             busy={mutation.busy}
+            close={cancel}
             label={existing ? "Guardar cambios" : "Crear borrador"}
           />
         </div>

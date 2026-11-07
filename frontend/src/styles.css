@@ -1561,6 +1561,12 @@ input[type="checkbox"] {
   border-top: 1px solid var(--line);
   margin-top: 20px;
 }
+.modal .unsaved-actions {
+  flex-wrap: wrap;
+}
+.unsaved-actions .button {
+  white-space: normal;
+}
 .modal .info-note {
   padding: 13px;
   border-radius: 6px;

@@ -12,21 +12,22 @@ import {
 import { Dashboard, Plans, SellerDetail, Sellers } from "./pages/Workspace.jsx";
 import { PlanForm } from "./pages/PlanForm.jsx";
 import { PlanDetail } from "./pages/PlanDetail.jsx";
+import { UnsavedChangesProvider, useLeaveConfirmation } from "./components/UnsavedChanges.jsx";
+import { installHashNavigation } from "./services/navigation.js";
 import "./styles.css";
 
 function App() {
+  const requestLeave = useLeaveConfirmation();
   const [route, setRoute] = useState(location.hash.slice(1) || "/");
   const [mobileNav, setMobileNav] = useState(false);
   const session = useResource("/api/workspace/");
   useEffect(() => {
-    const navigate = () => {
-      setRoute(location.hash.slice(1) || "/");
+    return installHashNavigation(window, requestLeave, (nextRoute) => {
+      setRoute(nextRoute);
       setMobileNav(false);
       window.scrollTo(0, 0);
-    };
-    window.addEventListener("hashchange", navigate);
-    return () => window.removeEventListener("hashchange", navigate);
-  }, []);
+    });
+  }, [requestLeave]);
   useEffect(() => {
     if (session.data) setCsrfToken(session.data.csrf_token);
   }, [session.data]);
@@ -190,6 +191,6 @@ function App() {
 }
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
+    <UnsavedChangesProvider><App /></UnsavedChangesProvider>
   </React.StrictMode>,
 );

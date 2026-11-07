@@ -379,13 +379,14 @@ export function FormError({ error }) {
     </div>
   ) : null;
 }
-export function Modal({ title, children, close, busy = false }) {
+export function Modal({ title, children, close, busy = false, initialFocus }) {
   const ref = useRef();
   const titleId = useId();
   useEffect(() => {
     const previous = document.activeElement;
     const dialog = ref.current;
     dialog.showModal();
+    if (initialFocus) dialog.querySelector(initialFocus)?.focus();
     return () => {
       dialog.close();
       if (previous?.isConnected) previous.focus({ preventScroll: true });

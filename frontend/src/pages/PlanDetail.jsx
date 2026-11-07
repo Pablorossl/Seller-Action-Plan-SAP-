@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useUnsavedChanges } from "../components/UnsavedChanges.jsx";
 import {
   Avatar,
   Badge,
@@ -84,11 +85,13 @@ function Comparison({ plan }) {
   );
 }
 
-function MetricForm({ plan, metric, done, close }) {
+function MetricForm({ plan, metric, done, close: onClose }) {
   const mutation = useMutation(done);
   const [page, setPage] = useState(1);
   const [baseline, setBaseline] = useState(metric?.baseline.id || "");
   const [target, setTarget] = useState(metric?.target_value || "");
+  const guard = useUnsavedChanges({ baseline, target }, { busy: mutation.busy });
+  const close = guard.close(onClose);
   const resource = useResource(
     !metric ? `/api/metrics/?seller=${plan.seller}&page=${page}` : null,
   );
@@ -178,7 +181,7 @@ function MetricForm({ plan, metric, done, close }) {
   );
 }
 
-function ActionForm({ plan, action, done, close }) {
+function ActionForm({ plan, action, done, close: onClose }) {
   const mutation = useMutation(done);
   const [form, setForm] = useState(
     action
@@ -205,6 +208,8 @@ function ActionForm({ plan, action, done, close }) {
           evidence: "",
         },
   );
+  const guard = useUnsavedChanges(form, { busy: mutation.busy });
+  const close = guard.close(onClose);
   const bind = (name) => ({
     name,
     value: form[name],
@@ -314,7 +319,7 @@ function ActionForm({ plan, action, done, close }) {
   );
 }
 
-function ReviewForm({ plan, user, done, close, previous }) {
+function ReviewForm({ plan, user, done, close: onClose, previous }) {
   const mutation = useMutation(done);
   const [form, setForm] = useState({
     plan_metric: plan.metrics[0]?.id || "",
@@ -330,6 +335,8 @@ function ReviewForm({ plan, user, done, close, previous }) {
     supersedes: previous?.id ?? null,
     correction_reason: "",
   });
+  const guard = useUnsavedChanges(form, { busy: mutation.busy });
+  const close = guard.close(onClose);
   const bind = (name) => ({
     name,
     value: form[name],
@@ -350,7 +357,7 @@ function ReviewForm({ plan, user, done, close, previous }) {
         }}
       >
         <FormError error={mutation.error} />
-        {previous && <label>Motivo de rectificación<textarea required {...bind("correction_reason")} /></label>}
+        {previous && <label>Motivo de rectificación<textarea required disabled={mutation.busy} {...bind("correction_reason")} /></label>}
         <p className="info-note">
           La evaluación utiliza las reglas del indicador. Para MQC se necesita
           un periodo mensual y volumen suficiente de pedidos.
@@ -431,13 +438,15 @@ function ReviewForm({ plan, user, done, close, previous }) {
   );
 }
 
-function CloseForm({ plan, done, close }) {
+function CloseForm({ plan, done, close: onClose }) {
   const mutation = useMutation(done);
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState(
     plan.status === "draft" ? "cancelled" : "closed",
   );
   const [confirm, setConfirm] = useState(false);
+  const guard = useUnsavedChanges({ notes, status, confirm }, { busy: mutation.busy });
+  const close = guard.close(onClose);
   return (
     <Modal title="Finalizar plan de mejora" close={close} busy={mutation.busy}>
       <form
@@ -519,6 +528,12 @@ export function PlanDetail({ id, user, params }) {
   const [modal, setModal] = useState(null);
   const [editing, setEditing] = useState(false);
   const [notice, setNotice] = useState("");
+  const editButton = useRef(null);
+  const wasEditing = useRef(false);
+  useEffect(() => {
+    if (wasEditing.current && !editing) editButton.current?.focus();
+    wasEditing.current = editing;
+  }, [editing]);
   const done = (plan) => {
     resource.setData(plan);
     setModal(null);
@@ -533,6 +548,7 @@ export function PlanDetail({ id, user, params }) {
         user={user}
         params={params}
         onSaved={done}
+        onCancel={() => setEditing(false)}
       />
     );
   return (
@@ -564,6 +580,7 @@ export function PlanDetail({ id, user, params }) {
               <Badge status={plan.status} />
               {canEdit && (
                 <button
+                  ref={editButton}
                   className="button secondary"
                   onClick={() => setEditing(true)}
                 >
