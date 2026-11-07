@@ -353,7 +353,7 @@ function ReviewForm({ plan, user, done, close: onClose, previous }) {
         }}
       >
         <FormError error={mutation.error} />
-        {previous && <label>Motivo de rectificación<textarea required disabled={mutation.busy} {...bind("correction_reason")} /></label>}
+        {previous && <Field label="Motivo de rectificación" required disabled={mutation.busy} {...bind("correction_reason")}><textarea /></Field>}
         <p className="info-note">
           La evaluación utiliza las reglas del indicador. Para MQC se necesita
           un periodo mensual y volumen suficiente de pedidos.
@@ -536,7 +536,10 @@ export function PlanDetail({ id, user, params }) {
     setEditing(false);
     setNotice("Cambios guardados correctamente.");
   };
-  const transition = useMutation(done);
+  const transition = useMutation((plan) => {
+    done(plan);
+    requestAnimationFrame(() => document.querySelector(".page-heading h1")?.focus());
+  });
   if (editing && resource.data)
     return (
       <PlanForm
@@ -614,7 +617,7 @@ export function PlanDetail({ id, user, params }) {
                 "Seguimiento",
                 "Resultado",
               ].map((step, i) => (
-                <li className={i < progress ? "reached" : ""} key={step}>
+                <li className={i < progress ? "reached" : ""} aria-current={i + 1 === progress ? "step" : undefined} key={step}>
                   <span>
                     {i + 1 < progress ? <Icon name="check" size={15} /> : i + 1}
                   </span>
@@ -710,6 +713,8 @@ export function PlanDetail({ id, user, params }) {
                       {plan.actions.map((a) => (
                         <article
                           id={`action-${a.id}`}
+                          tabIndex={-1}
+                          aria-labelledby={`action-title-${a.id}`}
                           className={`action-item ${String(a.id) === params.get("action") ? "highlight" : ""}`}
                           key={a.id}
                         >
@@ -724,7 +729,7 @@ export function PlanDetail({ id, user, params }) {
                             />
                           </span>
                           <div className="action-main">
-                            <h3>{a.description}</h3>
+                            <h3 id={`action-title-${a.id}`}>{a.description}</h3>
                             <div className="action-meta">
                               <Badge status={a.status} />
                               <span>

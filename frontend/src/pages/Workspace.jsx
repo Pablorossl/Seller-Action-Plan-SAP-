@@ -162,51 +162,41 @@ export function Dashboard({ user }) {
                   "#/plans?status=closed",
                   "Con resultado documentado",
                 ],
-              ].map(([label, key, icon, href, hint]) => (
-                <a
-                  href={href === "#prioridades" ? undefined : href}
-                  onClick={
-                    href === "#prioridades"
-                      ? (e) => {
-                          e.preventDefault();
-                          document
-                            .getElementById("prioridades")
-                            ?.scrollIntoView({ behavior: "smooth" });
-                        }
-                      : undefined
-                  }
-                  role={href === "#prioridades" ? "button" : undefined}
-                  tabIndex={href === "#prioridades" ? 0 : undefined}
-                  onKeyDown={
-                    href === "#prioridades"
-                      ? (e) => {
-                          if (e.key === "Enter" || e.key === " ") {
+              ].map(([label, key, icon, href, hint]) => {
+                const Component = href === "#prioridades" ? "button" : "a";
+                return (
+                  <Component
+                    type={href === "#prioridades" ? "button" : undefined}
+                    href={href === "#prioridades" ? undefined : href}
+                    onClick={
+                      href === "#prioridades"
+                        ? (e) => {
                             e.preventDefault();
-                            document
-                              .getElementById("prioridades")
-                              ?.scrollIntoView();
+                            const heading = document.getElementById("priorities-heading");
+                            heading?.focus({ preventScroll: true });
+                            heading?.scrollIntoView({ block: "start" });
                           }
-                        }
-                      : undefined
-                  }
-                  className={`stat ${key === "overdue_actions" && data.counts[key] ? "stat-warning" : ""}`}
-                  key={key}
-                >
-                  <div className="stat-top">
-                    <span>{label}</span>
-                    <Icon name={icon} />
-                  </div>
-                  <strong>{data.counts[key]}</strong>
-                  <small>{hint}</small>
-                </a>
-              ))}
+                        : undefined
+                    }
+                    className={`stat ${key === "overdue_actions" && data.counts[key] ? "stat-warning" : ""}`}
+                    key={key}
+                  >
+                    <div className="stat-top">
+                      <span>{label}</span>
+                      <Icon name={icon} />
+                    </div>
+                    <strong>{data.counts[key]}</strong>
+                    <small>{hint}</small>
+                  </Component>
+                );
+              })}
             </section>
             <div className="dashboard-columns">
               <section className="panel" id="prioridades">
                 <div className="panel-heading">
                   <div>
                     <div className="eyebrow">TU PRÓXIMO PASO</div>
-                    <h2>
+                    <h2 id="priorities-heading" tabIndex={-1}>
                       Prioridades de la semana{" "}
                       <span className="count-pill">
                         {data.priorities_count}
@@ -715,8 +705,10 @@ export function SellerDetail({ id, user }) {
           </section>
           <section className="panel">
             <div className="panel-heading">
-              <div className="tabs" aria-label="Planes del vendedor">
+              <div className="tabs" role="group" aria-label="Planes del vendedor">
                 <button
+                  type="button"
+                  aria-pressed={!history}
                   className={!history ? "active" : ""}
                   onClick={() => {
                     setHistory(false);
@@ -727,6 +719,8 @@ export function SellerDetail({ id, user }) {
                   <span className="count-pill">{s.open_plans}</span>
                 </button>
                 <button
+                  type="button"
+                  aria-pressed={history}
                   className={history ? "active" : ""}
                   onClick={() => {
                     setHistory(true);

@@ -14,6 +14,7 @@ import { PlanForm } from "./pages/PlanForm.jsx";
 import { PlanDetail } from "./pages/PlanDetail.jsx";
 import { UnsavedChangesProvider, useLeaveConfirmation } from "./components/UnsavedChanges.jsx";
 import { installHashNavigation } from "./services/navigation.js";
+import { useRouteFocus } from "./components/RouteFocus.jsx";
 import "./styles.css";
 
 function App() {
@@ -22,6 +23,8 @@ function App() {
   const [mobileNav, setMobileNav] = useState(false);
   const menuButton = useRef(null);
   const sidebar = useRef(null);
+  const content = useRef(null);
+  useRouteFocus(route, content);
   const closeMenu = () => {
     setMobileNav(false);
     menuButton.current?.focus();
@@ -105,7 +108,8 @@ function App() {
         href="#main-content"
         onClick={(e) => {
           e.preventDefault();
-          document.getElementById("main-content").focus();
+          setMobileNav(false);
+          requestAnimationFrame(() => content.current?.focus());
         }}
       >
         Saltar al contenido
@@ -182,7 +186,7 @@ function App() {
             <button
               ref={menuButton}
               className="icon-button mobile-menu"
-              aria-label="Mostrar navegación"
+              aria-label={mobileNav ? "Ocultar navegación" : "Mostrar navegación"}
               aria-expanded={mobileNav}
               aria-controls="workspace-navigation"
               onClick={() => setMobileNav(!mobileNav)}
@@ -201,7 +205,7 @@ function App() {
             <span className="environment-pill">Proyecto independiente</span>
           </div>
         </header>
-        <main id="main-content" tabIndex="-1" inert={mobileNav || undefined}>
+        <main ref={content} id="main-content" tabIndex="-1" inert={mobileNav || undefined}>
           <Resource resource={session}>
             {() => <div key={route}>{page}</div>}
           </Resource>

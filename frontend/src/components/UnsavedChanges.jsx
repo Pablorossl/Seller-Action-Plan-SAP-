@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import { Modal } from "./ui.jsx";
 import { formSnapshot } from "../services/navigation.js";
 
@@ -8,6 +8,7 @@ export function UnsavedChangesProvider({ children }) {
   const active = useRef(null);
   const pending = useRef(null);
   const [warning, setWarning] = useState(false);
+  const descriptionId = useId();
   const register = useCallback((guard) => {
     active.current = guard;
     return () => { if (active.current === guard) active.current = null; };
@@ -55,8 +56,8 @@ export function UnsavedChangesProvider({ children }) {
     <Context.Provider value={{ register, requestLeave }}>
       {children}
       {warning && (
-        <Modal title="Cambios sin guardar" close={() => choose(false)} initialFocus="[data-continue-editing]">
-          <p>Hay cambios sin guardar. Si los descartas, perderás los datos introducidos.</p>
+        <Modal title="Cambios sin guardar" close={() => choose(false)} initialFocus="[data-continue-editing]" descriptionId={descriptionId}>
+          <p id={descriptionId}>Hay cambios sin guardar. Si los descartas, perderás los datos introducidos.</p>
           <div className="form-actions unsaved-actions">
             <button data-continue-editing className="button secondary" onClick={() => choose(false)}>Continuar editando</button>
             <button className="button primary" onClick={() => choose(true)}>Descartar los cambios y abandonar</button>

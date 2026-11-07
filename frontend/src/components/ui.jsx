@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useId, useRef, useState } from "react";
 import { api } from "../services/api.js";
 
 export const labels = {
@@ -235,16 +235,35 @@ export function useResource(url) {
     setData: (data) => setState({ data, loading: false, error: null }),
   };
 }
+const ResourceFocus = createContext(null);
 export function Resource({ resource, children }) {
-  return resource.loading ? (
-    <Loading />
-  ) : resource.error ? (
-    <ErrorState error={resource.error} retry={resource.reload} />
-  ) : resource.data ? (
-    children(resource.data)
-  ) : null;
+  const paginationFocus = useRef(false);
+  return (
+    <ResourceFocus.Provider value={paginationFocus}>
+      {resource.loading ? (
+        <Loading />
+      ) : resource.error ? (
+        <ErrorState error={resource.error} retry={resource.reload} />
+      ) : resource.data ? (
+        children(resource.data)
+      ) : null}
+    </ResourceFocus.Provider>
+  );
 }
 export function Pagination({ data, page, setPage }) {
+  const pendingFocus = useContext(ResourceFocus);
+  const status = useRef(null);
+  useEffect(() => {
+    if (!pendingFocus?.current) return;
+    pendingFocus.current = false;
+    // The old pagination unmounted while loading. Do not interrupt someone
+    // who deliberately moved to another control during the request.
+    if (document.activeElement === document.body) status.current?.focus();
+  }, [pendingFocus]);
+  const changePage = (next) => {
+    if (pendingFocus) pendingFocus.current = true;
+    setPage(next);
+  };
   return (
     <div className="pagination">
       <span>
@@ -255,16 +274,16 @@ export function Pagination({ data, page, setPage }) {
           className="button secondary compact"
           type="button"
           disabled={!data.previous}
-          onClick={() => setPage(page - 1)}
+          onClick={() => changePage(page - 1)}
         >
           Anterior
         </button>
-        <span>Página {page}</span>
+        <span ref={status} className="pagination-status" tabIndex={-1}>Página {page}</span>
         <button
           className="button secondary compact"
           type="button"
           disabled={!data.next}
-          onClick={() => setPage(page + 1)}
+          onClick={() => changePage(page + 1)}
         >
           Siguiente
         </button>
@@ -304,10 +323,12 @@ export function SearchBox({
   initial = "",
 }) {
   const [text, setText] = useState(initial);
+  const input = useRef(null);
   return (
-    <div className="search-box" role="search">
+    <div className="search-box" role="search" aria-label={`Búsqueda: ${placeholder.replace(/^Buscar /, "").replace(/…$/, "")}`}>
       <Icon name="search" />
       <input
+        ref={input}
         aria-label={placeholder}
         placeholder={placeholder}
         value={text}
@@ -329,6 +350,7 @@ export function SearchBox({
           onClick={() => {
             setText("");
             onSearch("");
+            input.current?.focus();
           }}
         >
           <Icon name="close" size={16} />
@@ -359,13 +381,14 @@ export function Field({
 }) {
   const id = useId();
   const error = messages(errors?.[name]);
+  const describedBy = [hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") || undefined;
   const component = children ? (
     React.cloneElement(children, {
       id,
       name,
       required,
       "aria-invalid": !!error,
-      "aria-describedby": error || hint ? `${id}-help` : undefined,
+      "aria-describedby": describedBy,
       ...props,
     })
   ) : (
@@ -374,7 +397,7 @@ export function Field({
       name={name}
       required={required}
       aria-invalid={!!error}
-      aria-describedby={error || hint ? `${id}-help` : undefined}
+      aria-describedby={describedBy}
       {...props}
     />
   );
@@ -385,11 +408,8 @@ export function Field({
         {required && <span aria-hidden="true"> *</span>}
       </label>
       {component}
-      {(error || hint) && (
-        <small className={error ? "field-error" : ""} id={`${id}-help`}>
-          {error || hint}
-        </small>
-      )}
+      {hint && <small id={`${id}-hint`}>{hint}</small>}
+      {error && <small className="field-error" id={`${id}-error`}>{error}</small>}
     </div>
   );
 }
@@ -405,31 +425,57 @@ export function FormError({ error }) {
     </div>
   ) : null;
 }
-export function Modal({ title, children, close, busy = false, initialFocus }) {
+export function Modal({ title, children, close, busy = false, initialFocus, descriptionId }) {
   const ref = useRef();
   const titleId = useId();
   useEffect(() => {
     const previous = document.activeElement;
     const dialog = ref.current;
     dialog.showModal();
-    if (initialFocus) dialog.querySelector(initialFocus)?.focus();
+    (initialFocus ? dialog.querySelector(initialFocus) : dialog.querySelector(".modal-head h2"))?.focus();
     return () => {
       dialog.close();
-      if (previous?.isConnected) previous.focus({ preventScroll: true });
+      const usable = previous?.isConnected && !previous.matches(":disabled") &&
+        !previous.closest("[inert]") && previous.getClientRects().length;
+      if (usable) previous.focus({ preventScroll: true });
+      else if (document.activeElement === document.body || dialog.contains(document.activeElement))
+        (document.querySelector(".page-heading h1") || document.getElementById("main-content"))?.focus();
     };
   }, []);
+  useEffect(() => {
+    const dialog = ref.current;
+    // Disabling the submit button can send native focus to BODY. Keep a
+    // readable destination inside the modal while the request is pending.
+    if (busy && dialog.open && !dialog.contains(document.activeElement))
+      dialog.querySelector(".modal-head h2")?.focus();
+  }, [busy]);
   return (
     <dialog
       ref={ref}
       className="modal"
       aria-labelledby={titleId}
+      aria-describedby={descriptionId}
+      onKeyDown={(event) => {
+        if (event.key !== "Tab") return;
+        const dialog = ref.current;
+        const controls = [...dialog.querySelectorAll("a[href], button, input, select, textarea, [tabindex]")]
+          .filter(e => e.tabIndex >= 0 && !e.matches(":disabled") && !e.closest("[inert]") && e.getClientRects().length);
+        const current = document.activeElement;
+        const boundary = event.shiftKey
+          ? current === controls[0] || current === dialog || current === dialog.querySelector(".modal-head h2")
+          : current === controls.at(-1);
+        if (!controls.length || boundary) {
+          event.preventDefault();
+          (event.shiftKey ? controls.at(-1) : controls[0])?.focus();
+        }
+      }}
       onCancel={(e) => {
         e.preventDefault();
         if (!busy) close();
       }}
     >
       <div className="modal-head">
-        <h2 id={titleId}>{title}</h2>
+        <h2 id={titleId} tabIndex={-1}>{title}</h2>
         <button
           className="icon-button"
           disabled={busy}

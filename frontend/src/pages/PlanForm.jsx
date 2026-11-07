@@ -35,8 +35,8 @@ function RecordPicker({
     `${url}?${new URLSearchParams({ search, page })}`,
   );
   return (
-    <div className="record-picker">
-      <label className="picker-label">{label} *</label>
+    <fieldset className="record-picker">
+      <legend className="picker-label">{label} *</legend>
       {chosen && (
         <div className="selected-record">
           <Icon name="check" size={17} />
@@ -77,7 +77,7 @@ function RecordPicker({
           </>
         )}
       </Resource>
-    </div>
+    </fieldset>
   );
 }
 
@@ -140,7 +140,9 @@ export function PlanForm({ user, params, existing, onSaved, onCancel }) {
     if (onCancel) onCancel();
     else location.hash = backUrl;
   });
-  useEffect(() => { document.querySelector(".page-heading h1")?.focus(); }, [initializing]);
+  useEffect(() => {
+    if (existing) document.querySelector(".page-heading h1")?.focus();
+  }, [initializing]);
   useEffect(() => {
     if (!sellerId) return;
     const controller = new AbortController();
