@@ -12,6 +12,7 @@ import {
   PageHeading,
   Pagination,
   Resource,
+  ScrollableTable,
   date,
   finalPlan,
   labels,
@@ -26,12 +27,7 @@ import { PlanForm } from "./PlanForm.jsx";
 
 function Comparison({ plan }) {
   return (
-    <div
-      className="table-wrap"
-      tabIndex={0}
-      role="region"
-      aria-label="Tabla de datos desplazable"
-    >
+    <ScrollableTable label="Comparación de indicadores">
       <table>
         <thead>
           <tr>
@@ -81,7 +77,7 @@ function Comparison({ plan }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </ScrollableTable>
   );
 }
 

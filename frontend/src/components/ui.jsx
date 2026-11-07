@@ -272,6 +272,32 @@ export function Pagination({ data, page, setPage }) {
     </div>
   );
 }
+export function ScrollableTable({ children, label }) {
+  const ref = useRef(null);
+  const hintId = useId();
+  const [overflow, setOverflow] = useState(false);
+  useEffect(() => {
+    const region = ref.current;
+    const measure = () => setOverflow(region.scrollWidth > region.clientWidth + 1);
+    const observer = new ResizeObserver(measure);
+    observer.observe(region);
+    const table = region.querySelector("table");
+    if (table) observer.observe(table);
+    measure();
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <div className="table-region">
+      <p id={hintId} className="table-scroll-hint" hidden={!overflow}>
+        Desplaza la tabla horizontalmente para ver todas las columnas. Con teclado, enfoca la tabla y usa las flechas.
+      </p>
+      <div ref={ref} className="table-wrap" tabIndex={0} role="region"
+        aria-label={label} aria-describedby={overflow ? hintId : undefined}>
+        {children}
+      </div>
+    </div>
+  );
+}
 export function SearchBox({
   onSearch,
   placeholder = "Buscar por nombre o identificador…",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { setCsrfToken } from "./services/api.js";
 import {
@@ -20,6 +20,31 @@ function App() {
   const requestLeave = useLeaveConfirmation();
   const [route, setRoute] = useState(location.hash.slice(1) || "/");
   const [mobileNav, setMobileNav] = useState(false);
+  const menuButton = useRef(null);
+  const sidebar = useRef(null);
+  const closeMenu = () => {
+    setMobileNav(false);
+    menuButton.current?.focus();
+  };
+  useEffect(() => {
+    const compact = window.matchMedia("(max-width: 900px)");
+    const resize = () => { if (!compact.matches) setMobileNav(false); };
+    compact.addEventListener("change", resize);
+    return () => compact.removeEventListener("change", resize);
+  }, []);
+  useEffect(() => {
+    if (!mobileNav) return;
+    sidebar.current?.querySelector("nav a")?.focus();
+    const escape = (event) => {
+      if (event.key === "Escape" && !document.querySelector("dialog[open]")) {
+        event.preventDefault();
+        setMobileNav(false);
+        menuButton.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", escape);
+    return () => window.removeEventListener("keydown", escape);
+  }, [mobileNav]);
   const session = useResource("/api/workspace/");
   useEffect(() => {
     return installHashNavigation(window, requestLeave, (nextRoute) => {
@@ -85,7 +110,7 @@ function App() {
       >
         Saltar al contenido
       </a>
-      <aside className={`sidebar ${mobileNav ? "is-open" : ""}`}>
+      <aside ref={sidebar} id="workspace-navigation" className={`sidebar ${mobileNav ? "is-open" : ""}`}>
         <a className="brand" href="#/">
           <span className="brand-mark">
             <Icon name="trend" size={27} />
@@ -150,13 +175,16 @@ function App() {
           )}
         </div>
       </aside>
+      {mobileNav && <button className="nav-backdrop" aria-label="Cerrar navegación" onClick={closeMenu} />}
       <div className="main-shell">
         <header className="topbar">
           <div>
             <button
+              ref={menuButton}
               className="icon-button mobile-menu"
               aria-label="Mostrar navegación"
               aria-expanded={mobileNav}
+              aria-controls="workspace-navigation"
               onClick={() => setMobileNav(!mobileNav)}
             >
               <Icon name="menu" />
@@ -173,7 +201,7 @@ function App() {
             <span className="environment-pill">Proyecto independiente</span>
           </div>
         </header>
-        <main id="main-content" tabIndex="-1">
+        <main id="main-content" tabIndex="-1" inert={mobileNav || undefined}>
           <Resource resource={session}>
             {() => <div key={route}>{page}</div>}
           </Resource>

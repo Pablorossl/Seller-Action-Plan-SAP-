@@ -7,6 +7,7 @@ import {
   PageHeading,
   Pagination,
   Resource,
+  ScrollableTable,
   SearchBox,
   date,
   labels,
@@ -29,12 +30,7 @@ export function PlanTable({
       </Empty>
     );
   return (
-    <div
-      className="table-wrap"
-      tabIndex={0}
-      role="region"
-      aria-label="Tabla de datos desplazable"
-    >
+    <ScrollableTable label="Planes de mejora">
       <table>
         <thead>
           <tr>
@@ -93,7 +89,7 @@ export function PlanTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </ScrollableTable>
   );
 }
 
@@ -346,12 +342,7 @@ export function Dashboard({ user }) {
                     Hasta 10 observaciones recientes
                   </span>
                 </div>
-                <div
-                  className="table-wrap"
-                  tabIndex={0}
-                  role="region"
-                  aria-label="Tabla de datos desplazable"
-                >
+                <ScrollableTable label="Desviaciones registradas">
                   <table>
                     <thead>
                       <tr>
@@ -384,7 +375,7 @@ export function Dashboard({ user }) {
                       ))}
                     </tbody>
                   </table>
-                </div>
+                </ScrollableTable>
               </section>
             )}
           </>
@@ -435,12 +426,7 @@ export function Sellers() {
           {(data) => (
             <>
               {data.results.length ? (
-                <div
-                  className="table-wrap"
-                  tabIndex={0}
-                  role="region"
-                  aria-label="Tabla de datos desplazable"
-                >
+                <ScrollableTable label="Directorio de vendedores">
                   <table>
                     <thead>
                       <tr>
@@ -483,7 +469,7 @@ export function Sellers() {
                       ))}
                     </tbody>
                   </table>
-                </div>
+                </ScrollableTable>
               ) : (
                 <Empty
                   title={
@@ -644,12 +630,7 @@ export function SellerDetail({ id, user }) {
               {(data) => (
                 <>
                   {data.results.length ? (
-                    <div
-                      className="table-wrap"
-                      tabIndex={0}
-                      role="region"
-                      aria-label="Tabla de datos desplazable"
-                    >
+                    <ScrollableTable label="Indicadores del vendedor">
                       <table>
                         <thead>
                           <tr>
@@ -701,7 +682,7 @@ export function SellerDetail({ id, user }) {
                           ))}
                         </tbody>
                       </table>
-                    </div>
+                    </ScrollableTable>
                   ) : (
                     <Empty title="Sin indicadores disponibles" icon="trend">
                       Aún no se han registrado observaciones para este vendedor.
