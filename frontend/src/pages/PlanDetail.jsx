@@ -27,9 +27,9 @@ import {
 } from "../components/ui.jsx";
 import { PlanForm } from "./PlanForm.jsx";
 
-function Comparison({ plan }) {
+function Comparison({ plan, compact = false }) {
   return (
-    <ScrollableTable label="Comparación de indicadores">
+    <ScrollableTable label="Comparación de indicadores" compact={compact}>
       <table>
         <thead>
           <tr>
@@ -469,7 +469,7 @@ function CloseForm({ plan, done, close: onClose }) {
             .
           </p>
         </div>
-        <Comparison plan={plan} />
+        <Comparison plan={plan} compact />
         <p className="info-note">
           Cerrar el plan no implica alcanzar sus objetivos. Finalizar conserva
           su histórico. Las acciones completadas y
@@ -846,7 +846,7 @@ export function PlanDetail({ id, user, params }) {
                             </small>
                             {r.supersedes && <p>Rectifica #{r.supersedes}: {r.correction_reason}</p>}
                             <p>{plan.reviews.some(item => item.supersedes === r.id) ? "Sustituida" : "Medición efectiva"}</p>
-                            {!closed && user.permissions.add_planreview && !plan.reviews.some(item => item.supersedes === r.id) && <button onClick={() => setModal({ type: "review", previous: r })}>Rectificar revisión #{r.id}</button>}
+                            {!closed && user.permissions.add_planreview && !plan.reviews.some(item => item.supersedes === r.id) && <button type="button" className="button secondary compact" onClick={() => setModal({ type: "review", previous: r })}>Rectificar revisión #{r.id}</button>}
                           </article>
                         );
                       })}

@@ -309,7 +309,7 @@ export function Pagination({ data, page, setPage }) {
     </div>
   );
 }
-export function ScrollableTable({ children, label }) {
+export function ScrollableTable({ children, label, compact = false }) {
   const ref = useRef(null);
   const hintId = useId();
   const [overflow, setOverflow] = useState(false);
@@ -324,7 +324,7 @@ export function ScrollableTable({ children, label }) {
     return () => observer.disconnect();
   }, []);
   return (
-    <div className="table-region">
+    <div className={`table-region${compact ? " table-compact" : ""}`}>
       <p id={hintId} className="table-scroll-hint" hidden={!overflow}>
         Desplaza la tabla horizontalmente para ver todas las columnas. Con teclado, enfoca la tabla y usa las flechas.
       </p>
