@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Avatar,
   Badge,
@@ -25,11 +25,18 @@ import {
 export function PlanTable({
   plans,
   empty = "No hay planes que coincidan con los filtros",
+  filtered = false,
+  reset,
+  context,
 }) {
   if (!plans.length)
     return (
       <Empty title={empty}>
-        Los planes que registres aparecerán aquí con su estado y próxima acción.
+        <p>{filtered
+          ? "Prueba otra búsqueda o estado."
+          : "Los planes que registres aparecerán aquí con su estado y seguimiento."}
+          {context && ` Se mantiene la selección de ${context}.`}</p>
+        {reset && <button type="button" className="button secondary" onClick={reset}>Restablecer búsqueda y estado</button>}
       </Empty>
     );
   return (
@@ -41,6 +48,7 @@ export function PlanTable({
             <th scope="col">Indicadores</th>
             <th scope="col">Estado y resultado</th>
             <th scope="col">Responsable</th>
+            <th scope="col">Próximo seguimiento</th>
             <th scope="col">Fecha objetivo</th>
             <th scope="col">
               <span className="sr-only">Acceso</span>
@@ -78,6 +86,16 @@ export function PlanTable({
                   <Avatar name={plan.responsible_name} small />
                   {plan.responsible_name}
                 </div>
+              </td>
+              <td className="plan-followup">
+                {finalPlan(plan) ? <span className="muted">Seguimiento finalizado</span> : <>
+                  <span>Revisión: {date(plan.next_review_on)}</span>
+                  {plan.pending_actions != null && <small>{plan.pending_actions} {plan.pending_actions === 1 ? "acción pendiente" : "acciones pendientes"}</small>}
+                  {plan.next_action && <>
+                    <a className="table-sub" href={`${planUrl(plan.id)}?action=${plan.next_action.id}`}>Próxima acción: {plan.next_action.description}</a>
+                    <small>Plazo de acción: {date(plan.next_action.due_date)}</small>
+                  </>}
+                </>}
               </td>
               <td>{date(plan.due_date)}</td>
               <td>
@@ -125,27 +143,6 @@ export function Dashboard({ user }) {
             <section className="stats-grid" aria-label="Resumen operativo">
               {[
                 [
-                  "Vendedores asignados",
-                  "sellers",
-                  "sellers",
-                  "#/sellers",
-                  "En tu ámbito de acceso",
-                ],
-                [
-                  "Planes abiertos",
-                  "open_plans",
-                  "plans",
-                  "#/plans?status=open",
-                  "Borradores y planes en seguimiento",
-                ],
-                [
-                  "Acciones pendientes",
-                  "pending_actions",
-                  "check",
-                  "#/plans?status=open",
-                  "De planes abiertos",
-                ],
-                [
                   "Acciones vencidas",
                   "overdue_actions",
                   "alert",
@@ -158,6 +155,27 @@ export function Dashboard({ user }) {
                   "clock",
                   "#/plans?review=due",
                   "Según estado o fecha registrada",
+                ],
+                [
+                  "Acciones pendientes",
+                  "pending_actions",
+                  "check",
+                  "#/plans?status=open",
+                  "De planes abiertos",
+                ],
+                [
+                  "Planes abiertos",
+                  "open_plans",
+                  "plans",
+                  "#/plans?status=open",
+                  "Borradores y planes en seguimiento",
+                ],
+                [
+                  "Vendedores asignados",
+                  "sellers",
+                  "sellers",
+                  "#/sellers",
+                  "En tu ámbito de acceso",
                 ],
                 [
                   "Planes cerrados",
@@ -211,6 +229,7 @@ export function Dashboard({ user }) {
                 </div>
                 <p className="panel-intro">
                   Acciones vencidas y con plazo en los próximos 7 días.
+                  <span className="summary-count">Mostrando {data.priorities.length} de {data.priorities_count} acciones.</span>
                 </p>
                 {data.priorities.length ? (
                   <div className="priority-list">
@@ -261,27 +280,12 @@ export function Dashboard({ user }) {
                 )}
               </section>
               <aside className="dashboard-aside">
-                <section className="focus-panel">
-                  <div className="eyebrow">SEGUIMIENTO DE CALIDAD</div>
-                  <div className="focus-number">
-                    {data.counts.sellers_with_deviations}
-                    <Icon name="trend" size={36} />
-                  </div>
-                  <h2>Vendedores con desviaciones registradas</h2>
-                  <p>
-                    Según la última observación de cada indicador y canal.
-                    Consulta siempre su periodo de referencia.
-                  </p>
-                  <a className="button dark" href="#/sellers">
-                    Revisar vendedores
-                    <Icon name="arrow" size={17} />
-                  </a>
-                </section>
                 <section className="panel review-panel">
                   <div className="panel-heading">
                     <h2>Por revisar</h2>
                     <Icon name="clock" />
                   </div>
+                  <p className="panel-intro">Mostrando {data.reviews.length} de {data.reviews_count} planes por revisar.</p>
                   {data.reviews.length ? (
                     data.reviews.map((plan) => (
                       <a
@@ -305,8 +309,24 @@ export function Dashboard({ user }) {
                     <p className="muted">No hay revisiones pendientes.</p>
                   )}
                   {data.reviews_count > 5 && (
-                    <a href="#/plans?review=due">Ver todas las revisiones</a>
+                    <a href="#/plans?review=due">Ver todos los planes por revisar</a>
                   )}
+                </section>
+                <section className="focus-panel">
+                  <div className="eyebrow">SEGUIMIENTO DE CALIDAD</div>
+                  <div className="focus-number">
+                    {data.counts.sellers_with_deviations}
+                    <Icon name="trend" size={36} />
+                  </div>
+                  <h2>Vendedores con desviaciones registradas</h2>
+                  <p>
+                    Según la última observación de cada indicador y canal.
+                    Consulta siempre su periodo de referencia.
+                  </p>
+                  <a className="button dark" href="#/sellers">
+                    Revisar vendedores
+                    <Icon name="arrow" size={17} />
+                  </a>
                 </section>
               </aside>
             </div>
@@ -381,6 +401,8 @@ export function Dashboard({ user }) {
 
 export function Sellers() {
   const [search, setSearch] = useState("");
+  const [searchText, setSearchText] = useState("");
+  const searchInput = useRef(null);
   const [active, setActive] = useState("");
   const [page, setPage] = useState(1);
   const resource = useResource(
@@ -396,6 +418,9 @@ export function Sellers() {
       <section className="panel">
         <div className="toolbar">
           <SearchBox
+            value={searchText}
+            onTextChange={setSearchText}
+            inputRef={searchInput}
             onSearch={(text) => {
               setSearch(text);
               setPage(1);
@@ -425,9 +450,9 @@ export function Sellers() {
                     <thead>
                       <tr>
                         <th>Vendedor</th>
+                        <th>Planes abiertos</th>
                         <th>Identificador</th>
                         <th>Agente asignado</th>
-                        <th>Planes abiertos</th>
                         <th>Registrado</th>
                         <th>
                           <span className="sr-only">Acceso</span>
@@ -446,12 +471,12 @@ export function Sellers() {
                             </div>
                           </td>
                           <td>
+                            <span className="count-pill">{s.open_plans}</span>
+                          </td>
+                          <td>
                             <code>{s.reference}</code>
                           </td>
                           <td>{s.owner_name}</td>
-                          <td>
-                            <span className="count-pill">{s.open_plans}</span>
-                          </td>
                           <td>{date(s.created_at)}</td>
                           <td>
                             <a className="text-link" href={sellerUrl(s.id)}>
@@ -476,6 +501,9 @@ export function Sellers() {
                   {search || active
                     ? "Prueba otro nombre, identificador o filtro."
                     : "Los vendedores asignados a tu cuenta aparecerán aquí."}
+                  {(search || active) && <p><button type="button" className="button secondary" onClick={() => {
+                    setSearch(""); setSearchText(""); setActive(""); setPage(1); searchInput.current?.focus();
+                  }}>Restablecer filtros</button></p>}
                 </Empty>
               )}
               <Pagination data={data} page={page} setPage={setPage} />
@@ -489,6 +517,8 @@ export function Sellers() {
 
 export function Plans({ params, user }) {
   const [search, setSearch] = useState("");
+  const [searchText, setSearchText] = useState("");
+  const searchInput = useRef(null);
   const [status, setStatus] = useState(params.get("status") || "");
   const [page, setPage] = useState(1);
   const resource = useResource(
@@ -499,11 +529,12 @@ export function Plans({ params, user }) {
       <PageHeading
         eyebrow="DE LA DESVIACIÓN A LA MEJORA"
         title="Planes de mejora"
-        description={
-          params.get("review")
+        description={<>
+          {params.get("review")
             ? "Planes en revisión o con una revisión programada para hoy o antes."
-            : "Diagnósticos, compromisos y resultados, en un mismo lugar."
-        }
+            : "Diagnósticos, compromisos y resultados, en un mismo lugar."}
+          {params.get("seller") && <span className="summary-count">Planes del vendedor seleccionado. <a href={sellerUrl(params.get("seller"))}>Ver su ficha</a>.</span>}
+        </>}
       >
         {user.permissions.add_improvementplan &&
           user.permissions.add_planmetric && (
@@ -519,6 +550,9 @@ export function Plans({ params, user }) {
       <section className="panel">
         <div className="toolbar">
           <SearchBox
+            value={searchText}
+            onTextChange={setSearchText}
+            inputRef={searchInput}
             placeholder="Buscar plan, vendedor o responsable…"
             onSearch={(text) => {
               setSearch(text);
@@ -547,15 +581,20 @@ export function Plans({ params, user }) {
           </label>
           {(params.get("review") || params.get("seller")) && (
             <a className="text-link" href="#/plans">
-              Quitar filtro contextual
+              {params.get("review") && params.get("seller") ? "Quitar filtros de vendedor y revisión" : params.get("review") ? "Quitar filtro de revisión" : "Quitar filtro de vendedor"}
             </a>
           )}
         </div>
         <Resource resource={resource}>
           {(data) => (
             <>
-              <PlanTable plans={data.results} />
-              <Pagination data={data} page={page} setPage={setPage} />
+              <PlanTable plans={data.results} filtered={!!(search || status || params.get("review") || params.get("seller"))}
+                context={params.get("review") && params.get("seller") ? "vendedor y revisión" : params.get("review") ? "revisión" : params.get("seller") ? "vendedor" : ""}
+                empty={search || status || params.get("review") || params.get("seller") ? "No hay planes que coincidan con los filtros" : "Aún no hay planes registrados"}
+                reset={search || status ? () => {
+                  setSearch(""); setSearchText(""); setStatus(""); setPage(1); searchInput.current?.focus();
+                } : undefined} />
+              <Pagination data={data} page={page} setPage={setPage} pageSize={20} />
             </>
           )}
         </Resource>
@@ -593,10 +632,13 @@ export function SellerDetail({ id, user }) {
             description={`Agente asignado: ${s.owner_name} · Registrado el ${date(s.created_at)}`}
           >
             {canCreate && (
-              <a className="button primary" href={newPlanUrl(id)}>
-                <Icon name="plus" size={18} />
-                Crear plan de mejora
-              </a>
+              <div className="context-action">
+                <a className="button primary" href={newPlanUrl(id)}>
+                  <Icon name="plus" size={18} />
+                  Crear plan de mejora
+                </a>
+                {!metrics.loading && !metrics.error && metrics.data?.count === 0 && <small>Se necesita una observación inicial para crear un plan. Consulta los indicadores disponibles o su histórico.</small>}
+              </div>
             )}
           </PageHeading>
           <section className="panel">
@@ -604,8 +646,8 @@ export function SellerDetail({ id, user }) {
               <div>
                 <h2>Indicadores de calidad</h2>
                 <p className="muted">
-                  Observaciones registradas por canal. Consulta el periodo antes
-                  de interpretar el resultado.
+                  Observaciones del vendedor por canal y periodo. Se consultan
+                  por separado de las revisiones y resultados de cada plan.
                 </p>
               </div>
               <label className="check-label">
@@ -709,6 +751,12 @@ export function SellerDetail({ id, user }) {
           </section>
           <section className="panel">
             <div className="panel-heading">
+              <div>
+                <h2>Planes y resultados del vendedor</h2>
+                <p className="muted">Cada plan mide su evolución con sus propias revisiones. Consulta su periodo y resultado al cierre.</p>
+              </div>
+            </div>
+            <div className="panel-heading">
               <div className="tabs" role="group" aria-label="Planes del vendedor">
                 <button
                   type="button"
@@ -781,6 +829,7 @@ export function SellerDetail({ id, user }) {
                       data={data}
                       page={planPage}
                       setPage={setPlanPage}
+                      pageSize={20}
                     />
                   </>
                 )}

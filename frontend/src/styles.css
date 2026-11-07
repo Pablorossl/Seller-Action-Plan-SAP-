@@ -115,6 +115,10 @@ textarea:focus-visible,
   outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
+.form-section-body > h2:focus {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
 button, a, input, select, textarea, [tabindex] {
   scroll-margin-block: calc(var(--topbar-height) + 12px);
 }
@@ -641,6 +645,22 @@ td .person {
   margin: 0;
   padding: 0 var(--surface-padding) var(--space-4);
 }
+.summary-count {
+  display: block;
+  margin-top: var(--space-2);
+}
+.summary-count a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.context-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  width: 260px;
+  max-width: 100%;
+}
 .dashboard-columns {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 290px;
@@ -964,6 +984,10 @@ td small {
   font-size: var(--text-support);
   margin-top: 4px;
 }
+.plan-followup {
+  min-width: 190px;
+  max-width: 280px;
+}
 .table-title,
 a.table-sub {
   min-height: 24px;
@@ -1221,7 +1245,8 @@ code {
 .stepper li:last-child:after {
   display: none;
 }
-.stepper li > span {
+.stepper li > span,
+.form-stepper button > span {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1237,12 +1262,45 @@ code {
   color: #466c3f;
 }
 .stepper li.reached > span,
-.form-stepper li > span {
+.form-stepper button > span {
   background: #e3efd7;
   color: #45672f;
 }
 .form-stepper li {
   color: #4c6546;
+  min-width: 0;
+}
+.form-section-nav {
+  max-width: 1040px;
+}
+.form-section-nav > p {
+  font-size: var(--text-support);
+  margin-bottom: var(--space-2);
+}
+.form-stepper button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-control);
+  padding: var(--space-1);
+  min-height: var(--control-height);
+  max-width: 100%;
+  text-align: left;
+}
+.form-context {
+  display: block;
+  color: var(--ink);
+  font-weight: var(--weight-medium);
+  margin-bottom: var(--space-2);
+}
+.review-assessment {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
 }
 .plan-layout {
   display: grid;
@@ -1963,6 +2021,10 @@ input[type="checkbox"] {
     font-size: var(--text-support);
     text-align: center;
     flex: 1 !important;
+  }
+  .form-stepper button {
+    flex-direction: column;
+    text-align: center;
   }
   .stepper li:after {
     display: none;

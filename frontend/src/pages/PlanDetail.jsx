@@ -237,7 +237,7 @@ function ActionForm({ plan, action, done, close: onClose }) {
           );
         }}
       >
-        <FormError error={mutation.error} />
+        <FormError error={mutation.error} labels={{ due_date: "Fecha límite", responsible: "Persona o equipo responsable", evidence: "Evidencia de ejecución" }} />
         <fieldset disabled={mutation.busy}>
           <Field
             label="Descripción de la acción"
@@ -357,8 +357,8 @@ function ReviewForm({ plan, user, done, close: onClose, previous }) {
         <FormError error={mutation.error} />
         {previous && <Field label="Motivo de rectificación" required disabled={mutation.busy} {...bind("correction_reason")}><textarea /></Field>}
         <p className="info-note">
-          La evaluación utiliza las reglas del indicador. Para MQC se necesita
-          un periodo mensual y volumen suficiente de pedidos.
+          Registra el valor y el periodo medidos. La evaluación aplica las reglas
+          del indicador y, cuando corresponda, exige un periodo mensual y un volumen suficiente de pedidos.
         </p>
         <fieldset disabled={mutation.busy}>
           <Field label="Indicador a revisar" required {...bind("plan_metric")}>
@@ -407,6 +407,7 @@ function ReviewForm({ plan, user, done, close: onClose, previous }) {
             />
             <Field
               label="Valoración del agente"
+              hint="Valoración cualitativa del seguimiento. No sustituye al resultado calculado a partir de las mediciones."
               required
               {...bind("assessment")}
             >
@@ -458,7 +459,7 @@ function CloseForm({ plan, done, close: onClose }) {
           });
         }}
       >
-        <FormError error={mutation.error} />
+        <FormError error={mutation.error} labels={{ notes: "Resultado y razones de la finalización" }} />
         <div className="closure-summary">
           <PlanResult plan={plan} />
           <p>
@@ -533,14 +534,14 @@ export function PlanDetail({ id, user, params }) {
     if (wasEditing.current && !editing) editButton.current?.focus();
     wasEditing.current = editing;
   }, [editing]);
-  const done = (plan) => {
+  const done = (plan, message = "Cambios guardados correctamente.") => {
     resource.setData(plan);
     setModal(null);
     setEditing(false);
-    setNotice("Cambios guardados correctamente.");
+    setNotice(message);
   };
   const transition = useMutation((plan) => {
-    done(plan);
+    done(plan, "Estado del plan actualizado.");
     requestAnimationFrame(() => document.querySelector(".page-heading h1")?.focus());
   });
   if (editing && resource.data)
@@ -549,7 +550,7 @@ export function PlanDetail({ id, user, params }) {
         existing={resource.data}
         user={user}
         params={params}
-        onSaved={done}
+        onSaved={(plan) => done(plan, "Plan actualizado correctamente. El histórico se conserva.")}
         onCancel={() => setEditing(false)}
       />
     );
@@ -558,6 +559,9 @@ export function PlanDetail({ id, user, params }) {
       {(plan) => {
         const closed = finalPlan(plan);
         const canEdit = !closed && user.permissions.change_improvementplan;
+        const primaryAction = !closed && (plan.status === "draft"
+          ? user.permissions.add_planaction && "action"
+          : user.permissions.add_planreview && "review");
         const progress = closed
           ? 4
           : plan.status === "in_review"
@@ -578,11 +582,14 @@ export function PlanDetail({ id, user, params }) {
                   <a href={sellerUrl(plan.seller)}>
                     {plan.seller_name} · {plan.seller_reference} ↗
                   </a>
-                  {closed && <PlanResult plan={plan} />}
+                  <PlanResult plan={plan} />
                 </>
               }
             >
               <PlanStatus plan={plan} />
+              {primaryAction && <button type="button" className="button primary" onClick={() => setModal({ type: primaryAction })}>
+                {primaryAction === "action" ? "Añadir acción" : "Registrar revisión"}
+              </button>}
               {canEdit && (
                 <button
                   ref={editButton}
@@ -594,7 +601,7 @@ export function PlanDetail({ id, user, params }) {
               )}
               {canEdit && user.permissions.close_improvementplan && (
                 <button
-                  className="button primary"
+                  className="button secondary"
                   onClick={() => setModal({ type: "close" })}
                 >
                   Finalizar plan
@@ -705,7 +712,7 @@ export function PlanDetail({ id, user, params }) {
                         {closed ? " al cierre" : ""}
                       </p>
                     </div>
-                    {!closed && user.permissions.add_planaction && (
+                    {!closed && user.permissions.add_planaction && primaryAction !== "action" && (
                       <button
                         className="button secondary compact"
                         onClick={() => setModal({ type: "action" })}
@@ -802,7 +809,7 @@ export function PlanDetail({ id, user, params }) {
                         al más antiguo.
                       </p>
                     </div>
-                    {!closed && user.permissions.add_planreview && (
+                    {!closed && user.permissions.add_planreview && primaryAction !== "review" && (
                       <button
                         className="button secondary compact"
                         onClick={() => setModal({ type: "review" })}
@@ -832,7 +839,10 @@ export function PlanDetail({ id, user, params }) {
                                   · {r.order_count ?? "Sin datos de"} pedidos
                                 </small>
                               </div>
-                              <Badge status={r.assessment} />
+                              <div className="review-assessment">
+                                <span className="result-label">Valoración del agente</span>
+                                <Badge status={r.assessment} />
+                              </div>
                             </div>
                             <p className="preserve">{r.comments}</p>
                             {r.next_steps && (
@@ -982,7 +992,7 @@ export function PlanDetail({ id, user, params }) {
               <MetricForm
                 plan={plan}
                 metric={modal.metric}
-                done={done}
+                done={(plan) => done(plan, modal.metric ? "Objetivo actualizado correctamente." : "Indicador añadido al plan.")}
                 close={() => setModal(null)}
               />
             )}
@@ -990,7 +1000,7 @@ export function PlanDetail({ id, user, params }) {
               <ActionForm
                 plan={plan}
                 action={modal.action}
-                done={done}
+                done={(plan) => done(plan, modal.action ? "Acción actualizada correctamente." : "Acción añadida al plan.")}
                 close={() => setModal(null)}
               />
             )}
@@ -999,12 +1009,12 @@ export function PlanDetail({ id, user, params }) {
                 plan={plan}
                 previous={modal.previous}
                 user={user}
-                done={done}
+                done={(plan) => done(plan, modal.previous ? "Rectificación registrada. Se conserva la revisión original." : "Revisión registrada. Consulta la evaluación actual.")}
                 close={() => setModal(null)}
               />
             )}
             {modal?.type === "close" && (
-              <CloseForm plan={plan} done={done} close={() => setModal(null)} />
+              <CloseForm plan={plan} done={(plan) => done(plan, "Plan finalizado. Consulta el resultado al cierre.")} close={() => setModal(null)} />
             )}
           </>
         );

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useId, useRef, useState } from "react";
 import { api } from "../services/api.js";
 import { planResult } from "../services/planPresentation.js";
+import { messages, paginationRange } from "../services/uiPresentation.js";
+export { messages } from "../services/uiPresentation.js";
 
 export const labels = {
   draft: "Borrador",
@@ -268,9 +270,10 @@ export function Resource({ resource, children }) {
     </ResourceFocus.Provider>
   );
 }
-export function Pagination({ data, page, setPage }) {
+export function Pagination({ data, page, setPage, pageSize = 50 }) {
   const pendingFocus = useContext(ResourceFocus);
   const status = useRef(null);
+  const range = paginationRange(data, page, pageSize);
   useEffect(() => {
     if (!pendingFocus?.current) return;
     pendingFocus.current = false;
@@ -285,7 +288,7 @@ export function Pagination({ data, page, setPage }) {
   return (
     <div className="pagination">
       <span>
-        {data.count} {data.count === 1 ? "registro" : "registros"}
+        {data.count ? `${range.first}–${range.last} de ${data.count} ${data.count === 1 ? "registro" : "registros"}` : "0 registros"}
       </span>
       <div>
         <button
@@ -296,7 +299,9 @@ export function Pagination({ data, page, setPage }) {
         >
           Anterior
         </button>
-        <span ref={status} className="pagination-status" tabIndex={-1}>Página {page}</span>
+        <span ref={status} className="pagination-status" tabIndex={-1}>
+          {range.pages ? `Página ${page} de ${range.pages}` : "Sin páginas"}
+        </span>
         <button
           className="button secondary compact"
           type="button"
@@ -339,9 +344,15 @@ export function SearchBox({
   onSearch,
   placeholder = "Buscar por nombre o identificador…",
   initial = "",
+  value: controlledText,
+  onTextChange,
+  inputRef,
 }) {
-  const [text, setText] = useState(initial);
-  const input = useRef(null);
+  const [draft, setDraft] = useState(initial);
+  const text = controlledText ?? draft;
+  const setText = onTextChange || setDraft;
+  const localInput = useRef(null);
+  const input = inputRef || localInput;
   return (
     <div className="search-box" role="search" aria-label={`Búsqueda: ${placeholder.replace(/^Buscar /, "").replace(/…$/, "")}`}>
       <Icon name="search" />
@@ -376,17 +387,6 @@ export function SearchBox({
       )}
     </div>
   );
-}
-export function messages(errors) {
-  if (!errors) return "";
-  if (typeof errors === "string") return errors;
-  if (Array.isArray(errors)) return errors.map(messages).join(" ");
-  return Object.entries(errors)
-    .map(
-      ([key, val]) =>
-        `${/^\d+$/.test(key) ? `Indicador ${Number(key) + 1}` : key}: ${messages(val)}`,
-    )
-    .join(" ");
 }
 export function Field({
   label,
@@ -431,7 +431,7 @@ export function Field({
     </div>
   );
 }
-export function FormError({ error }) {
+export function FormError({ error, labels }) {
   const ref = useRef();
   useEffect(() => {
     if (error) ref.current?.focus();
@@ -439,7 +439,7 @@ export function FormError({ error }) {
   return error ? (
     <div ref={ref} tabIndex="-1" className="form-error" role="alert">
       {error.message}
-      <p>{messages(error.fields)}</p>
+      <p>{messages(error.fields, labels)}</p>
     </div>
   ) : null;
 }

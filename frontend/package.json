@@ -10,7 +10,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node src/services/api.test.js && node src/services/navigation.test.js && node src/services/planPresentation.test.js"
+    "test": "node src/services/api.test.js && node src/services/navigation.test.js && node src/services/planPresentation.test.js && node src/services/uiPresentation.test.js"
   },
   "dependencies": {
     "react": "19.3.1",

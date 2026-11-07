@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useId, useState } from "react";
 import { api } from "../services/api.js";
 import { useUnsavedChanges } from "../components/UnsavedChanges.jsx";
 import {
@@ -27,6 +27,7 @@ function RecordPicker({
   url,
   chosen,
   onSelect,
+  pageSize = 50,
   render = (item) => item.name,
 }) {
   const [search, setSearch] = useState("");
@@ -73,7 +74,7 @@ function RecordPicker({
             {!data.results.length && (
               <p className="muted">Sin coincidencias.</p>
             )}
-            <Pagination data={data} page={page} setPage={setPage} />
+            <Pagination data={data} page={page} setPage={setPage} pageSize={pageSize} />
           </>
         )}
       </Resource>
@@ -82,6 +83,12 @@ function RecordPicker({
 }
 
 export function PlanForm({ user, params, existing, onSaved, onCancel }) {
+  const sectionPrefix = useId();
+  const focusSection = (section) => {
+    const heading = document.getElementById(`${sectionPrefix}-${section}`);
+    heading?.focus({ preventScroll: true });
+    heading?.scrollIntoView({ block: "start" });
+  };
   const sellerId = existing?.seller || params.get("seller");
   const [selectedSeller, setSelectedSeller] = useState(null);
   const [responsible, setResponsible] = useState({
@@ -245,26 +252,28 @@ export function PlanForm({ user, params, existing, onSaved, onCancel }) {
             ? "Editar diagnóstico y seguimiento"
             : "Cada mejora empieza con un plan"
         }
-        description="Define el problema, concreta el objetivo y organiza el seguimiento. Los campos con * son obligatorios."
+        description={<>
+          {existing && <span className="form-context">{existing.title} · {existing.seller_name}</span>}
+          Define el problema, concreta el objetivo y organiza el seguimiento. Los campos con * son obligatorios.
+        </>}
       />
+      <nav aria-label="Secciones del formulario" className="form-section-nav">
+      <p className="muted">Ir a una sección del formulario:</p>
       <ol className="stepper form-stepper">
-        <li>
-          <span>1</span>Diagnóstico
-        </li>
-        <li>
-          <span>2</span>Indicadores y objetivos
-        </li>
-        <li>
-          <span>3</span>Responsable y plazos
-        </li>
+        {[["diagnosis", "Diagnóstico"], ["metrics", "Indicadores y objetivos"], ["followup", "Responsable y plazos"]].map(([key, label], index) =>
+          <li key={key}><button type="button" onClick={() => focusSection(key)}>
+            <span>{index + 1}</span>{" "}{label}
+          </button></li>
+        )}
       </ol>
+      </nav>
       <form className="plan-form" onSubmit={submit}>
         <FormError error={mutation.error} />
         <fieldset disabled={mutation.busy}>
           <section className="panel form-panel">
             <div className="section-number">01</div>
             <div className="form-section-body">
-              <h2>Entender el problema</h2>
+              <h2 id={`${sectionPrefix}-diagnosis`} tabIndex={-1}>Entender el problema</h2>
               <p className="muted">
                 Un diagnóstico concreto ayuda a definir acciones que funcionan.
               </p>
@@ -343,10 +352,10 @@ export function PlanForm({ user, params, existing, onSaved, onCancel }) {
           <section className="panel form-panel">
             <div className="section-number">02</div>
             <div className="form-section-body">
-              <h2>Medir la mejora</h2>
+              <h2 id={`${sectionPrefix}-metrics`} tabIndex={-1}>Medir la mejora</h2>
               <p className="muted">
-                Selecciona uno o varios indicadores del mismo periodo. Django
-                valida la dirección de mejora y el objetivo.
+                Selecciona uno o varios indicadores del mismo periodo. El objetivo
+                debe mejorar el valor inicial en la dirección del indicador; se comprobará al guardar.
               </p>
               {!existing && (
                 <>
@@ -474,10 +483,11 @@ export function PlanForm({ user, params, existing, onSaved, onCancel }) {
           <section className="panel form-panel">
             <div className="section-number">03</div>
             <div className="form-section-body">
-              <h2>Organizar el seguimiento</h2>
+              <h2 id={`${sectionPrefix}-followup`} tabIndex={-1}>Organizar el seguimiento</h2>
               <RecordPicker
                 label="Responsable del seguimiento"
                 url="/api/responsibles/"
+                pageSize={20}
                 chosen={responsible}
                 onSelect={setResponsible}
               />
