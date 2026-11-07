@@ -2,6 +2,53 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { ApiError, api, getAllPages, setCsrfToken } from "./api.js";
 
+test("rechaza JSON malformado, HTML y cuerpos vacíos con HTTP 200", async () => {
+  for (const body of ['{"today":', '<html>Proxy interno</html>', '']) {
+    await assert.rejects(api("/api/overview/", {
+      request: async () => new Response(body, { status: 200 }),
+    }), (error) => error instanceof ApiError && error.status === 200 &&
+      error.message.includes("respuesta inválida") && !error.message.includes(body || "Proxy"));
+  }
+});
+
+test("acepta JSON válido y DELETE 204 sin intentar leer JSON", async () => {
+  const data = { today: "2026-11-07", counts: { sellers: 2 } };
+  assert.deepEqual(await api("/api/overview/", {
+    request: async () => Response.json(data),
+  }), data);
+  assert.equal(await api("/api/sellers/1/", {
+    method: "DELETE", request: async () => new Response(null, { status: 204 }),
+  }), null);
+});
+
+test("conserva estado HTTP y detalles de errores JSON y HTML", async () => {
+  for (const status of [400, 403, 500]) {
+    for (const body of [JSON.stringify({ detail: "Error controlado" }), "<html>Privado</html>"]) {
+      await assert.rejects(api("/api/plans/", {
+        request: async () => new Response(body, { status }),
+      }), (error) => error instanceof ApiError && error.status === status &&
+        !error.message.includes("Privado") &&
+        (body.startsWith("<") || error.fields.detail === "Error controlado"));
+    }
+  }
+});
+
+test("no reintenta escrituras con una respuesta inválida", async () => {
+  let calls = 0;
+  await assert.rejects(api("/api/plans/", { method: "POST", data: {}, request: async () => {
+    calls++;
+    return new Response("{", { status: 200 });
+  } }), ApiError);
+  assert.equal(calls, 1);
+});
+
+test("respeta cancelaciones durante la lectura del cuerpo", async () => {
+  const abort = new DOMException("Aborted", "AbortError");
+  await assert.rejects(api("/api/overview/", { request: async () => ({
+    ok: true, status: 200, json: async () => { throw abort; },
+  }) }), (error) => error === abort);
+});
+
 test("envía la clave de reintento y comunica conflictos de edición", async () => {
   await assert.rejects(api("/api/plans/1/actions/", {
     method: "POST", data: { description: "Revisar" }, idempotencyKey: "test-request-key",

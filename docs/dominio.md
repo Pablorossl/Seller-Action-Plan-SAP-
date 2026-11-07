@@ -33,3 +33,18 @@ La evaluación es una ayuda operativa. SAP no envía notificaciones oficiales, n
 La Fase 1 conserva problema, causa raíz, evidencia, responsables y plazos. Cada objetivo numérico pertenece a un indicador inicial y canal, y puede tener varias revisiones históricas. Las incidencias y los tiempos mejoran al disminuir; aceptación, seguimiento, NPS y entrega mejoran al aumentar. Alcanzar el objetivo admite igualdad; demostrar mejora frente al inicio requiere una variación estricta.
 
 Completar acciones no equivale a cumplir objetivos. Sin una revisión evaluable se muestra resultado no evaluable. Las revisiones MQC también requieren mes y volumen suficiente para concluir mejora o logro; las revisiones de NPS/entrega conservan sus reglas independientes. La valoración del agente se guarda aparte del cálculo. Un plan puede cerrarse sin alcanzar el objetivo, o sin datos suficientes, si se documentan las razones y se conserva la evaluación del momento. Más detalles y recorrido: [Fase 1](fase-1.md).
+
+### Vencimiento operativo e histórico
+
+El filtro de acciones vencidas del admin y su columna «Vencida (operativa)»
+identifican acciones pendientes o en progreso con fecha límite anterior a hoy,
+excluyendo planes cerrados y cancelados, igual que el resumen operativo del Dashboard.
+La fecha límite de hoy todavía no está vencida. Los borradores conservan la
+semántica operativa existente; las acciones completadas o canceladas no vencen.
+
+El detalle y la evaluación de un plan finalizado conservan el vencimiento histórico:
+`PlanAction.is_overdue` consulta `closure_evaluation.action_overdue`, registrado al
+finalizar. Una acción vencida al cierre sigue constando como tal en el histórico,
+pero sale de la cola operativa. Una acción futura al cierre no cambia retrospectivamente
+al avanzar el calendario. Si un cierre antiguo carece de ese detalle, el valor
+histórico permanece desconocido; no se reconstruye con la fecha actual.

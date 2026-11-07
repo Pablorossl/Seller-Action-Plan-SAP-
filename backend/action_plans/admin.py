@@ -176,7 +176,7 @@ class PlanMetricAdmin(ScopedPlanAdmin):
 
 
 class OverdueFilter(admin.SimpleListFilter):
-    title = "vencimiento"
+    title = "vencimiento operativo"
     parameter_name = "overdue"
 
     def lookups(self, request, model_admin):
@@ -184,7 +184,8 @@ class OverdueFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "yes":
-            return queryset.filter(due_date__lt=timezone.localdate(), status__in=["pending", "in_progress"])
+            return queryset.exclude(plan__status__in=FINAL_STATUSES).filter(
+                due_date__lt=timezone.localdate(), status__in=["pending", "in_progress"])
         return queryset
 
 
@@ -197,9 +198,11 @@ class PlanActionAdmin(ScopedPlanAdmin):
     list_filter = ["status", "kind", OverdueFilter]
     search_fields = ["description", "plan__title", "plan__seller__name", "responsible"]
 
-    @admin.display(boolean=True, description="Vencida")
+    @admin.display(boolean=True, description="Vencida (operativa)")
     def overdue(self, obj):
-        return obj.is_overdue
+        # La cola operativa termina al finalizar el plan. is_overdue conserva
+        # la instantánea histórica para el detalle y la evaluación del cierre.
+        return obj.plan.status not in FINAL_STATUSES and obj.is_overdue
 
 
 @admin.register(PlanReview)

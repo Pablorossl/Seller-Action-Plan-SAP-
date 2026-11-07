@@ -1,7 +1,9 @@
 export class ApiError extends Error {
-  constructor(status, fields = {}) {
+  constructor(status, fields = {}, invalidResponse = false) {
     super(
-      status === 403
+      invalidResponse
+        ? "SAP ha devuelto una respuesta inválida. Vuelve a cargar los datos o inténtalo de nuevo."
+        : status === 403
         ? "Tu sesión ha caducado o no tienes permiso para esta operación."
         : status === 404
           ? "No se encuentra este registro o no tienes acceso a él."
@@ -47,7 +49,16 @@ export async function api(
     if (error.name === "AbortError") throw error;
     throw new ApiError(0);
   }
-  const body = await response.json().catch(() => ({}));
+  if (response.status === 204) return null;
+  let body;
+  try {
+    body = await response.json();
+  } catch (error) {
+    if (error.name === "AbortError") throw error;
+    // Los errores HTTP conservan su estado incluso si el proxy devuelve HTML.
+    // Un éxito con cuerpo ilegible nunca debe llegar al consumidor como datos.
+    throw new ApiError(response.status, {}, response.ok);
+  }
   if (!response.ok) throw new ApiError(response.status, body);
   return body;
 }

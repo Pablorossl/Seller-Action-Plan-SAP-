@@ -39,6 +39,18 @@ def run_flow(*, base, username, password, other_username, other_password,
         page.get_by_label("Contraseña").fill(password)
         page.get_by_role("button", name="Entrar en mi espacio").click()
         expect(page.get_by_role("heading", name="Prioridades de la semana")).to_be_visible()
+        # H02: el error atraviesa api/useResource/Resource y permite recuperar
+        # el Dashboard sin errores de renderizado ni cerrar la sesión.
+        for invalid_body in ('{"today":', '<html>Proxy inesperado</html>'):
+            def invalid_overview(route):
+                route.fulfill(status=200, content_type="text/html", body=invalid_body)
+            page.route("**/api/overview/", invalid_overview)
+            page.reload()
+            expect(page.get_by_role("alert")).to_contain_text("respuesta inválida")
+            expect(page.get_by_role("heading", name="Prioridades de la semana")).to_have_count(0)
+            page.unroute("**/api/overview/", invalid_overview)
+            page.get_by_role("button", name="Volver a intentar").click()
+            expect(page.get_by_role("heading", name="Prioridades de la semana")).to_be_visible()
         page.screenshot(path=str(artifacts / "dashboard.png"), full_page=True)
         cookies = {cookie["name"]: cookie for cookie in context.cookies()}
         assert cookies["sessionid"]["secure"] and cookies["sessionid"]["httpOnly"]
@@ -177,6 +189,7 @@ def run_flow(*, base, username, password, other_username, other_password,
     report = {"url": base, "environment": "local TLS de prueba" if local_tls else "public",
         "plan_id": plan_id, "flow": "6 → 4.5 → 3", "status": "closed", "result": "achieved",
         "reload": True, "logout": True, "csrf": True, "other_agent_denied": True, "mobile_width": 390,
+        "invalid_json_recovery": True, "unexpected_html_recovery": True,
         "page_errors": errors, "critical_responses": failed_responses}
     (artifacts / "browser-result.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
     print(json.dumps(report, ensure_ascii=False), flush=True)
