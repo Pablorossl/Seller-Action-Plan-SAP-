@@ -16,8 +16,9 @@
   --green: #146952;
   --lime: #c3f17c;
   --line: #e3e9e5;
-  --muted: #697973;
+  --muted: #53665c;
   --red: #ad382d;
+  --control-border: #748278;
   --shadow: 0 2px 5px #17362c03;
   --topbar-height: 73px;
 }
@@ -397,7 +398,7 @@ main {
   font-size: 9px;
   font-weight: 650;
   letter-spacing: 1.7px;
-  color: #718077;
+  color: #56685e;
   margin-bottom: 10px;
 }
 .heading-actions {
@@ -471,7 +472,7 @@ main {
 }
 .back-link {
   display: inline-block;
-  color: #64776d;
+  color: #52655b;
   font-size: 12px;
   margin-bottom: 19px;
 }
@@ -808,7 +809,6 @@ main {
 }
 .badge-achieved,
 .badge-completed,
-.badge-closed,
 .badge-ok {
   background: #eaf5e5;
   color: #456c35;
@@ -824,10 +824,28 @@ main {
   background: #fceee9;
   color: #a84231;
 }
-.badge-cancelled,
 .badge-no_progress {
   background: #f1eeee;
   color: #756363;
+}
+.badge-closed,
+.badge-cancelled {
+  background: #edf1f4;
+  color: #445861;
+}
+.plan-status,
+.plan-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 8px;
+}
+.plan-result {
+  margin-top: 6px;
+}
+.result-label {
+  font-size: 11px;
+  color: var(--muted);
 }
 .table-wrap {
   position: relative;
@@ -858,7 +876,7 @@ table {
 th {
   font-size: 10px;
   font-weight: 500;
-  color: #748278;
+  color: #52645a;
   background: #fafbf9;
   letter-spacing: 0.15px;
   padding: 13px 18px;
@@ -903,6 +921,10 @@ td small {
   font-size: 11px;
   margin-top: 4px;
 }
+.table-title,
+a.table-sub {
+  min-height: 24px;
+}
 .metric-tags {
   display: flex;
   gap: 4px;
@@ -915,7 +937,7 @@ td small {
   padding: 3px 6px;
   border-radius: 4px;
   font-size: 9px;
-  color: #667a5d;
+  color: #4e6248;
 }
 .metric-value {
   font-size: 15px;
@@ -939,7 +961,7 @@ code {
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #dfe6df;
+  border: 1px solid var(--control-border);
   border-radius: 6px;
   padding: 0 10px;
   background: white;
@@ -1062,7 +1084,7 @@ code {
 }
 .info-note {
   background: #f7f9f4;
-  color: #6a795f;
+  color: #526447;
   padding: 14px 22px;
   font-size: 11px;
   line-height: 1.7;
@@ -1076,7 +1098,7 @@ code {
   border: 0;
   padding: 3px 0 10px;
   font-size: 13px;
-  color: #7b867e;
+  color: #5b6a60;
   border-bottom: 2px solid transparent;
 }
 .tabs button.active {
@@ -1106,7 +1128,7 @@ code {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  color: #839084;
+  color: #53665c;
   font-size: 10px;
   border-top: 1px solid var(--line);
   padding: 22px 0 4px;
@@ -1130,7 +1152,7 @@ code {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #8b968c;
+  color: #59685b;
   font-size: 12px;
   position: relative;
 }
@@ -1156,7 +1178,7 @@ code {
   flex-shrink: 0;
   border-radius: 100%;
   background: #f2f4ef;
-  color: #8a9485;
+  color: #59664f;
   font-size: 11px;
 }
 .stepper li.reached {
@@ -1165,7 +1187,7 @@ code {
 .stepper li.reached > span,
 .form-stepper li > span {
   background: #e3efd7;
-  color: #4d7535;
+  color: #45672f;
 }
 .form-stepper li {
   color: #4c6546;
@@ -1216,7 +1238,7 @@ code {
 }
 .result-note {
   padding: 0 15px;
-  color: #77846f;
+  color: #56664b;
   font-size: 11px;
   line-height: 1.6;
 }
@@ -1236,7 +1258,7 @@ code {
 }
 .diagnosis-grid h3 {
   font-size: 10px;
-  color: #74816d;
+  color: #56664c;
   letter-spacing: 0.4px;
 }
 .diagnosis-grid p {
@@ -1337,8 +1359,8 @@ code {
 }
 .closure-panel {
   padding-bottom: 22px;
-  border-color: #cbdcbe;
-  background: #fbfdf8;
+  border-color: var(--line);
+  background: #fbfcfc;
 }
 .closure-panel > p,
 .closure-panel > small {
@@ -1368,7 +1390,7 @@ code {
 }
 .section-number {
   font-size: 12px;
-  color: #829771;
+  color: #51683e;
   padding: 5px 8px;
   background: #f2f6ed;
   border-radius: 5px;
@@ -1401,7 +1423,7 @@ code {
   font-weight: 550;
 }
 .field label span {
-  color: #7c8f70;
+  color: var(--muted);
 }
 .field small {
   font-size: 11px;
@@ -1412,7 +1434,7 @@ code {
 input,
 select,
 textarea {
-  border: 1px solid #dce4da;
+  border: 1px solid var(--control-border);
   border-radius: 6px;
   padding: 10px 11px;
   background: #fff;
@@ -1422,7 +1444,7 @@ textarea {
 }
 input::placeholder,
 textarea::placeholder {
-  color: #97a190;
+  color: #53665c;
   font-size: 12px;
 }
 textarea {
@@ -1431,7 +1453,7 @@ textarea {
 }
 input[readonly] {
   background: #f5f7f3;
-  color: #708167;
+  color: #536849;
 }
 input[aria-invalid="true"],
 textarea[aria-invalid="true"],

@@ -6,10 +6,13 @@ import {
   Icon,
   PageHeading,
   Pagination,
+  PlanResult,
+  PlanStatus,
   Resource,
   ScrollableTable,
   SearchBox,
   date,
+  finalPlan,
   labels,
   metricLabels,
   newPlanUrl,
@@ -36,7 +39,7 @@ export function PlanTable({
           <tr>
             <th scope="col">Plan / vendedor</th>
             <th scope="col">Indicadores</th>
-            <th scope="col">Estado</th>
+            <th scope="col">Estado y resultado</th>
             <th scope="col">Responsable</th>
             <th scope="col">Fecha objetivo</th>
             <th scope="col">
@@ -64,7 +67,8 @@ export function PlanTable({
                 </div>
               </td>
               <td>
-                <Badge status={plan.status} />
+                <PlanStatus plan={plan} />
+                {finalPlan(plan) && <PlanResult plan={plan} />}
                 {plan.needs_review && (
                   <small className="text-warning">Requiere revisión</small>
                 )}
@@ -158,9 +162,9 @@ export function Dashboard({ user }) {
                 [
                   "Planes cerrados",
                   "closed_plans",
-                  "trend",
+                  "plans",
                   "#/plans?status=closed",
-                  "Con resultado documentado",
+                  "Consulta su resultado al cierre",
                 ],
               ].map(([label, key, icon, href, hint]) => {
                 const Component = href === "#prioridades" ? "button" : "a";
@@ -740,18 +744,16 @@ export function SellerDetail({ id, user }) {
                         {data.results.map((p) => (
                           <article key={p.id}>
                             <div>
-                              <Badge status={p.status} />
+                              <PlanStatus plan={p} />
                               <a href={planUrl(p.id)}>
                                 <h3>{p.title}</h3>
                               </a>
                               <p>{p.objective}</p>
-                              <small>
-                                {history
-                                  ? labels[p.closure_evaluation.result]
-                                  : p.next_action
+                              {history ? <PlanResult plan={p} /> : <small>
+                                {p.next_action
                                     ? `Próxima acción: ${p.next_action.description} · ${date(p.next_action.due_date)}`
                                     : "Sin acciones pendientes"}
-                              </small>
+                              </small>}
                             </div>
                             <a
                               className="button secondary"

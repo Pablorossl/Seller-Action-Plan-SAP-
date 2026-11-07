@@ -11,6 +11,8 @@ import {
   Modal,
   PageHeading,
   Pagination,
+  PlanResult,
+  PlanStatus,
   Resource,
   ScrollableTable,
   date,
@@ -458,7 +460,7 @@ function CloseForm({ plan, done, close: onClose }) {
       >
         <FormError error={mutation.error} />
         <div className="closure-summary">
-          <Badge status={plan.evaluation.result} />
+          <PlanResult plan={plan} />
           <p>
             Acciones completadas: {plan.evaluation.actions.completed}. Acciones
             abiertas:{" "}
@@ -469,7 +471,8 @@ function CloseForm({ plan, done, close: onClose }) {
         </div>
         <Comparison plan={plan} />
         <p className="info-note">
-          Finalizar el plan conserva su histórico. Las acciones completadas y
+          Cerrar el plan no implica alcanzar sus objetivos. Finalizar conserva
+          su histórico. Las acciones completadas y
           los objetivos alcanzados se evalúan por separado. Si quedan
           pendientes, documenta la decisión.
         </p>
@@ -571,12 +574,15 @@ export function PlanDetail({ id, user, params }) {
               eyebrow={`PLAN DE MEJORA · #${plan.id}`}
               title={plan.title}
               description={
-                <a href={sellerUrl(plan.seller)}>
-                  {plan.seller_name} · {plan.seller_reference} ↗
-                </a>
+                <>
+                  <a href={sellerUrl(plan.seller)}>
+                    {plan.seller_name} · {plan.seller_reference} ↗
+                  </a>
+                  {closed && <PlanResult plan={plan} />}
+                </>
               }
             >
-              <Badge status={plan.status} />
+              <PlanStatus plan={plan} />
               {canEdit && (
                 <button
                   ref={editButton}
@@ -678,8 +684,9 @@ export function PlanDetail({ id, user, params }) {
                   )}
                   {!plan.metrics.length && (
                     <Empty title="Sin indicadores vinculados">
-                      Este plan necesita al menos un objetivo antes de
-                      activarse.
+                      {closed
+                        ? "No constan indicadores vinculados en este plan finalizado."
+                        : "Este plan necesita al menos un objetivo antes de activarse."}
                     </Empty>
                   )}
                 </section>
@@ -774,9 +781,10 @@ export function PlanDetail({ id, user, params }) {
                       ))}
                     </div>
                   ) : (
-                    <Empty title="Concreta el siguiente paso">
-                      Añade acciones correctivas y preventivas con un
-                      responsable y una fecha límite.
+                    <Empty title={closed ? "Sin acciones registradas" : "Concreta el siguiente paso"}>
+                      {closed
+                        ? "No constan acciones en este plan finalizado."
+                        : "Añade acciones correctivas y preventivas con un responsable y una fecha límite."}
                     </Empty>
                   )}
                 </section>
@@ -845,11 +853,12 @@ export function PlanDetail({ id, user, params }) {
                     </div>
                   ) : (
                     <Empty
-                      title="La evolución empieza con una revisión"
-                      icon="trend"
+                      title={closed ? "Sin revisiones registradas" : "La evolución empieza con una revisión"}
+                      icon={closed ? "plans" : "trend"}
                     >
-                      Registra valores observados y evidencias para evaluar los
-                      objetivos.
+                      {closed
+                        ? "No constan revisiones en este plan finalizado."
+                        : "Registra valores observados y evidencias para evaluar los objetivos."}
                     </Empty>
                   )}
                 </section>
@@ -857,7 +866,7 @@ export function PlanDetail({ id, user, params }) {
                   <section className="panel closure-panel">
                     <div className="panel-heading">
                       <h2>Resultado y cierre</h2>
-                      <Badge status={plan.closure_evaluation.result} />
+                      <PlanResult plan={plan} />
                     </div>
                     <p className="preserve">{plan.closure_notes}</p>
                     <small>
@@ -958,13 +967,14 @@ export function PlanDetail({ id, user, params }) {
                   )}
                 </section>
                 <div className="result-note">
-                  <Icon name="trend" />
+                  <Icon name="plans" />
                   <h3>Resultados con contexto</h3>
                   <p>
-                    El cumplimiento se calcula a partir de las revisiones y las
-                    reglas de cada indicador.
+                    {closed
+                      ? "El estado administrativo y el resultado al cierre se muestran por separado. El resultado conserva la evaluación registrada."
+                      : "El cumplimiento se calcula a partir de las revisiones y las reglas de cada indicador."}
                   </p>
-                  <Badge status={plan.evaluation.result} />
+                  <PlanResult plan={plan} />
                 </div>
               </aside>
             </div>

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useId, useRef, useState } from "react";
 import { api } from "../services/api.js";
+import { planResult } from "../services/planPresentation.js";
 
 export const labels = {
   draft: "Borrador",
@@ -134,6 +135,23 @@ export function Badge({ status, children }) {
     <span className={`badge badge-${status}`}>
       <span className="status-dot" />
       {children || labels[status] || status}
+    </span>
+  );
+}
+export function PlanStatus({ plan }) {
+  return (
+    <span className="plan-status">
+      <span className="result-label">Estado</span>
+      <Badge status={plan.status} />
+    </span>
+  );
+}
+export function PlanResult({ plan }) {
+  const result = planResult(plan);
+  return (
+    <span className="plan-result">
+      <span className="result-label">{result.qualifier}</span>
+      <Badge status={result.code}>{result.label}</Badge>
     </span>
   );
 }
