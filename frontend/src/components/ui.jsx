@@ -109,6 +109,7 @@ const paths = {
     </>
   ),
   menu: <path d="M4 6h16M4 12h16M4 18h16" />,
+  chevron: <path d="m14 6-6 6 6 6" />,
   trend: (
     <>
       <path d="m3 17 6-6 4 4 8-10M15 5h6v6" />

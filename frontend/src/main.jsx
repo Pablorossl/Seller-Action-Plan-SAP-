@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { setCsrfToken } from "./services/api.js";
 import {
-  Avatar,
   Empty,
   Icon,
   Resource,
@@ -15,12 +14,15 @@ import { PlanDetail } from "./pages/PlanDetail.jsx";
 import { UnsavedChangesProvider, useLeaveConfirmation } from "./components/UnsavedChanges.jsx";
 import { installHashNavigation } from "./services/navigation.js";
 import { useRouteFocus } from "./components/RouteFocus.jsx";
+import { Sidebar } from "./components/Sidebar.jsx";
 import "./styles.css";
 
 function App() {
   const requestLeave = useLeaveConfirmation();
   const [route, setRoute] = useState(location.hash.slice(1) || "/");
   const [mobileNav, setMobileNav] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia("(max-width: 760px)").matches);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.matchMedia("(max-width: 1199px)").matches);
   const menuButton = useRef(null);
   const sidebar = useRef(null);
   const content = useRef(null);
@@ -30,24 +32,54 @@ function App() {
     menuButton.current?.focus();
   };
   useEffect(() => {
-    const compact = window.matchMedia("(max-width: 900px)");
-    const resize = () => { if (!compact.matches) setMobileNav(false); };
-    compact.addEventListener("change", resize);
-    return () => compact.removeEventListener("change", resize);
+    const mobile = window.matchMedia("(max-width: 760px)");
+    const tablet = window.matchMedia("(max-width: 1199px)");
+    const resize = () => {
+      const focused = document.activeElement;
+      const inSidebar = sidebar.current?.contains(focused);
+      setIsMobile(mobile.matches);
+      setSidebarCollapsed(tablet.matches);
+      setMobileNav(false);
+      if (mobile.matches && inSidebar) requestAnimationFrame(() => menuButton.current?.focus());
+      else if (!mobile.matches && focused === menuButton.current)
+        requestAnimationFrame(() => sidebar.current?.querySelector("nav a[aria-current]")?.focus());
+    };
+    mobile.addEventListener("change", resize);
+    tablet.addEventListener("change", resize);
+    return () => {
+      mobile.removeEventListener("change", resize);
+      tablet.removeEventListener("change", resize);
+    };
   }, []);
   useEffect(() => {
-    if (!mobileNav) return;
-    sidebar.current?.querySelector("nav a")?.focus();
-    const escape = (event) => {
-      if (event.key === "Escape" && !document.querySelector("dialog[open]")) {
+    if (!mobileNav || !isMobile) return;
+    (sidebar.current?.querySelector("nav a[aria-current]") || sidebar.current?.querySelector("nav a"))?.focus();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const keyboard = (event) => {
+      if (document.querySelector("dialog[open]")) return;
+      if (event.key === "Escape") {
         event.preventDefault();
         setMobileNav(false);
         menuButton.current?.focus();
       }
+      if (event.key === "Tab") {
+        const controls = [...sidebar.current.querySelectorAll("a[href], button:not([disabled])")]
+          .filter(control => control.getClientRects().length);
+        controls.push(menuButton.current);
+        const index = controls.indexOf(document.activeElement);
+        if (index === -1 || (!event.shiftKey && index === controls.length - 1) || (event.shiftKey && index === 0)) {
+          event.preventDefault();
+          controls[event.shiftKey ? controls.length - 1 : 0]?.focus();
+        }
+      }
     };
-    window.addEventListener("keydown", escape);
-    return () => window.removeEventListener("keydown", escape);
-  }, [mobileNav]);
+    window.addEventListener("keydown", keyboard);
+    return () => {
+      window.removeEventListener("keydown", keyboard);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileNav, isMobile]);
   const session = useResource("/api/workspace/");
   useEffect(() => {
     return installHashNavigation(window, requestLeave, (nextRoute) => {
@@ -102,7 +134,7 @@ function App() {
       );
   }
   return (
-    <div className="app-shell">
+    <div className={`app-shell${sidebarCollapsed && !isMobile ? " sidebar-collapsed" : ""}`}>
       <a
         className="skip-link"
         href="#main-content"
@@ -114,72 +146,11 @@ function App() {
       >
         Saltar al contenido
       </a>
-      <aside ref={sidebar} id="workspace-navigation" className={`sidebar ${mobileNav ? "is-open" : ""}`}>
-        <a className="brand" href="#/">
-          <span className="brand-mark">
-            <Icon name="trend" size={27} />
-          </span>
-          <span>
-            SAP<small>Seller Action Plan</small>
-          </span>
-        </a>
-        <div className="workspace-label">
-          <span className="live-dot" />
-          Marketplace workspace
-        </div>
-        <p className="nav-label">GESTIÓN OPERATIVA</p>
-        <nav aria-label="Navegación principal">
-          {[
-            ["dashboard", "/", "Dashboard"],
-            ["sellers", "/sellers", "Vendedores"],
-            ["plans", "/plans", "Planes de mejora"],
-          ].map(([key, href, text]) => (
-            <a
-              href={`#${href}`}
-              key={key}
-              className={section === key ? "active" : ""}
-              aria-current={section === key ? "page" : undefined}
-            >
-              <Icon name={key} />
-              {text}
-              {section === key && <span className="nav-active-dot" />}
-            </a>
-          ))}
-        </nav>
-        <div className="sidebar-bottom">
-          <div className="sidebar-note">
-            <span>UNA MEJORA A LA VEZ</span>
-            <p>
-              Del diagnóstico
-              <br />a la acción.
-            </p>
-            <Icon name="trend" size={24} />
-          </div>
-          {user && (
-            <>
-              <div className="user-info">
-                <Avatar name={user.name} />
-                <div>
-                  <strong>{user.name}</strong>
-                  <small>Marketplace Agent</small>
-                </div>
-              </div>
-              <form action="/accounts/logout/" method="post">
-                <input
-                  type="hidden"
-                  name="csrfmiddlewaretoken"
-                  value={user.csrf_token}
-                />
-                <button className="logout" type="submit">
-                  <Icon name="logout" size={17} />
-                  Cerrar sesión
-                </button>
-              </form>
-            </>
-          )}
-        </div>
-      </aside>
-      {mobileNav && <button className="nav-backdrop" aria-label="Cerrar navegación" onClick={closeMenu} />}
+      <Sidebar sidebarRef={sidebar} section={section} user={user}
+        collapsed={sidebarCollapsed && !isMobile} mobile={isMobile} open={mobileNav}
+        onToggle={() => setSidebarCollapsed(value => !value)} onClose={closeMenu} />
+      <button className={`nav-backdrop${mobileNav ? " is-visible" : ""}`} tabIndex={-1}
+        aria-hidden={!mobileNav} aria-label="Cerrar navegación" onClick={closeMenu} />
       <div className="main-shell">
         <header className="topbar">
           <div>
