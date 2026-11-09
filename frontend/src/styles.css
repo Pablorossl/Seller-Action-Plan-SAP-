@@ -108,7 +108,7 @@ textarea:focus-visible,
 .table-wrap:focus-visible {
   outline-offset: -3px;
 }
-.page-heading h1:focus,
+.page-heading h1:focus-visible,
 .action-item:focus,
 .pagination-status:focus,
 .modal-head h2:focus {

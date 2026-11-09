@@ -33,8 +33,8 @@ export function Sidebar({
       document.removeEventListener("keydown", escape);
     };
   }, [collapsed, open]);
-  const showTooltip = (event, label, includeExpanded = false) => {
-    if (!collapsed && !includeExpanded) return;
+  const showTooltip = (event, label) => {
+    if (!collapsed) return;
     keepTooltip();
     const rect = event.currentTarget.getBoundingClientRect();
     setTooltip({
@@ -43,11 +43,11 @@ export function Sidebar({
       top: Math.max(24, Math.min(window.innerHeight - 24, rect.top + rect.height / 2)),
     });
   };
-  const describe = (label, includeExpanded = false) => ({
-    "aria-describedby": (collapsed || includeExpanded) && tooltip?.label === label ? tooltipId : undefined,
-    onMouseEnter: (event) => showTooltip(event, label, includeExpanded),
+  const describe = (label) => ({
+    "aria-describedby": collapsed && tooltip?.label === label ? tooltipId : undefined,
+    onMouseEnter: (event) => showTooltip(event, label),
     onMouseLeave: dismissTooltip,
-    onFocus: (event) => showTooltip(event, label, includeExpanded),
+    onFocus: (event) => showTooltip(event, label),
     onBlur: dismissTooltip,
   });
   const closeCurrentRoute = (event) => {
@@ -93,9 +93,8 @@ export function Sidebar({
         </div>}
       </div>
       <button type="button" className="sidebar-toggle" aria-label={collapsed ? "Expandir menú lateral" : "Contraer menú lateral"}
-        aria-expanded={!collapsed} aria-controls="workspace-navigation" onClick={onToggle}
-        {...describe(collapsed ? "Expandir menú" : "Contraer menú", true)} />
-      {tooltip && createPortal(
+        aria-expanded={!collapsed} aria-controls="workspace-navigation" onClick={onToggle} />
+      {collapsed && tooltip && createPortal(
         <div id={tooltipId} role="tooltip" className="sidebar-tooltip" style={{ left: tooltip.left, top: tooltip.top }}
           onMouseEnter={keepTooltip} onMouseLeave={dismissTooltip}>{tooltip.label}</div>, document.body)}
     </aside>
