@@ -206,8 +206,10 @@ fieldset {
 .app-shell {
   /* Share geometry and timing so the rail and content move together. */
   --sidebar-width: 228px;
-  --sidebar-duration: 300ms;
-  --sidebar-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --sidebar-duration: 380ms;
+  --sidebar-easing: cubic-bezier(0.22, 1, 0.36, 1);
+  /* About 1.2px of overshoot on the 148px movement, shared with the content. */
+  --sidebar-spring: cubic-bezier(0.2, 0.8, 0.3, 1.06);
   display: flex;
   min-height: 100vh;
 }
@@ -223,7 +225,7 @@ fieldset {
   inset: 0 auto 0 0;
   z-index: 20;
   border-right: 1px solid #ffffff12;
-  transition: width var(--sidebar-duration) var(--sidebar-easing);
+  transition: width var(--sidebar-duration) var(--sidebar-spring);
 }
 .sidebar-scroll {
   /* Keep scrolling separate from the button on the outer edge. */
@@ -294,32 +296,6 @@ fieldset {
   color: var(--ink);
   border-radius: 13px;
 }
-.workspace-label {
-  font-size: 11px;
-  height: 40px;
-  margin: 24px 6px 28px;
-  padding: 12px 6px;
-  border-top: 1px solid #ffffff13;
-  border-bottom: 1px solid #ffffff13;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  color: #c5d2ce;
-  overflow: hidden;
-  transition: height var(--sidebar-duration) var(--sidebar-easing),
-    margin var(--sidebar-duration) var(--sidebar-easing),
-    padding var(--sidebar-duration) var(--sidebar-easing),
-    border-color var(--sidebar-duration) var(--sidebar-easing);
-}
-.sidebar-collapsed .workspace-label {
-  height: 0;
-  margin: 24px 6px 20px;
-  padding: 0 6px;
-  border-bottom-color: transparent;
-}
-.sidebar-collapsed .workspace-label .live-dot {
-  visibility: hidden;
-}
 .live-dot {
   width: 6px;
   height: 6px;
@@ -332,7 +308,7 @@ fieldset {
   height: 12px;
   font-size: 9px;
   letter-spacing: 1.7px;
-  margin: 0 13px 13px;
+  margin: 28px 13px 13px;
   color: #8fa6a0;
   white-space: nowrap;
   overflow: hidden;
@@ -491,7 +467,7 @@ fieldset {
   margin-left: var(--sidebar-width);
   min-width: 0;
   flex: 1;
-  transition: margin-left var(--sidebar-duration) var(--sidebar-easing);
+  transition: margin-left var(--sidebar-duration) var(--sidebar-spring);
 }
 .topbar {
   min-height: var(--topbar-height);
@@ -509,11 +485,67 @@ fieldset {
   gap: 17px;
   font-size: 12px;
 }
-.topbar-product {
+.topbar-navigation {
+  flex: 1;
+}
+.breadcrumbs {
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.breadcrumbs ol {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.breadcrumbs li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+.breadcrumbs li:last-child {
+  flex: 0 1 auto;
+}
+.breadcrumbs a,
+.breadcrumb-current {
+  display: block;
+  padding: 5px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.breadcrumbs a {
   color: var(--muted);
+  text-decoration: none;
+  transition: color 140ms ease;
+}
+.breadcrumbs a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.breadcrumbs a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.breadcrumb-current {
+  color: var(--ink);
+  font-weight: 600;
 }
 .breadcrumb-separator {
-  color: #b9c4be;
+  flex: 0 0 auto;
+  color: #8c9c94;
+  font-size: 16px;
+  user-select: none;
+}
+.topbar-right {
+  flex-shrink: 0;
 }
 .topbar-right > span {
   display: flex;
@@ -2043,12 +2075,29 @@ input[type="checkbox"] {
   .topbar > div {
     gap: 9px;
   }
-  .topbar-right {
+  .topbar-navigation {
+    gap: 12px;
+  }
+  .topbar-navigation .mobile-menu {
     flex-shrink: 0;
   }
-  .topbar-product,
-  .breadcrumb-separator {
+  .topbar-navigation:has(.breadcrumbs li:nth-child(3)) + .topbar-right {
     display: none;
+  }
+  .breadcrumbs ol,
+  .breadcrumbs li {
+    gap: 7px;
+  }
+  .breadcrumbs ol {
+    flex-wrap: wrap;
+    row-gap: 0;
+  }
+  .breadcrumbs li:nth-child(3) {
+    flex-basis: 100%;
+  }
+  .breadcrumbs a,
+  .breadcrumb-current {
+    padding: 2px 0;
   }
   .topbar-right > span {
     font-size: var(--text-support);
@@ -2257,6 +2306,11 @@ input[type="checkbox"] {
   .app-footer > span:last-child {
     max-width: 100px;
     text-align: right;
+  }
+}
+@media (max-width: 480px) {
+  .topbar-right {
+    display: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -1,12 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Avatar, Icon } from "./ui.jsx";
-
-const sections = [
-  ["dashboard", "/", "Dashboard"],
-  ["sellers", "/sellers", "Vendedores"],
-  ["plans", "/plans", "Planes de mejora"],
-];
+import { navigationSections } from "../services/routes.js";
 
 export function Sidebar({
   sidebarRef, section, user, collapsed, mobile, open, onToggle, onClose,
@@ -66,10 +61,9 @@ export function Sidebar({
           <span className="brand-mark"><Icon name="trend" size={27} /></span>
           <span className="sidebar-label">SAP<small>Seller Action Plan</small></span>
         </a>
-        <div className="workspace-label"><span className="live-dot" /><span className="sidebar-label">Marketplace workspace</span></div>
         <p className="nav-label">GESTIÓN OPERATIVA</p>
         <nav aria-label="Navegación principal">
-          {sections.map(([key, href, text]) => (
+          {navigationSections.map(({ key, path: href, label: text }) => (
             <a href={`#${href}`} key={key} className={section === key ? "active" : ""}
               aria-label={text} aria-current={section === key ? "page" : undefined}
               onClick={closeCurrentRoute} {...describe(text)}>

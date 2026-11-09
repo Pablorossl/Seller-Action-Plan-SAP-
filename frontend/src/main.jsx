@@ -15,6 +15,8 @@ import { UnsavedChangesProvider, useLeaveConfirmation } from "./components/Unsav
 import { installHashNavigation } from "./services/navigation.js";
 import { useRouteFocus } from "./components/RouteFocus.jsx";
 import { Sidebar } from "./components/Sidebar.jsx";
+import { Breadcrumbs } from "./components/Breadcrumbs.jsx";
+import { resolveRoute, routeBreadcrumbs } from "./services/routes.js";
 import "./styles.css";
 
 function App() {
@@ -91,48 +93,7 @@ function App() {
   useEffect(() => {
     if (session.data) setCsrfToken(session.data.csrf_token);
   }, [session.data]);
-  const [path, query = ""] = route.split("?");
-  const params = new URLSearchParams(query);
-  const section = path.startsWith("/sellers")
-    ? "sellers"
-    : path.startsWith("/plans")
-      ? "plans"
-      : "dashboard";
-  const sectionName = {
-    dashboard: "Dashboard",
-    sellers: "Vendedores",
-    plans: "Planes de mejora",
-  }[section];
-  useEffect(() => {
-    document.title = `${sectionName} · Seller Action Plan`;
-  }, [sectionName]);
-  let page;
-  const user = session.data;
-  if (user) {
-    if (path === "/") page = <Dashboard user={user} />;
-    else if (path === "/sellers") page = <Sellers />;
-    else if (/^\/sellers\/\d+$/.test(path))
-      page = <SellerDetail id={path.split("/")[2]} user={user} />;
-    else if (path === "/plans") page = <Plans user={user} params={params} />;
-    else if (path === "/plans/new")
-      page =
-        user.permissions.add_improvementplan &&
-        user.permissions.add_planmetric ? (
-          <PlanForm user={user} params={params} />
-        ) : (
-          <Empty title="Acceso denegado">
-            Tu cuenta no tiene permiso para crear planes.
-          </Empty>
-        );
-    else if (/^\/plans\/\d+$/.test(path))
-      page = <PlanDetail id={path.split("/")[2]} user={user} params={params} />;
-    else
-      page = (
-        <Empty title="Página no encontrada">
-          <a href="#/">Volver al dashboard</a>
-        </Empty>
-      );
-  }
+  const activeRoute = resolveRoute(route);
   return (
     <div className={`app-shell${sidebarCollapsed && !isMobile ? " sidebar-collapsed" : ""}`}>
       <a
@@ -146,52 +107,94 @@ function App() {
       >
         Saltar al contenido
       </a>
-      <Sidebar sidebarRef={sidebar} section={section} user={user}
+      <Sidebar sidebarRef={sidebar} section={activeRoute.section} user={session.data}
         collapsed={sidebarCollapsed && !isMobile} mobile={isMobile} open={mobileNav}
         onToggle={() => setSidebarCollapsed(value => !value)} onClose={closeMenu} />
       <button className={`nav-backdrop${mobileNav ? " is-visible" : ""}`} tabIndex={-1}
         aria-hidden={!mobileNav} aria-label="Cerrar navegación" onClick={closeMenu} />
       <div className="main-shell">
-        <header className="topbar">
-          <div>
-            <button
-              ref={menuButton}
-              className="icon-button mobile-menu"
-              aria-label={mobileNav ? "Ocultar navegación" : "Mostrar navegación"}
-              aria-expanded={mobileNav}
-              aria-controls="workspace-navigation"
-              onClick={() => setMobileNav(!mobileNav)}
-            >
-              <Icon name="menu" />
-            </button>
-            <span className="topbar-product">Workspace</span>
-            <span className="breadcrumb-separator">/</span>
-            <strong>{sectionName}</strong>
-          </div>
-          <div className="topbar-right">
-            <span>
-              <Icon name="calendar" size={16} />
-              {user ? date(user.today) : "Seller Action Plan"}
-            </span>
-            <span className="environment-pill">Proyecto independiente</span>
-          </div>
-        </header>
-        <main ref={content} id="main-content" tabIndex="-1" inert={mobileNav || undefined}>
-          <Resource resource={session}>
-            {() => <div key={route}>{page}</div>}
-          </Resource>
-          <footer className="app-footer">
-            <span>
-              Seller Action Plan <span className="footer-dot">·</span>{" "}
-              Seguimiento con propósito
-            </span>
-            <span>Sin conexión con Mirakl</span>
-          </footer>
-        </main>
+        <RouteView key={route} route={activeRoute} session={session} content={content}
+          menuButton={menuButton} mobileNav={mobileNav} setMobileNav={setMobileNav} />
       </div>
     </div>
   );
 }
+
+function RouteView({ route, session, content, menuButton, mobileNav, setMobileNav }) {
+  const { key, id, params } = route;
+  const user = session.data;
+  // One detail request supplies both the page and its breadcrumb. Keying this
+  // view by the accepted route also prevents names leaking between resources.
+  const detail = useResource(user ? route.resourceUrl : null);
+  const breadcrumbs = routeBreadcrumbs(route, detail);
+  const currentLabel = breadcrumbs.at(-1).label;
+  useEffect(() => {
+    document.title = `${currentLabel} · Seller Action Plan`;
+  }, [currentLabel]);
+  let page;
+  if (user) {
+    if (key === "dashboard") page = <Dashboard user={user} />;
+    else if (key === "sellers") page = <Sellers />;
+    else if (key === "seller") page = <SellerDetail id={id} user={user} seller={detail} />;
+    else if (key === "plans") page = <Plans user={user} params={params} />;
+    else if (key === "plan-new")
+      page =
+        user.permissions.add_improvementplan &&
+        user.permissions.add_planmetric ? (
+          <PlanForm user={user} params={params} />
+        ) : (
+          <Empty title="Acceso denegado">
+            Tu cuenta no tiene permiso para crear planes.
+          </Empty>
+        );
+    else if (key === "plan") page = <PlanDetail user={user} params={params} resource={detail} />;
+    else
+      page = (
+        <Empty title="Página no encontrada">
+          <a href="#/">Volver al dashboard</a>
+        </Empty>
+      );
+  }
+  return (
+    <>
+      <header className="topbar">
+        <div className="topbar-navigation">
+          <button
+            ref={menuButton}
+            className="icon-button mobile-menu"
+            aria-label={mobileNav ? "Ocultar navegación" : "Mostrar navegación"}
+            aria-expanded={mobileNav}
+            aria-controls="workspace-navigation"
+            onClick={() => setMobileNav(!mobileNav)}
+          >
+            <Icon name="menu" />
+          </button>
+          <Breadcrumbs items={breadcrumbs} />
+        </div>
+        <div className="topbar-right">
+          <span>
+            <Icon name="calendar" size={16} />
+            {user ? date(user.today) : "Seller Action Plan"}
+          </span>
+          <span className="environment-pill">Proyecto independiente</span>
+        </div>
+      </header>
+      <main ref={content} id="main-content" tabIndex="-1" inert={mobileNav || undefined}>
+        <Resource resource={session}>
+          {() => <div>{page}</div>}
+        </Resource>
+        <footer className="app-footer">
+          <span>
+            Seller Action Plan <span className="footer-dot">·</span>{" "}
+            Seguimiento con propósito
+          </span>
+          <span>Sin conexión con Mirakl</span>
+        </footer>
+      </main>
+    </>
+  );
+}
+
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <UnsavedChangesProvider><App /></UnsavedChangesProvider>

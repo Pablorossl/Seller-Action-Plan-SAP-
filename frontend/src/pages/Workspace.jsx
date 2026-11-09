@@ -603,8 +603,7 @@ export function Plans({ params, user }) {
   );
 }
 
-export function SellerDetail({ id, user }) {
-  const seller = useResource(`/api/sellers/${id}/`);
+export function SellerDetail({ id, user, seller }) {
   const [metricPage, setMetricPage] = useState(1);
   const [planPage, setPlanPage] = useState(1);
   const [history, setHistory] = useState(false);

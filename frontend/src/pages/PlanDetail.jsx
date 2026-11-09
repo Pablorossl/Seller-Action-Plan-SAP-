@@ -523,8 +523,7 @@ function CloseForm({ plan, done, close: onClose }) {
   );
 }
 
-export function PlanDetail({ id, user, params }) {
-  const resource = useResource(`/api/plans/${id}/`);
+export function PlanDetail({ user, params, resource }) {
   const [modal, setModal] = useState(null);
   const [editing, setEditing] = useState(false);
   const [notice, setNotice] = useState("");
