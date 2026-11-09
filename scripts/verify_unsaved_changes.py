@@ -50,8 +50,8 @@ def navigation_flow(**args):
             return page.get_by_role('link', name='Volver al plan', exact=False)
         page.goto(base + '/accounts/login/')
         page.get_by_label('Nombre de usuario').fill(args['username'])
-        page.get_by_label('Contraseña').fill(args['password'])
-        page.get_by_role('button', name='Entrar en mi espacio').click()
+        page.get_by_label('Contraseña', exact=True).fill(args['password'])
+        page.get_by_role('button', name='Iniciar sesión').click()
         expect(page.get_by_role('heading', name='Prioridades de la semana')).to_be_visible()
         sellers = context.request.get(base + '/api/sellers/?search=' + args['seller_reference']).json()['results']
         seller = next(s for s in sellers if s['reference'] == args['seller_reference'])
@@ -299,7 +299,7 @@ def navigation_flow(**args):
         expect(page.get_by_label('Título del plan')).to_have_value('Edición antes de salir de sesión')
         page.get_by_role('button', name='Cerrar sesión').click()
         discard()
-        expect(page.get_by_role('button', name='Entrar en mi espacio')).to_be_visible()
+        expect(page.get_by_role('button', name='Iniciar sesión')).to_be_visible()
         assert native == ['beforeunload'], native
         check('Cerrar sesión: continuar conserva; descartar envía logout con CSRF sin doble advertencia')
         assert not errors, errors

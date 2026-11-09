@@ -33,11 +33,11 @@ def run_flow(*, base, username, password, other_username, other_password,
         page.on("response", lambda response: failed_responses.append(f"{response.status} {urlsplit(response.url).path}")
             if response.status >= 500 or ("/static/" in response.url and response.status >= 400) else None)
         page.goto(base + "/dashboard/")
-        expect(page.get_by_role("button", name="Entrar en mi espacio")).to_be_visible()
+        expect(page.get_by_role("button", name="Iniciar sesión")).to_be_visible()
         page.screenshot(path=str(artifacts / "login.png"), full_page=True)
         page.get_by_label("Nombre de usuario").fill(username)
-        page.get_by_label("Contraseña").fill(password)
-        page.get_by_role("button", name="Entrar en mi espacio").click()
+        page.get_by_label("Contraseña", exact=True).fill(password)
+        page.get_by_role("button", name="Iniciar sesión").click()
         expect(page.get_by_role("heading", name="Prioridades de la semana")).to_be_visible()
         # H02: el error atraviesa api/useResource/Resource y permite recuperar
         # el Dashboard sin errores de renderizado ni cerrar la sesión.
@@ -173,8 +173,8 @@ def run_flow(*, base, username, password, other_username, other_password,
         other_page = other.new_page()
         other_page.goto(base + "/accounts/login/")
         other_page.get_by_label("Nombre de usuario").fill(other_username)
-        other_page.get_by_label("Contraseña").fill(other_password)
-        other_page.get_by_role("button", name="Entrar en mi espacio").click()
+        other_page.get_by_label("Contraseña", exact=True).fill(other_password)
+        other_page.get_by_role("button", name="Iniciar sesión").click()
         expect(other_page.get_by_role("heading", name="Prioridades de la semana")).to_be_visible()
         assert other.request.get(detail_url).status == 404
         token = other.request.get(base + "/api/workspace/").json()["csrf_token"]
@@ -182,7 +182,7 @@ def run_flow(*, base, username, password, other_username, other_password,
         other_page.goto(plan_url)
         expect(other_page.get_by_role("alert")).to_contain_text("No se encuentra este registro")
         page.get_by_role("button", name="Cerrar sesión").click()
-        expect(page.get_by_role("button", name="Entrar en mi espacio")).to_be_visible()
+        expect(page.get_by_role("button", name="Iniciar sesión")).to_be_visible()
         assert context.request.get(detail_url).status == 403
         assert not errors and not failed_responses, (errors, failed_responses)
         browser.close()

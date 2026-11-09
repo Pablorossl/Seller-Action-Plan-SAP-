@@ -66,8 +66,8 @@ def closure_flow(*, base, username, password, other_username, other_password,
 
         def login(page, who=username, secret=password):
             page.get_by_label('Nombre de usuario').fill(who)
-            page.get_by_label('Contraseña').fill(secret)
-            page.get_by_role('button', name='Entrar en mi espacio').click()
+            page.get_by_label('Contraseña', exact=True).fill(secret)
+            page.get_by_role('button', name='Iniciar sesión').click()
             expect(page.get_by_role('heading', name='Prioridades de la semana')).to_be_visible()
 
         # Include the Django entry pages, which previous axe flows did not scan.
@@ -78,8 +78,8 @@ def closure_flow(*, base, username, password, other_username, other_password,
             capture(page, 'django-login')
             if width == 1440:
                 page.get_by_label('Nombre de usuario').fill('ausente_qa_cierre')
-                page.get_by_label('Contraseña').fill('Credencial incorrecta exclusivamente ficticia')
-                page.get_by_role('button', name='Entrar en mi espacio').click()
+                page.get_by_label('Contraseña', exact=True).fill('Credencial incorrecta exclusivamente ficticia')
+                page.get_by_role('button', name='Iniciar sesión').click()
                 expect(page.locator('.errorlist')).to_be_visible()
                 assert context.request.get(base+'/api/workspace/').status == 403
                 capture(page, 'django-login-error')

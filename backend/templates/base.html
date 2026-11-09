@@ -1,12 +1,14 @@
 {% load static %}
 <!doctype html>
 <html lang="es">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% block title %}Seller Action Plan{% endblock %}</title><link rel="stylesheet" href="{% static 'sap/auth.css' %}">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% block title %}Seller Action Plan{% endblock %}</title>{% block styles %}<link rel="stylesheet" href="{% static 'sap/auth.css' %}">{% endblock %}
 {% include "includes/favicon.html" %}
 </head>
 <body>
+{% block body %}
 <header><a href="/dashboard/">SAP · Seller Action Plan</a></header>
 <main>{% block content %}{% endblock %}</main>
 <footer><p>Proyecto académico independiente · Datos ficticios · Sin conexión con Mirakl</p></footer>
+{% endblock %}
 </body>
 </html>

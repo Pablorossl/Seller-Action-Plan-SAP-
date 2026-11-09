@@ -1,6 +1,11 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Acceso temporalmente limitado</h1>
-<p>Se han registrado demasiados intentos de acceso. Espera 15 minutos antes de intentarlo de nuevo o contacta con la persona responsable de SAP.</p>
-<a href="{% url 'login' %}">Volver al acceso</a>
+{% extends "registration/login.html" %}
+{% block title %}Acceso limitado · Seller Action Plan{% endblock %}
+{% block login_content %}
+<div class="login-heading">
+  <p class="login-eyebrow">SELLER ACTION PLAN</p>
+  <h1 id="login-title">Acceso temporalmente limitado</h1>
+  <p>Se han registrado demasiados intentos de acceso. Espera 15 minutos antes de intentarlo de nuevo.</p>
+</div>
+<a class="login-submit login-return" href="{% url 'login' %}">Volver al acceso</a>
+<p class="login-help">Si necesitas ayuda, contacta con la persona responsable de SAP.</p>
 {% endblock %}

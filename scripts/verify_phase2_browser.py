@@ -78,8 +78,8 @@ def main():
                 base = "http://127.0.0.1:8765"
                 page.goto(base + "/dashboard/")
                 page.get_by_label("Nombre de usuario").fill("agente_demo")
-                page.get_by_label("Contraseña").fill(password)
-                page.get_by_role("button", name="Entrar en mi espacio").click()
+                page.get_by_label("Contraseña", exact=True).fill(password)
+                page.get_by_role("button", name="Iniciar sesión").click()
                 expect(page.get_by_role("heading", name="Hola, Pablo")).to_be_visible()
                 expect(page.get_by_role("heading", name="Prioridades de la semana")).to_be_visible()
                 page.evaluate("window.scrollTo(0, 0)")
@@ -171,8 +171,8 @@ def main():
                 other_page = other.new_page()
                 other_page.goto(base + "/accounts/login/")
                 other_page.get_by_label("Nombre de usuario").fill("agente_ajeno")
-                other_page.get_by_label("Contraseña").fill(password)
-                other_page.get_by_role("button", name="Entrar en mi espacio").click()
+                other_page.get_by_label("Contraseña", exact=True).fill(password)
+                other_page.get_by_role("button", name="Iniciar sesión").click()
                 other_page.goto(plan_url)
                 expect(other_page.get_by_role("alert")).to_contain_text("No se encuentra este registro")
                 # Estados transitorios del frontend, aislados del flujo persistido anterior.

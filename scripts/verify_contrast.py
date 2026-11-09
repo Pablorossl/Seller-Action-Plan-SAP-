@@ -39,8 +39,8 @@ def contrast_flow(*,base,username,password,artifacts,local_tls=False,strict=True
         context=browser.new_context(ignore_https_errors=local_tls,locale='es-ES',viewport={'width':1440,'height':900})
         page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
         page.goto(base+'/accounts/login/')
-        page.get_by_label('Nombre de usuario').fill(username);page.get_by_label('Contraseña').fill(password)
-        page.get_by_role('button',name='Entrar en mi espacio').click()
+        page.get_by_label('Nombre de usuario').fill(username);page.get_by_label('Contraseña', exact=True).fill(password)
+        page.get_by_role('button',name='Iniciar sesión').click()
         expect(page.get_by_role('heading',name='Prioridades de la semana')).to_be_visible()
         plans=context.request.get(base+'/api/plans/').json()['results']
         good=next(p for p in plans if p['status']=='closed' and p['closure_evaluation'].get('result')=='achieved')
