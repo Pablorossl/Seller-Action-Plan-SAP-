@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="43" height="43" viewBox="0 0 43 43">
+  <!-- Existing SAP brand-mark: 43px tile, 13px radius, centered 27px trend icon. -->
+  <rect width="43" height="43" rx="13" fill="#c3f17c"/>
+  <g transform="translate(8 8) scale(1.125)" fill="none" stroke="#183831" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m3 17 6-6 4 4 8-10M15 5h6v6"/>
+  </g>
+</svg>
