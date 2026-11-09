@@ -19,7 +19,8 @@ from playwright.sync_api import expect, sync_playwright
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "artifacts/login-redesign"
 PYTHON = ROOT / ".venv/bin/python"
-SIZES = [(2560, 1440), (1920, 1080), (1440, 900), (1280, 720),
+SIZES = [(2560, 1440), (1920, 1080), (1440, 900), (1366, 768),
+         (1366, 650), (1280, 720), (1280, 600),
          (1024, 768), (768, 1024), (600, 800), (390, 844), (375, 667),
          (320, 568), (844, 390)]
 
@@ -39,8 +40,8 @@ def run_browser(base, password):
         expect(page.get_by_label("Nombre de usuario")).to_be_focused()
         measure = (ROOT / "scripts/measure_contrast.js").read_text().replace(
             "const selectors=[", "const selectors=['.login-brand-name','.login-brand-name small',"
-            "'.login-workspace','.login-eyebrow','h1','.login-heading > p:last-child',"
-            "'.login-field label','.login-hint','.login-help','.login-footer span',"
+            "'h1','.login-heading > p:last-child',"
+            "'.login-field label','.login-hint','.login-help',"
             "'.login-submit','.login-password-toggle','.login-error','.login-field-error',")
 
         def contrast(name):
@@ -56,17 +57,43 @@ def run_browser(base, password):
             page.set_viewport_size({"width": width, "height": height})
             metrics = page.evaluate("""() => ({width: innerWidth,
                 scrollWidth: document.documentElement.scrollWidth,
+                scrollHeight: document.documentElement.scrollHeight,
+                cardWidth: document.querySelector('.login-content').getBoundingClientRect().width,
                 formWidth: document.querySelector('#login-form').getBoundingClientRect().width})""")
             assert metrics["scrollWidth"] <= width, metrics
-            assert metrics["formWidth"] <= 384, metrics
+            assert metrics["cardWidth"] <= 440, metrics
+            assert metrics["formWidth"] <= 400, metrics
+            if height >= 568:
+                assert metrics["scrollHeight"] <= height, metrics
             expect(page.get_by_role("button", name="Iniciar sesión", exact=True)).to_be_visible()
             page.screenshot(path=str(OUT / f"login-{width}x{height}.png"), full_page=True)
             report["sizes"].append(metrics | {"height": height})
+        report["checks"].append("complete login without vertical scroll from 568px high; card at most 440px wide")
 
         page.set_viewport_size({"width": 1440, "height": 900})
         username = page.get_by_label("Nombre de usuario")
         password_field = page.get_by_label("Contraseña", exact=True)
         submit = page.get_by_role("button", name="Iniciar sesión", exact=True)
+        username.focus()
+        assert username.evaluate("e => getComputedStyle(e).outlineColor") == "rgb(20, 105, 82)"
+
+        # Force Chromium's autofill pseudo state to inspect the real CSS/UA
+        # cascade. This tests appearance, not a saved password manager profile.
+        cdp = context.new_cdp_session(page)
+        cdp.send("DOM.enable")
+        cdp.send("CSS.enable")
+        root = cdp.send("DOM.getDocument")["root"]["nodeId"]
+        for field in ("#id_username", "#id_password"):
+            node = cdp.send("DOM.querySelector", {"nodeId": root, "selector": field})["nodeId"]
+            cdp.send("CSS.forcePseudoState", {"nodeId": node, "forcedPseudoClasses": ["autofill"]})
+            appearance = page.locator(field).evaluate("""e => ({autofilled: e.matches(':autofill'),
+                shadow: getComputedStyle(e).boxShadow, text: getComputedStyle(e).webkitTextFillColor})""")
+            assert appearance["autofilled"], appearance
+            assert "rgb(255, 255, 255)" in appearance["shadow"] and "inset" in appearance["shadow"], appearance
+            assert appearance["text"] == "rgb(24, 56, 49)", appearance
+            cdp.send("CSS.forcePseudoState", {"nodeId": node, "forcedPseudoClasses": []})
+        cdp.detach()
+        report["checks"].append("green focus and white autofill appearance in Chromium's CSS/UA cascade")
         username.focus()
         page.keyboard.press("Tab")
         expect(password_field).to_be_focused()

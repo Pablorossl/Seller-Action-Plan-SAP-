@@ -6,21 +6,19 @@
 <script src="{% static 'sap/login.js' %}" defer></script>
 {% endblock %}
 {% block body %}
-<header class="login-header">
-  <div class="login-brand">
-    <span class="login-brand-mark" aria-hidden="true">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 6-6 4 4 8-10M15 5h6v6"/></svg>
-    </span>
-    <span class="login-brand-name">SAP<small>Seller Action Plan</small></span>
-  </div>
-  <span class="login-workspace">Marketplace workspace</span>
-</header>
-
 <main class="login-main">
+  <header class="login-header">
+    <div class="login-brand">
+      <span class="login-brand-mark" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 6-6 4 4 8-10M15 5h6v6"/></svg>
+      </span>
+      <span class="login-brand-name">SAP<small>Seller Action Plan</small></span>
+    </div>
+  </header>
+
   <section class="login-content" aria-labelledby="login-title">
     {% block login_content %}
     <div class="login-heading">
-      <p class="login-eyebrow">SELLER ACTION PLAN</p>
       <h1 id="login-title">Iniciar sesión</h1>
       <p>Accede a tu espacio de gestión.</p>
     </div>
@@ -37,10 +35,9 @@
         <input id="id_username" name="username" type="text" value="{{ form.username.value|default_if_none:'' }}"
           autocomplete="username" autocapitalize="none" spellcheck="false" required
           maxlength="{{ form.username.field.widget.attrs.maxlength }}"
-          aria-describedby="username-hint{% if form.username.errors %} username-errors{% endif %}{% if form.non_field_errors %} login-errors{% endif %}"
+          {% if form.username.errors or form.non_field_errors %}aria-describedby="{% if form.username.errors %}username-errors {% endif %}{% if form.non_field_errors %}login-errors{% endif %}"{% endif %}
           {% if form.username.errors or form.non_field_errors %}aria-invalid="true"{% endif %}
           {% if not form.errors %}autofocus{% endif %}>
-        <p id="username-hint" class="login-hint">Utiliza el nombre de usuario asignado en SAP.</p>
         {% if form.username.errors %}<div id="username-errors" class="login-field-error">{% for error in form.username.errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
       </div>
 
@@ -65,13 +62,8 @@
       <p class="login-status sr-only" role="status" aria-live="polite"></p>
     </form>
 
-    <p class="login-help">Si necesitas acceso, contacta con la persona responsable de SAP.</p>
+    <p class="login-help">Para solicitar acceso, contacta con el responsable de SAP.</p>
     {% endblock %}
   </section>
 </main>
-
-<footer class="login-footer">
-  <span>Seller Action Plan</span>
-  <span>Gestión de vendedores y planes de mejora</span>
-</footer>
 {% endblock %}
