@@ -33,21 +33,21 @@ export function Sidebar({
       document.removeEventListener("keydown", escape);
     };
   }, [collapsed, open]);
-  const showTooltip = (event, label) => {
-    if (!collapsed) return;
+  const showTooltip = (event, label, includeExpanded = false) => {
+    if (!collapsed && !includeExpanded) return;
     keepTooltip();
     const rect = event.currentTarget.getBoundingClientRect();
     setTooltip({
       label,
-      left: sidebarRef.current.getBoundingClientRect().right + 12,
+      left: Math.max(sidebarRef.current.getBoundingClientRect().right, rect.right) + 12,
       top: Math.max(24, Math.min(window.innerHeight - 24, rect.top + rect.height / 2)),
     });
   };
-  const describe = (label) => ({
-    "aria-describedby": collapsed && tooltip?.label === label ? tooltipId : undefined,
-    onMouseEnter: (event) => showTooltip(event, label),
+  const describe = (label, includeExpanded = false) => ({
+    "aria-describedby": (collapsed || includeExpanded) && tooltip?.label === label ? tooltipId : undefined,
+    onMouseEnter: (event) => showTooltip(event, label, includeExpanded),
     onMouseLeave: dismissTooltip,
-    onFocus: (event) => showTooltip(event, label),
+    onFocus: (event) => showTooltip(event, label, includeExpanded),
     onBlur: dismissTooltip,
   });
   const closeCurrentRoute = (event) => {
@@ -93,10 +93,9 @@ export function Sidebar({
         </div>}
       </div>
       <button type="button" className="sidebar-toggle" aria-label={collapsed ? "Expandir menú lateral" : "Contraer menú lateral"}
-        aria-expanded={!collapsed} aria-controls="workspace-navigation" onClick={onToggle}>
-        <Icon name="chevron" size={16} />
-      </button>
-      {collapsed && tooltip && createPortal(
+        aria-expanded={!collapsed} aria-controls="workspace-navigation" onClick={onToggle}
+        {...describe(collapsed ? "Expandir menú" : "Contraer menú", true)} />
+      {tooltip && createPortal(
         <div id={tooltipId} role="tooltip" className="sidebar-tooltip" style={{ left: tooltip.left, top: tooltip.top }}
           onMouseEnter={keepTooltip} onMouseLeave={dismissTooltip}>{tooltip.label}</div>, document.body)}
     </aside>
