@@ -15,6 +15,7 @@ class VercelSettingsTests(SimpleTestCase):
             "VERCEL": "1", "VERCEL_ENV": "production", "DJANGO_DEBUG": "False",
             "DJANGO_SECRET_KEY": secrets.token_urlsafe(64),
             "DJANGO_ALLOWED_HOSTS": "sap.example.invalid",
+            "VERCEL_URL": "sap-test-deployment.vercel.app",
             "DJANGO_CSRF_TRUSTED_ORIGINS": "https://sap.example.invalid",
             "DATABASE_URL": "postgresql://placeholder:placeholder@127.0.0.1:1/sap?sslmode=require",
         }
@@ -26,6 +27,10 @@ class VercelSettingsTests(SimpleTestCase):
             {"DJANGO_ALLOWED_HOSTS": ".vercel.app"}, {"DJANGO_ALLOWED_HOSTS": "*.vercel.app"},
             {"DJANGO_CSRF_TRUSTED_ORIGINS": "https://*.vercel.app"},
             {"DJANGO_SECRET_KEY": "django-insecure-" + secrets.token_urlsafe(64)},
+            {"VERCEL_URL": "*.vercel.app"},
+            {"VERCEL_URL": "https://sap-test-deployment.vercel.app"},
+            {"VERCEL_URL": "sap-test-deployment.vercel.app.attacker.invalid"},
+            {"VERCEL_URL": "sap-test-deployment.vercel.app:443"},
         ]
         for invalid in invalid_settings:
             with self.subTest(invalid=list(invalid)):

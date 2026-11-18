@@ -53,6 +53,12 @@ for path in (*assets, "/static/sap/auth.css", "/static/admin/css/base.css"):
 assert not (Path(settings.STATIC_ROOT) / "react/index.html").exists()
 assert client.get("/static/react/index.html").status_code == 404
 assert client.get("/accounts/login/", HTTP_HOST="untrusted.example.invalid").status_code == 400
+assert client.get("/", HTTP_HOST="sap-build-check.vercel.app").status_code == 302
+assert client.get("/accounts/login/", HTTP_HOST="sap-build-check.vercel.app").status_code == 200
+assert client.get("/api/plans/", HTTP_HOST="sap-build-check.vercel.app").status_code == 403
+assert client.get("/", HTTP_HOST="other-deployment.vercel.app").status_code == 400
+assert client.get("/", HTTP_HOST="untrusted.example.invalid",
+    HTTP_X_FORWARDED_HOST="sap-build-check.vercel.app").status_code == 400
 assert client.get("/accounts/login/", HTTP_X_FORWARDED_PROTO="http").status_code == 301
 assert client.get("/healthz/", HTTP_X_FORWARDED_PROTO="http").status_code == 301
 assert connection.connection is None, "Las comprobaciones no necesitan SQL"
@@ -65,6 +71,7 @@ def main():
         "VERCEL": "1", "VERCEL_ENV": "production", "DJANGO_DEBUG": "False",
         "DJANGO_SECRET_KEY": secrets.token_urlsafe(64),
         "DJANGO_ALLOWED_HOSTS": "sap.example.invalid",
+        "VERCEL_URL": "sap-build-check.vercel.app",
         "DJANGO_CSRF_TRUSTED_ORIGINS": "https://sap.example.invalid",
         "DATABASE_URL": "postgresql://placeholder:placeholder@127.0.0.1:1/sap?sslmode=require",
         "SAP_DEMO_MODE": "False", "DJANGO_TRUST_PROXY": "False",

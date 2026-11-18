@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import timedelta
 from urllib.parse import urlsplit
 import os
+import re
 
 import environ
 from django.core.exceptions import ImproperlyConfigured
@@ -35,6 +36,16 @@ if not DEBUG:
         parsed = urlsplit(origin)
         if parsed.scheme != "https" or not parsed.hostname or "*" in origin or parsed.path or parsed.query or parsed.fragment or parsed.username:
             raise ImproperlyConfigured("Los orígenes CSRF de producción deben ser orígenes HTTPS exactos.")
+
+# La captura de Vercel visita el dominio único del deployment, no el alias
+# público. Confiar sólo en este hostname de entorno, nunca en cabeceras HTTP.
+if ON_VERCEL:
+    deployment_hostname = env("VERCEL_URL", default="")
+    if deployment_hostname:
+        if not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.vercel\.app", deployment_hostname):
+            raise ImproperlyConfigured("VERCEL_URL debe ser el hostname exacto del deployment Vercel.")
+        if deployment_hostname not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(deployment_hostname)
 
 INSTALLED_APPS = [
     "django.contrib.admin", "django.contrib.auth", "django.contrib.contenttypes",
