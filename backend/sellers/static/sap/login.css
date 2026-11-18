@@ -127,7 +127,17 @@ h1 { margin: 0 0 8px; font-size: 26px; font-weight: 700; line-height: 1.25; lett
   caret-color: #183831;
 }
 .login-hint { margin: 7px 0 0; font-size: 12px; color: var(--login-muted); }
-.login-password { position: relative; }
+.login-input-wrap { position: relative; }
+.login-input-wrap input { padding-left: 44px; }
+.login-field-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  z-index: 1;
+  color: #183831;
+  pointer-events: none;
+}
 .login-password input { padding-right: 52px; }
 .login-password-toggle {
   position: absolute;
@@ -262,18 +272,6 @@ h1 { margin: 0 0 8px; font-size: 26px; font-weight: 700; line-height: 1.25; lett
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 
-.login-username-field input, .login-password input {
-  padding-left: 44px;
-  background-repeat: no-repeat;
-  background-position: 14px center;
-  background-size: 20px 20px;
-}
-.login-username-field input {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23183831' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3Cpath d='M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2'/%3E%3C/svg%3E");
-}
-.login-password input {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23183831' stroke-width='1.6' stroke-linecap='round'%3E%3Crect x='4' y='10' width='16' height='12' rx='2'/%3E%3Cpath d='M7 10V6a5 5 0 0 1 10 0v4M12 15v3'/%3E%3C/svg%3E");
-}
 .login-help:has(.login-help-icon) {
   display: flex;
   align-items: center;

@@ -28,23 +28,33 @@
         {% if form.non_field_errors %}<p>El usuario o la contraseña no son correctos.</p>{% endif %}
       </div>
 
-      <div class="login-field login-username-field">
+      <div class="login-field">
         <label for="id_username">Nombre de usuario</label>
-        <input id="id_username" name="username" type="text" value="{{ form.username.value|default_if_none:'' }}"
-          autocomplete="username" autocapitalize="none" spellcheck="false" required
-          maxlength="{{ form.username.field.widget.attrs.maxlength }}"
-          {% if form.username.errors or form.non_field_errors %}aria-describedby="{% if form.username.errors %}username-errors {% endif %}{% if form.non_field_errors %}login-errors{% endif %}"{% endif %}
-          {% if form.username.errors or form.non_field_errors %}aria-invalid="true"{% endif %}
-          {% if not form.errors %}autofocus{% endif %}>
+        <div class="login-input-wrap">
+          <input id="id_username" name="username" type="text" value="{{ form.username.value|default_if_none:'' }}"
+            autocomplete="username" autocapitalize="none" spellcheck="false" required
+            maxlength="{{ form.username.field.widget.attrs.maxlength }}"
+            {% if form.username.errors or form.non_field_errors %}aria-describedby="{% if form.username.errors %}username-errors {% endif %}{% if form.non_field_errors %}login-errors{% endif %}"{% endif %}
+            {% if form.username.errors or form.non_field_errors %}aria-invalid="true"{% endif %}
+            {% if not form.errors %}autofocus{% endif %}>
+          <svg class="login-field-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="7" r="4"/>
+            <path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2"/>
+          </svg>
+        </div>
         {% if form.username.errors %}<div id="username-errors" class="login-field-error">{% for error in form.username.errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
       </div>
 
       <div class="login-field">
         <label for="id_password">Contraseña</label>
-        <div class="login-password">
+        <div class="login-input-wrap login-password">
           <input id="id_password" name="password" type="password" autocomplete="current-password" required
             {% if form.password.errors or form.non_field_errors %}aria-invalid="true"{% endif %}
             {% if form.password.errors or form.non_field_errors %}aria-describedby="{% if form.password.errors %}password-errors {% endif %}{% if form.non_field_errors %}login-errors{% endif %}"{% endif %}>
+          <svg class="login-field-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+            <rect x="4" y="10" width="16" height="12" rx="2"/>
+            <path d="M7 10V6a5 5 0 0 1 10 0v4M12 15v3"/>
+          </svg>
           <button class="login-password-toggle" type="button" aria-label="Mostrar contraseña" aria-controls="id_password" aria-pressed="false" hidden>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="login-eye-slash" d="m3 3 18 18"/></svg>
           </button>
