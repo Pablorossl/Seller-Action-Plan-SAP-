@@ -20,8 +20,8 @@ body {
   min-height: 100dvh;
   display: grid;
   place-items: center;
-  padding: 32px 20px;
-  font-size: 16px;
+  padding: 24px 20px;
+  font-size: 14px;
   line-height: 1.6;
 }
 /* Keep the photograph confined to the sign-in screen. The native lockout
@@ -45,7 +45,7 @@ button:focus-visible, input:focus-visible, a:focus-visible, [tabindex="-1"]:focu
 }
 [hidden] { display: none !important; }
 .login-header {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -54,7 +54,7 @@ button:focus-visible, input:focus-visible, a:focus-visible, [tabindex="-1"]:focu
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   text-align: center;
 }
 .login-brand::after {
@@ -65,9 +65,9 @@ button:focus-visible, input:focus-visible, a:focus-visible, [tabindex="-1"]:focu
   border-radius: 2px;
   background: #a0ce19;
 }
-.login-brand-mark { display: block; width: 88px; height: 88px; }
+.login-brand-mark { display: block; width: 56px; height: 56px; }
 .login-brand-name {
-  font-size: clamp(26px, 3vw, 44px);
+  font-size: 30px;
   font-weight: 700;
   letter-spacing: -1px;
   line-height: 1.15;
@@ -76,31 +76,31 @@ button:focus-visible, input:focus-visible, a:focus-visible, [tabindex="-1"]:focu
   display: block;
   margin-top: 8px;
   color: #35433e;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 450;
   letter-spacing: 0;
   line-height: 1.4;
 }
 .login-main {
   width: 100%;
-  max-width: clamp(560px, 38.3vw, 640px);
+  max-width: 440px;
 }
 .login-content {
-  padding: 32px 40px;
+  padding: 28px;
   border: 1px solid #dde5df;
   border-radius: 16px;
   background: #fff;
   box-shadow: 0 2px 4px #142f2e04, 0 12px 32px #142f2e08;
 }
 .login-heading { margin-bottom: 24px; }
-h1 { margin: 0 0 8px; font-size: 32px; font-weight: 700; line-height: 1.25; letter-spacing: -0.7px; }
+h1 { margin: 0 0 8px; font-size: 26px; font-weight: 700; line-height: 1.25; letter-spacing: -0.7px; }
 .login-heading > p:last-child { margin: 0; color: var(--login-muted); }
 .login-field + .login-field { margin-top: 20px; }
-.login-field label { display: block; margin-bottom: 6px; font-size: 15px; font-weight: 650; }
+.login-field label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 550; }
 .login-field input {
   width: 100%;
   min-width: 0;
-  height: 48px;
+  height: 44px;
   border: 1px solid #829087;
   border-radius: 6px;
   padding: 0 13px;
@@ -131,8 +131,8 @@ h1 { margin: 0 0 8px; font-size: 32px; font-weight: 700; line-height: 1.25; lett
   position: absolute;
   right: 1px;
   top: 1px;
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   display: grid;
   place-items: center;
   border: 0;
@@ -147,7 +147,7 @@ h1 { margin: 0 0 8px; font-size: 32px; font-weight: 700; line-height: 1.25; lett
 .login-password-toggle[aria-pressed="true"] .login-eye-slash { display: block; }
 .login-submit {
   width: 100%;
-  min-height: 52px;
+  min-height: 44px;
   margin-top: 24px;
   padding: 10px 16px;
   display: flex;
@@ -213,7 +213,7 @@ h1 { margin: 0 0 8px; font-size: 32px; font-weight: 700; line-height: 1.25; lett
   .login-brand-name small { max-width: 300px; font-size: 14px; }
   .login-content { padding: 24px; }
   .login-brand::after { width: 56px; margin-top: 2px; }
-  h1 { font-size: 28px; }
+  h1 { font-size: 26px; }
   .login-field input { font-size: 16px; } /* Avoid zooming the viewport on iOS. */
 }
 /* Portrait crops cannot preserve both groups. A light veil keeps the
@@ -230,19 +230,32 @@ h1 { margin: 0 0 8px; font-size: 32px; font-weight: 700; line-height: 1.25; lett
     background-position: 57% center;
   }
 }
-@media (max-height: 850px) {
-  .login-brand { gap: 8px; }
-  .login-brand-mark { width: 48px; height: 48px; }
-  .login-brand-name { font-size: 26px; }
-  .login-brand-name small { margin-top: 5px; font-size: 13px; }
-}
-@media (max-height: 650px) {
-  body { padding-block: 20px; }
-  .login-header { margin-bottom: 20px; }
-  .login-content { padding-block: 24px; }
+/* Compact the composition by available height, without hiding overflow.
+   Very short windows can still scroll naturally to reach every control. */
+@media (max-height: 700px) {
+  body { padding-block: 16px; }
+  .login-header { margin-bottom: 16px; }
+  .login-brand { gap: 7px; }
+  .login-brand-mark { width: 40px; height: 40px; }
+  .login-brand-name { font-size: 24px; }
+  .login-brand-name small { margin-top: 5px; font-size: 12px; }
+  .login-brand::after { height: 2px; margin-top: 2px; }
+  .login-content { padding-block: 20px; }
+  .login-heading { margin-bottom: 18px; }
+  .login-field + .login-field { margin-top: 16px; }
+  .login-submit { margin-top: 20px; }
+  .login-help { margin-top: 18px; padding-top: 16px; background-position-y: 18px; }
 }
 @media (max-width: 360px) {
   .login-content { padding-inline: 20px; }
+}
+@media (max-height: 600px) {
+  body { padding-block: 12px; }
+  .login-brand-mark { width: 32px; height: 32px; }
+  .login-brand { gap: 5px; }
+  .login-brand-name { font-size: 22px; }
+  .login-header { margin-bottom: 12px; }
+  .login-heading { margin-bottom: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
