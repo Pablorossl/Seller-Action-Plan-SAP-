@@ -21,14 +21,14 @@ body {
   display: grid;
   place-items: center;
   padding: 32px 20px;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.6;
 }
 /* Keep the photograph confined to the sign-in screen. The native lockout
    template shares this stylesheet but retains its existing presentation. */
 body:has(#login-form) {
   background-color: #edf3ef;
-  background-image: url("images/login-workspace.webp");
+  background-image: radial-gradient(ellipse 29% 48% at 50% 22%, #ffffffed 0%, #ffffffb8 48%, #ffffff00 100%), url("images/login-workspace.webp");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -50,44 +50,57 @@ button:focus-visible, input:focus-visible, a:focus-visible, [tabindex="-1"]:focu
   align-items: center;
   justify-content: center;
 }
-.login-brand { display: flex; align-items: center; gap: 11px; }
-.login-brand-mark {
-  width: 40px;
-  height: 40px;
-  border-radius: 11px;
-  display: grid;
-  place-items: center;
-  background: #c3f17c;
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
 }
-.login-brand-name { font-size: 23px; font-weight: 700; letter-spacing: 0.8px; line-height: 1; }
+.login-brand::after {
+  content: "";
+  width: 72px;
+  height: 3px;
+  margin-top: 6px;
+  border-radius: 2px;
+  background: #a0ce19;
+}
+.login-brand-mark { display: block; width: 88px; height: 88px; }
+.login-brand-name {
+  font-size: clamp(26px, 3vw, 44px);
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1.15;
+}
 .login-brand-name small {
   display: block;
-  margin-top: 7px;
-  color: var(--login-muted);
-  font-size: 10px;
+  margin-top: 8px;
+  color: #35433e;
+  font-size: 18px;
   font-weight: 450;
-  letter-spacing: 1px;
+  letter-spacing: 0;
+  line-height: 1.4;
 }
 .login-main {
   width: 100%;
-  max-width: 440px;
+  max-width: clamp(560px, 38.3vw, 640px);
 }
 .login-content {
-  padding: 32px;
+  padding: 32px 40px;
   border: 1px solid #dde5df;
-  border-radius: 12px;
+  border-radius: 16px;
   background: #fff;
   box-shadow: 0 2px 4px #142f2e04, 0 12px 32px #142f2e08;
 }
 .login-heading { margin-bottom: 24px; }
-h1 { margin: 0 0 8px; font-size: 26px; font-weight: 650; line-height: 1.25; letter-spacing: -0.7px; }
+h1 { margin: 0 0 8px; font-size: 32px; font-weight: 700; line-height: 1.25; letter-spacing: -0.7px; }
 .login-heading > p:last-child { margin: 0; color: var(--login-muted); }
 .login-field + .login-field { margin-top: 20px; }
-.login-field label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 550; }
+.login-field label { display: block; margin-bottom: 6px; font-size: 15px; font-weight: 650; }
 .login-field input {
   width: 100%;
   min-width: 0;
-  height: 44px;
+  height: 48px;
   border: 1px solid #829087;
   border-radius: 6px;
   padding: 0 13px;
@@ -118,8 +131,8 @@ h1 { margin: 0 0 8px; font-size: 26px; font-weight: 650; line-height: 1.25; lett
   position: absolute;
   right: 1px;
   top: 1px;
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   display: grid;
   place-items: center;
   border: 0;
@@ -134,7 +147,7 @@ h1 { margin: 0 0 8px; font-size: 26px; font-weight: 650; line-height: 1.25; lett
 .login-password-toggle[aria-pressed="true"] .login-eye-slash { display: block; }
 .login-submit {
   width: 100%;
-  min-height: 44px;
+  min-height: 52px;
   margin-top: 24px;
   padding: 10px 16px;
   display: flex;
@@ -142,10 +155,10 @@ h1 { margin: 0 0 8px; font-size: 26px; font-weight: 650; line-height: 1.25; lett
   align-items: center;
   gap: 10px;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: 9px;
   background: var(--login-green);
   color: white;
-  font-weight: 550;
+  font-weight: 700;
   transition: background-color 140ms ease;
 }
 .login-submit:hover { background: #10563f; }
@@ -196,7 +209,11 @@ h1 { margin: 0 0 8px; font-size: 26px; font-weight: 650; line-height: 1.25; lett
 @media (max-width: 600px) {
   body { padding: 24px 16px; }
   .login-header { margin-bottom: 20px; }
+  .login-brand-mark { width: 56px; height: 56px; }
+  .login-brand-name small { max-width: 300px; font-size: 14px; }
   .login-content { padding: 24px; }
+  .login-brand::after { width: 56px; margin-top: 2px; }
+  h1 { font-size: 28px; }
   .login-field input { font-size: 16px; } /* Avoid zooming the viewport on iOS. */
 }
 /* Portrait crops cannot preserve both groups. A light veil keeps the
@@ -213,6 +230,12 @@ h1 { margin: 0 0 8px; font-size: 26px; font-weight: 650; line-height: 1.25; lett
     background-position: 57% center;
   }
 }
+@media (max-height: 850px) {
+  .login-brand { gap: 8px; }
+  .login-brand-mark { width: 48px; height: 48px; }
+  .login-brand-name { font-size: 26px; }
+  .login-brand-name small { margin-top: 5px; font-size: 13px; }
+}
 @media (max-height: 650px) {
   body { padding-block: 20px; }
   .login-header { margin-bottom: 20px; }
@@ -223,4 +246,21 @@ h1 { margin: 0 0 8px; font-size: 26px; font-weight: 650; line-height: 1.25; lett
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+.login-username-field input, .login-password input {
+  padding-left: 44px;
+  background-repeat: no-repeat;
+  background-position: 14px center;
+  background-size: 20px 20px;
+}
+.login-username-field input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23183831' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3Cpath d='M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2'/%3E%3C/svg%3E");
+}
+.login-password input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23183831' stroke-width='1.6' stroke-linecap='round'%3E%3Crect x='4' y='10' width='16' height='12' rx='2'/%3E%3Cpath d='M7 10V6a5 5 0 0 1 10 0v4M12 15v3'/%3E%3C/svg%3E");
+}
+.login-help {
+  padding-left: 28px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23146952' stroke-width='1.7' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 11v6M12 7v.1'/%3E%3C/svg%3E") no-repeat left 22px / 18px 18px;
 }

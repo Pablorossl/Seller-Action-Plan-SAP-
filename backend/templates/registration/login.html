@@ -9,10 +9,8 @@
 <main class="login-main">
   <header class="login-header">
     <div class="login-brand">
-      <span class="login-brand-mark" aria-hidden="true">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 6-6 4 4 8-10M15 5h6v6"/></svg>
-      </span>
-      <span class="login-brand-name">SAP<small>Seller Action Plan</small></span>
+      <img class="login-brand-mark" src="{% static 'react/assets/favicon.svg' %}" width="72" height="72" alt="">
+      <span class="login-brand-name">Seller Action Plan<small>Plataforma de gestión y mejora del rendimiento</small></span>
     </div>
   </header>
 
@@ -30,7 +28,7 @@
         {% if form.non_field_errors %}<p>El usuario o la contraseña no son correctos.</p>{% endif %}
       </div>
 
-      <div class="login-field">
+      <div class="login-field login-username-field">
         <label for="id_username">Nombre de usuario</label>
         <input id="id_username" name="username" type="text" value="{{ form.username.value|default_if_none:'' }}"
           autocomplete="username" autocapitalize="none" spellcheck="false" required
