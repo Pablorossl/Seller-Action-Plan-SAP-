@@ -17,11 +17,24 @@ body {
   min-width: 280px;
   min-height: 100vh;
   min-height: 100svh;
+  min-height: 100dvh;
   display: grid;
   place-items: center;
   padding: 32px 20px;
   font-size: 14px;
   line-height: 1.6;
+}
+/* Keep the photograph confined to the sign-in screen. The native lockout
+   template shares this stylesheet but retains its existing presentation. */
+body:has(#login-form) {
+  background-color: #edf3ef;
+  background-image: url("images/login-workspace.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+body:has(#login-form) .login-content {
+  box-shadow: 0 4px 12px #18383108, 0 20px 56px #18383118;
 }
 button, input { font: inherit; }
 button { cursor: pointer; touch-action: manipulation; }
@@ -185,6 +198,20 @@ h1 { margin: 0 0 8px; font-size: 26px; font-weight: 650; line-height: 1.25; lett
   .login-header { margin-bottom: 20px; }
   .login-content { padding: 24px; }
   .login-field input { font-size: 16px; } /* Avoid zooming the viewport on iOS. */
+}
+/* Portrait crops cannot preserve both groups. A light veil keeps the
+   photograph recognizable while protecting the brand and field hierarchy. */
+@media (max-aspect-ratio: 1/1) {
+  body:has(#login-form) {
+    background-image: linear-gradient(#f4f7f56b, #f4f7f56b), url("images/login-workspace.webp");
+    background-position: 54% center;
+  }
+}
+@media (max-width: 600px) {
+  body:has(#login-form) {
+    background-image: linear-gradient(#f4f7f5a6, #f4f7f5a6), url("images/login-workspace.webp");
+    background-position: 57% center;
+  }
 }
 @media (max-height: 650px) {
   body { padding-block: 20px; }
