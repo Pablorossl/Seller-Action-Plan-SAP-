@@ -4,7 +4,7 @@ import { Avatar, Icon } from "./ui.jsx";
 import { navigationSections } from "../services/routes.js";
 
 export function Sidebar({
-  sidebarRef, section, user, collapsed, mobile, open, onToggle, onClose,
+  sidebarRef, section, user, onGuide, collapsed, mobile, open, onToggle, onClose,
 }) {
   const [tooltip, setTooltip] = useState(null);
   const tooltipId = useId();
@@ -63,7 +63,7 @@ export function Sidebar({
         </a>
         <p className="nav-label">GESTIÓN OPERATIVA</p>
         <nav aria-label="Navegación principal">
-          {navigationSections.map(({ key, path: href, label: text }) => (
+          {navigationSections.filter(item => !item.admin || user?.role === "ADMIN").map(({ key, path: href, label: text }) => (
             <a href={`#${href}`} key={key} className={section === key ? "active" : ""}
               aria-label={text} aria-current={section === key ? "page" : undefined}
               onClick={closeCurrentRoute} {...describe(text)}>
@@ -72,11 +72,14 @@ export function Sidebar({
               {section === key && <span className="nav-active-dot" />}
             </a>
           ))}
+          {user && <button type="button" className="logout" onClick={onGuide} aria-label="Guía de SAP" {...describe("Guía de SAP")}>
+            <Icon name="help"/><span className="sidebar-label">Guía de SAP</span>
+          </button>}
         </nav>
         {user && <div className="sidebar-bottom">
           <div className="user-info" title={user.name}>
             <Avatar name={user.name} />
-            <div className="sidebar-label"><strong>{user.name}</strong><small>Marketplace Agent</small></div>
+            <div className="sidebar-label"><strong>{user.name}</strong><small>{user.role === "ADMIN" ? "Administrador" : "Agente"}</small></div>
           </div>
           <form action="/accounts/logout/" method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value={user.csrf_token} />

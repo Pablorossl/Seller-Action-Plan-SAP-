@@ -84,7 +84,7 @@ def closure_flow(*, base, username, password, other_username, other_password,
                 assert context.request.get(base+'/api/workspace/').status == 403
                 capture(page, 'django-login-error')
             login(page)
-            page.goto(base+'/')
+            page.goto(base+'/portal/')
             expect(page.get_by_role('heading', name='Tu espacio de trabajo')).to_be_visible()
             assert page.locator('.seller-list li').count() >= 55
             capture(page, 'django-portal')

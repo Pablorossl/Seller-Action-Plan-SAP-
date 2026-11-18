@@ -2350,3 +2350,16 @@ input[type="checkbox"] {
   flex-wrap: wrap;
   border-top: 1px solid var(--line);
 }
+
+.account-panel { padding: 1.5rem; margin-bottom: 1rem; }
+.account-list { list-style: none; padding: 0; }
+.account-list li, .assignment-form { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; padding-block: .75rem; }
+.account-list li + li { border-top: 1px solid var(--border, #dde3e2); }
+.account-fields { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: .85rem; }
+.assignment-form .field { flex: 1 1 15rem; min-width: 0; }
+.assignment-form select { width: 100%; }
+.guide-step { padding-block: 1rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .guide-step { animation: guide-enter .18s ease-out; }
+  @keyframes guide-enter { from { opacity: .4; transform: translateY(4px); } }
+}

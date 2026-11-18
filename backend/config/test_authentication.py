@@ -62,8 +62,8 @@ class AuthenticationIdentityTests(TestCase):
     def test_next_root_session_reuse_and_logout_revocation(self):
         response = self.login(self.agent.username, self.password, next="/")
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response["Location"], "/")
-        self.assertContains(self.client.get("/"), "Tu espacio de trabajo")
+        self.assertEqual(response["Location"], "/dashboard/")
+        self.assertRedirects(self.client.get("/accounts/login/"), "/dashboard/", fetch_redirect_response=False)
         session = response.cookies["sessionid"]
         self.assertTrue(session["secure"])
         self.assertTrue(session["httponly"])

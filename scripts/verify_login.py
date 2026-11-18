@@ -233,9 +233,11 @@ def run_browser(base, password):
         expect(plain.get_by_label("Nombre de usuario")).to_have_value("login_qa")
         plain.get_by_label("Contraseña", exact=True).fill(password)
         plain.get_by_role("button", name="Iniciar sesión", exact=True).click()
-        plain.wait_for_url(base + "/")
+        plain.wait_for_url(base + "/dashboard/")
+        plain.get_by_role("link", name="Consultar mis vendedores").click()
         expect(plain.get_by_role("heading", name="Tu espacio de trabajo")).to_be_visible()
-        report["checks"].append("native login without JavaScript, validation and next=/ portal")
+        report["checks"].append("native login without JavaScript, validation and dashboard and accessible portal")
+        plain.get_by_role("button", name="Cerrar sesión").click()
         plain.goto(base + "/accounts/login/")
         plain.get_by_label("Nombre de usuario").fill("locked_qa")
         plain.get_by_label("Contraseña", exact=True).fill(password)
@@ -257,7 +259,18 @@ def run_browser(base, password):
     print(f"OK: {len(SIZES)} viewports; {len(report['checks'])} login checks; no JS/asset errors. {OUT}")
 
 
-def main():
+def prepare_login(manage):
+    manage("migrate", "--noinput")
+    manage("shell", "-c", """import os
+from django.contrib.auth import get_user_model
+from django.core.management import call_command
+for username in ('login_qa', 'locked_qa'):
+    get_user_model().objects.create_user(username=username, password=os.environ['SAP_QA_PASSWORD'])
+    call_command('configure_plan_agent', username=username, interface_only=True)
+""")
+
+
+def main(prepare=prepare_login, browser_check=None):
     OUT.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="sap-login-qa-") as temp:
         with socket.socket() as probe:
@@ -275,14 +288,7 @@ def main():
             def manage(*args):
                 subprocess.run([str(PYTHON), "backend/manage.py", *args], cwd=ROOT, env=environment,
                                stdout=log, stderr=subprocess.STDOUT, check=True)
-            manage("migrate", "--noinput")
-            manage("shell", "-c", """import os
-from django.contrib.auth import get_user_model
-from django.core.management import call_command
-for username in ('login_qa', 'locked_qa'):
-    get_user_model().objects.create_user(username=username, password=os.environ['SAP_QA_PASSWORD'])
-    call_command('configure_plan_agent', username=username, interface_only=True)
-""")
+            prepare(manage)
             server = subprocess.Popen([str(PYTHON), "backend/manage.py", "runserver",
                 f"127.0.0.1:{port}", "--noreload"], cwd=ROOT, env=environment, stdout=log, stderr=subprocess.STDOUT)
             try:
@@ -294,7 +300,7 @@ for username in ('login_qa', 'locked_qa'):
                         time.sleep(.1)
                 else:
                     raise RuntimeError(f"Django did not start; see {OUT / 'server.log'}")
-                run_browser(base, password)
+                (browser_check or run_browser)(base, password)
             finally:
                 server.terminate()
                 server.wait(timeout=10)

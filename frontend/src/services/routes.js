@@ -2,6 +2,7 @@
 export const navigationSections = [
   { key: "dashboard", path: "/", label: "Dashboard" },
   { key: "sellers", path: "/sellers", label: "Vendedores" },
+  { key: "users", path: "/users", label: "Gestión de usuarios", admin: true },
   { key: "plans", path: "/plans", label: "Planes de mejora" },
 ];
 

@@ -8,7 +8,8 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from rest_framework.response import Response
-from sellers.models import visible_sellers
+from rest_framework.exceptions import PermissionDenied
+from sellers.models import visible_sellers, is_workspace_admin
 from sellers.serializers import SellerSerializer
 from quality.models import MetricCode
 
@@ -21,7 +22,7 @@ class SellerViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = visible_sellers(self.request.user).select_related("owner").annotate(
-            open_plans=Count("plans", filter=~Q(plans__status__in=["closed", "cancelled"])))
+            open_plans=Count("plans", filter=Q(plans__created_by=self.request.user) & ~Q(plans__status__in=["closed", "cancelled"])))
         if self.request.query_params.get("active_plans") == "1":
             qs = qs.filter(open_plans__gt=0)
         elif self.request.query_params.get("active_plans") == "0":
@@ -29,6 +30,8 @@ class SellerViewSet(viewsets.ModelViewSet):
         return qs.order_by("name", "id")
 
     def perform_create(self, serializer):
+        if not is_workspace_admin(self.request.user):
+            raise PermissionDenied("Crear y asignar tiendas requiere administración.")
         serializer.save(owner=self.request.user)
 
     @transaction.atomic

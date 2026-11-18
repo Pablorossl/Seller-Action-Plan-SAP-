@@ -2,7 +2,7 @@
 
 Run after neon deploy, npm run db:migrate and npm run build:
     .venv/bin/python scripts/verify_neon_e2e.py --allow-writes
-Creates a temporary agent and seller, then removes only those test records.
+Creates a temporary SAP administrator and seller, then removes only those test records.
 Starts npm start on port 8000; that port must be free. Never prints credentials.
 """
 import argparse
@@ -47,7 +47,7 @@ def main():
     from django.contrib.sessions.models import Session
     from django.db import connection
     from django.db.migrations.executor import MigrationExecutor
-    from sellers.models import AGENT_GROUP, Seller
+    from sellers.models import AGENT_GROUP, Seller, WorkspaceProfile
     import psycopg
 
     primary = os.environ.get("DATABASE_URL", "")
@@ -111,6 +111,7 @@ def main():
     try:
         user = get_user_model().objects.create_user(username=username, password=password)
         user.groups.add(group)
+        WorkspaceProfile.objects.create(user=user, is_admin=True, onboarding_pending=False)
         with tempfile.TemporaryFile() as log:
             start(log)
             checks["health_http_200"] = True

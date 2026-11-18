@@ -23,7 +23,7 @@ from action_plans.services import close_plan, plans_with_history, visible_plans
 from quality.serializers import QualityMetricSerializer
 from quality.services import classify
 from quality.views import latest_metrics
-from sellers.models import visible_sellers
+from sellers.models import visible_sellers, is_workspace_admin
 
 
 class WorkspacePagination(PageNumberPagination):
@@ -194,6 +194,8 @@ def workspace(request):
     user = request.user
     names = ["view_improvementplan", "add_improvementplan", "change_improvementplan", "close_improvementplan", "add_planmetric", "change_planmetric", "add_planaction", "change_planaction", "add_planreview"]
     return Response({"id": user.pk, "name": user.get_full_name() or user.username,
+        "role": "ADMIN" if is_workspace_admin(user) else "AGENT",
+        "onboarding_pending": getattr(getattr(user, "workspace_profile", None), "onboarding_pending", False),
         "username": user.username, "csrf_token": get_token(request), "today": timezone.localdate(),
         "permissions": {name: user.has_perm(f"action_plans.{name}") for name in names}})
 

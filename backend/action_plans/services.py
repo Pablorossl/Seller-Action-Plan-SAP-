@@ -8,11 +8,11 @@ from django.utils import timezone
 
 from action_plans.models import FINAL_STATUSES, ActionStatus, ImprovementPlan, PlanMetric, PlanReview, PlanStatus
 from quality.services import classify
-from sellers.models import visible_sellers
+from sellers.models import Seller, visible_sellers
 
 
 def visible_plans(user):
-    return ImprovementPlan.objects.filter(seller__in=visible_sellers(user))
+    return ImprovementPlan.objects.filter(created_by=user, seller__in=visible_sellers(user))
 
 
 def plans_with_history(queryset):
@@ -69,13 +69,15 @@ def evaluate_plan(plan: ImprovementPlan) -> dict:
 
 
 @transaction.atomic
-def close_plan(*, plan_id: int, actor, notes: str, status: str = PlanStatus.CLOSED, expected_revision=None) -> ImprovementPlan:
+def close_plan(*, plan_id: int, actor, notes: str, status: str = PlanStatus.CLOSED, expected_revision=None, administrative=False) -> ImprovementPlan:
     if not actor.is_active or not actor.has_perms(["action_plans.change_improvementplan", "action_plans.close_improvementplan"]):
         raise PermissionDenied("No tienes permiso para finalizar planes.")
     # También serializa el cierre con una reasignación administrativa del vendedor.
-    seller_id = visible_plans(actor).values_list("seller_id", flat=True).get(pk=plan_id)
-    visible_sellers(actor).select_for_update().get(pk=seller_id)
-    plan = visible_plans(actor).select_for_update().get(pk=plan_id)
+    plans = ImprovementPlan.objects.all() if administrative and actor.is_superuser else visible_plans(actor)
+    seller_id = plans.values_list("seller_id", flat=True).get(pk=plan_id)
+    sellers = Seller.objects.all() if administrative and actor.is_superuser else visible_sellers(actor)
+    sellers.select_for_update().get(pk=seller_id)
+    plan = plans.select_for_update().get(pk=plan_id)
     from action_plans.concurrency import check_revision
     check_revision(plan, expected_revision)
     if status not in FINAL_STATUSES:

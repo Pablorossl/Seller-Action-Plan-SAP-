@@ -55,6 +55,8 @@ export const finalPlan = (plan) =>
   ["closed", "cancelled"].includes(plan.status);
 
 const paths = {
+  help: <><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 4 3c-1 0-1 1-1 2m0 2v1"/></>,
+  users: <><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></>,
   dashboard: (
     <>
       <rect x="3" y="3" width="7" height="7" rx="1.5" />
@@ -210,15 +212,6 @@ export function ErrorState({ error, retry }) {
       <Icon name="alert" />
       <div>
         <strong>{error.message}</strong>
-        {error.status === 403 && (
-          <p>
-            <a
-              href={`/accounts/login/?next=${encodeURIComponent(location.pathname + location.hash)}`}
-            >
-              Iniciar sesión con una cuenta autorizada
-            </a>
-          </p>
-        )}
         {retry && (
           <button className="button secondary" onClick={retry}>
             Volver a intentar

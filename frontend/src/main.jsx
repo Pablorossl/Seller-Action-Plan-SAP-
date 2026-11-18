@@ -17,6 +17,8 @@ import { useRouteFocus } from "./components/RouteFocus.jsx";
 import { Sidebar } from "./components/Sidebar.jsx";
 import { Breadcrumbs } from "./components/Breadcrumbs.jsx";
 import { resolveRoute, routeBreadcrumbs } from "./services/routes.js";
+import { Users } from "./pages/Users.jsx";
+import { Guide } from "./components/Guide.jsx";
 import "./styles.css";
 
 function App() {
@@ -82,6 +84,7 @@ function App() {
       document.body.style.overflow = previousOverflow;
     };
   }, [mobileNav, isMobile]);
+  const [guide, setGuide] = useState(false);
   const session = useResource("/api/workspace/");
   useEffect(() => {
     return installHashNavigation(window, requestLeave, (nextRoute) => {
@@ -107,7 +110,10 @@ function App() {
       >
         Saltar al contenido
       </a>
-      <Sidebar sidebarRef={sidebar} section={activeRoute.section} user={session.data}
+      {session.data && (guide || session.data.onboarding_pending) && <Guide user={session.data} close={() => {
+        session.setData({...session.data, onboarding_pending: false}); setGuide(false);
+      }}/>}
+      <Sidebar onGuide={() => { setGuide(true); setMobileNav(false); }} sidebarRef={sidebar} section={activeRoute.section} user={session.data}
         collapsed={sidebarCollapsed && !isMobile} mobile={isMobile} open={mobileNav}
         onToggle={() => setSidebarCollapsed(value => !value)} onClose={closeMenu} />
       <button className={`nav-backdrop${mobileNav ? " is-visible" : ""}`} tabIndex={-1}
@@ -134,6 +140,7 @@ function RouteView({ route, session, content, menuButton, mobileNav, setMobileNa
   let page;
   if (user) {
     if (key === "dashboard") page = <Dashboard user={user} />;
+    else if (key === "users") page = user.role === "ADMIN" ? <Users /> : <Empty title="Acceso denegado">Esta sección requiere permisos de administración.</Empty>;
     else if (key === "sellers") page = <Sellers />;
     else if (key === "seller") page = <SellerDetail id={id} user={user} seller={detail} />;
     else if (key === "plans") page = <Plans user={user} params={params} />;

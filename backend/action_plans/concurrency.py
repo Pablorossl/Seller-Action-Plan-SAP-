@@ -23,9 +23,9 @@ def check_revision(instance, expected):
 
 def lock_plan(user, pk):
     """Dentro de atomic(): asignación → plan. No bloquea otros vendedores."""
-    seller_id = get_object_or_404(ImprovementPlan.objects.only("seller_id"), pk=pk).seller_id
+    seller_id = get_object_or_404(ImprovementPlan.objects.only("seller_id"), pk=pk, created_by=user).seller_id
     seller = get_object_or_404(visible_sellers(user).select_for_update(), pk=seller_id)
-    return get_object_or_404(ImprovementPlan.objects.select_for_update(), pk=pk, seller=seller)
+    return get_object_or_404(ImprovementPlan.objects.select_for_update(), pk=pk, seller=seller, created_by=user)
 
 
 def request_identity(request):

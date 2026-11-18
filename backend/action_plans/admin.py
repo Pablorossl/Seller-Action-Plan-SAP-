@@ -13,7 +13,11 @@ from action_plans.forms import ClosePlanForm, ImprovementPlanForm, RevisionForm
 from action_plans.models import FINAL_STATUSES, ImprovementPlan, PlanAction, PlanMetric, PlanReview
 from action_plans.services import close_plan, evaluate_plan, plans_with_history, visible_plans
 from quality.models import QualityMetric
-from sellers.models import AGENT_GROUP, visible_sellers
+from sellers.models import AGENT_GROUP, Seller, visible_sellers
+
+
+def admin_sellers(user):
+    return Seller.objects.all() if user.is_superuser else visible_sellers(user)
 
 
 class ScopedPlanAdmin(admin.ModelAdmin):
@@ -24,20 +28,24 @@ class ScopedPlanAdmin(admin.ModelAdmin):
         return user.is_active and (user.is_superuser or user.groups.filter(name=AGENT_GROUP).exists())
 
     def get_queryset(self, request):
-        return super().get_queryset(request).filter(**{f"{self.seller_path}__in": visible_sellers(request.user)})
+        queryset = super().get_queryset(request)
+        if request.user.is_superuser:
+            return queryset
+        plan_path = self.seller_path.removesuffix("seller") + "pk__in"
+        return queryset.filter(**{plan_path: visible_plans(request.user)})
 
     def get_object(self, request, object_id, from_field=None):
         obj = super().get_object(request, object_id, from_field)
         if obj and request.method == "POST":
             plan = obj if isinstance(obj, ImprovementPlan) else (obj.plan_metric.plan if isinstance(obj, PlanReview) else obj.plan)
-            get_object_or_404(visible_sellers(request.user).select_for_update(), pk=plan.seller_id)
+            get_object_or_404(admin_sellers(request.user).select_for_update(), pk=plan.seller_id)
             ImprovementPlan.objects.select_for_update().get(pk=plan.pk)
             obj = super().get_object(request, object_id, from_field)
         return obj
 
     def save_model(self, request, obj, form, change):
         plan = obj if isinstance(obj, ImprovementPlan) else (obj.plan_metric.plan if isinstance(obj, PlanReview) else obj.plan)
-        get_object_or_404(visible_sellers(request.user).select_for_update(), pk=plan.seller_id)
+        get_object_or_404(admin_sellers(request.user).select_for_update(), pk=plan.seller_id)
         super().save_model(request, obj, form, change)
 
     def has_module_permission(self, request):
@@ -71,14 +79,15 @@ class ScopedPlanAdmin(admin.ModelAdmin):
         return super().lookup_allowed(lookup, value, request)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        plans = ImprovementPlan.objects.all() if request.user.is_superuser else visible_plans(request.user)
         if db_field.name == "seller":
-            kwargs["queryset"] = visible_sellers(request.user)
+            kwargs["queryset"] = admin_sellers(request.user)
         elif db_field.name == "plan":
-            kwargs["queryset"] = visible_plans(request.user).exclude(status__in=FINAL_STATUSES)
+            kwargs["queryset"] = plans.exclude(status__in=FINAL_STATUSES)
         elif db_field.name == "baseline":
-            kwargs["queryset"] = QualityMetric.objects.filter(seller__in=visible_sellers(request.user)).select_related("seller", "policy")
+            kwargs["queryset"] = QualityMetric.objects.filter(seller__in=admin_sellers(request.user)).select_related("seller", "policy")
         elif db_field.name == "plan_metric":
-            kwargs["queryset"] = PlanMetric.objects.filter(plan__in=visible_plans(request.user).exclude(status__in=FINAL_STATUSES)).select_related("plan", "baseline__policy")
+            kwargs["queryset"] = PlanMetric.objects.filter(plan__in=plans.exclude(status__in=FINAL_STATUSES)).select_related("plan", "baseline__policy")
         elif db_field.name == "responsible":
             users = get_user_model().objects.filter(is_active=True)
             kwargs["queryset"] = users if request.user.is_superuser else users.filter(pk=request.user.pk)
@@ -154,7 +163,7 @@ class ImprovementPlanAdmin(ScopedPlanAdmin):
         form = ClosePlanForm(request.POST or None)
         if request.method == "POST" and form.is_valid():
             try:
-                close_plan(plan_id=plan.pk, actor=request.user, **form.cleaned_data)
+                close_plan(plan_id=plan.pk, actor=request.user, administrative=True, **form.cleaned_data)
             except ValidationError as exc:
                 form.add_error(None, exc)
             else:

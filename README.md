@@ -220,7 +220,7 @@ python manage.py seed_demo --owner TU_USUARIO
 
 Sustituye `TU_USUARIO` por el nombre que acabas de crear. La contraseña se introduce interactivamente y nunca se incluye en el repositorio. `seed_demo` añade el grupo `Marketplace Agent` al usuario indicado y crea **dos vendedores, siete políticas y catorce observaciones** ficticias de septiembre de 2026. Puede repetirse sin duplicar datos; no reasigna una demo de otro usuario. Solo funciona con `DEBUG=True` y no crea contraseñas ni usuarios.
 
-Para probar un agente sin privilegios globales, crea un usuario desde `/admin/`, sin `is_staff` ni `is_superuser`, asígnale el grupo `Marketplace Agent` y selecciona ese usuario como `owner` de sus vendedores. El grupo puede crearse desde el administrador si no se cargó la demo.
+Para dar de alta a un agente, abre **Gestión de usuarios** en SAP con una cuenta administradora. Crea la cuenta, selecciona **Ver tiendas** y asigna las tiendas que gestionará. La guía de primera sesión queda disponible en el menú de ayuda.
 
 En cambios futuros de modelos:
 
@@ -239,7 +239,7 @@ python manage.py configure_plan_agent --username TU_USUARIO
 python manage.py seed_plan_demo --owner TU_USUARIO
 ```
 
-El primer comando habilita `is_staff`, añade el grupo de agente y permisos individuales del módulo. No concede acceso administrativo a vendedores, políticas ni usuarios. Con `--interface-only` conserva `is_staff` y habilita sólo los permisos funcionales; para una cuenta nueva sin Admin usa `python manage.py create_demo_agent --username evaluador`. El segundo carga, solo en desarrollo, un vendedor ficticio adicional con el caso completo **6% → 4,5% → 3%**, dos acciones y cierre. Puede repetirse sin modificar el histórico. Para gestionar desde React, entra en `/dashboard/` después de compilar. El permiso `is_staff` solo es necesario para Admin; la [guía de Fase 1](docs/fase-1.md) explica también cómo crear el recorrido manualmente.
+El primer comando habilita `is_staff`, añade el grupo de agente y permisos individuales del módulo. No concede acceso administrativo a vendedores, políticas ni usuarios. Con `--interface-only` conserva `is_staff` y habilita sólo los permisos funcionales; para una cuenta nueva sin Admin usa `python manage.py create_demo_agent --username NOMBRE`. El segundo carga, solo en desarrollo, un vendedor ficticio adicional con el caso completo **6% → 4,5% → 3%**, dos acciones y cierre. Puede repetirse sin modificar el histórico. Para gestionar desde React, entra en `/dashboard/` después de compilar. El permiso `is_staff` solo es necesario para Admin; la [guía de Fase 1](docs/fase-1.md) explica también cómo crear el recorrido manualmente.
 
 ## Ejecución local
 
@@ -257,10 +257,11 @@ npm run dev
 
 | URL | Uso |
 | --- | --- |
-| `http://127.0.0.1:8000/` | Portal HTML Django, acceso y vendedores persistidos |
+| `http://127.0.0.1:8000/` | Acceso al dashboard con la sesión Django |
+| `http://127.0.0.1:8000/portal/` | Lista HTML de tiendas asignadas |
 | `http://127.0.0.1:8000/dashboard/` | Aplicación operativa de la Fase 2; requiere `npm run build` |
 | `http://127.0.0.1:8000/admin/` | Administración; requiere usuario autorizado |
-| `http://127.0.0.1:5173/static/react/` | React en desarrollo; usa su enlace «Iniciar sesión» |
+| `http://127.0.0.1:5173/static/react/` | React en desarrollo; redirige al login si la sesión ha caducado |
 | `http://127.0.0.1:8000/api/sellers/` | JSON de los vendedores accesibles para la sesión |
 
 Utiliza `127.0.0.1` de forma consistente: `localhost` y `127.0.0.1` mantienen cookies distintas. Accede desde el enlace del propio frontend para establecer su sesión mediante el proxy.
@@ -284,11 +285,14 @@ Autenticación por **cookie de sesión Django**, sin JWT ni Basic Auth. Se requi
 | Endpoint | Métodos | Comportamiento |
 | --- | --- | --- |
 | `/api/` | GET | Índice de endpoints, con rol autorizado |
-| `/api/sellers/` | GET, POST | Lista accesible; búsqueda `search`, filtro `active_plans=1/0`, paginación y número de planes abiertos; crea vendedor asignado al usuario |
+| `/api/sellers/` | GET, POST | Lista accesible; búsqueda `search`, filtro `active_plans=1/0`, paginación y número de planes abiertos; el alta requiere administración |
 | `/api/sellers/{id}/` | GET, PUT, PATCH, DELETE | Solo vendedor accesible; no permite reasignar `owner` |
 | `/api/metrics/` | GET | Observaciones accesibles; filtros `seller` y `latest=1`, con clasificación del backend |
 | `/api/metrics/{id}/` | GET | Detalle de observación accesible |
 | `/api/workspace/` | GET | Sesión, capacidades y token CSRF |
+| `/api/users/`, `/api/users/{id}/` | GET, POST / PATCH | Directorio, alta y edición de agentes por ADMIN |
+| `/api/assignments/{id}/` | PATCH | Cambia el titular de la tienda comprobando su titular anterior |
+| `/api/onboarding/complete/` | POST | Guarda la finalización u omisión de la guía del usuario actual |
 | `/api/overview/` | GET | Resumen operativo, prioridades y revisiones |
 | `/api/responsibles/` | GET | Responsables autorizados, búsqueda y paginación |
 | `/api/plans/` | GET, POST | Lista paginada y creación atómica con varios indicadores |
@@ -303,7 +307,7 @@ Autenticación por **cookie de sesión Django**, sin JWT ni Basic Auth. Se requi
 | `/accounts/logout/` | POST | Cierre de sesión con CSRF |
 | `/healthz/` | GET, HEAD | Disponibilidad SQL; 200 o 503 sin datos privados |
 
-POST de vendedor, con sesión y token CSRF válidos:
+POST de vendedor, con sesión administrativa y token CSRF válidos:
 
 ```json
 {"name": "Tienda Ficticia", "reference": "FICTICIA-003"}
@@ -319,19 +323,30 @@ Clasificaciones: `ok`, `alarm`, `suspension_threshold`, `insufficient_orders`, `
 
 | Rol | Capacidades actuales |
 | --- | --- |
-| Administrador (`is_superuser`) | Todos los vendedores e indicadores; usuarios, grupos, asignaciones y políticas mediante Django Admin |
-| Marketplace Agent (incluye uso por Account Manager) | CRUD de vendedores propios y lectura de indicadores; gestión React de planes con permisos explícitos; Admin solo si además tiene `is_staff` |
+| Administrador SAP (`ADMIN`) | Gestión de agentes y asignaciones desde React. Evalúa sus tiendas y gestiona sus planes propios |
+| Superusuario Django | Todos los vendedores e indicadores; usuarios, grupos, asignaciones y políticas mediante Django Admin |
+| Marketplace Agent (incluye uso por Account Manager) | Consulta y mantenimiento de tiendas asignadas y lectura de indicadores; gestión React de planes con permisos explícitos; Admin solo si además tiene `is_staff` |
 | Autenticado sin rol | Sin acceso a la API de dominio; portal sin vendedores |
 | Anónimo | Formulario de acceso; sin acceso a datos |
 
-El filtrado del queryset se aplica tanto al listado como al detalle y a las escrituras. No se confía en ocultar botones para autorizar. Conceder `is_staff` por sí solo no otorga acceso a planes: se exige también grupo y permisos Django. La administración de vendedores, indicadores y políticas sigue reservada al superusuario.
+El filtrado del queryset se aplica tanto al listado como al detalle y a las escrituras. No se confía en ocultar botones para autorizar. Conceder `is_staff` por sí solo no otorga acceso a planes: se exige también grupo y permisos Django. El superusuario mantiene acceso al catálogo de indicadores y políticas en Django Admin.
+
+### Despliegue de la actualización multiusuario
+
+Compila React con `npm run build` y prepara la versión de Django correspondiente. En el paso de release de la base de destino, ejecuta `python backend/manage.py migrate --plan` y `python backend/manage.py migrate --noinput` antes de servir la nueva versión. Para Neon se puede usar el comando existente `npm run db:migrate -- --noinput`.
+
+La migración `sellers.0002_workspace_accounts` actualiza la fila de `evaluador` a `admin` y le asigna el perfil ADMIN de SAP. Conserva la clave primaria y el hash de Django. Si ambas identidades existen, la transacción se detiene para resolver la colisión. Si falta `evaluador`, se instala el esquema sin crear cuentas. Conserva una copia recuperable previa para revertir la migración de identidad.
+
+Cada tienda conserva un único titular y admite quedar sin asignar. Al transferirla, el nuevo titular puede consultar sus indicadores y crear planes. Los planes previos conservan su autor, acciones, revisiones y objetivos. Para acceder a un plan en el espacio personal se requieren simultáneamente la autoría y el acceso a la tienda.
+
+Tras el release, comprueba con las cuentas existentes que `admin` acepta la contraseña anterior y que el agente conserva sus tiendas y planes. El recorrido automatizado local con base temporal se ejecuta con `python3 scripts/verify_workspace.py` tras compilar React.
 
 Casos de uso disponibles:
 
 | Actor | Caso de uso | Resultado |
 | --- | --- | --- |
 | Usuario | Iniciar sesión y abrir el portal Django | Consulta únicamente los vendedores permitidos por su rol |
-| Agente | Crear o editar un vendedor mediante API | Registro persistido y asignado al agente autenticado |
+| Agente | Editar una tienda asignada mediante API | Datos de la tienda persistidos |
 | Administrador | Registrar indicadores y políticas desde Admin | Observaciones vinculadas al vendedor, canal, periodo y versión |
 | Agente | Abrir las secciones React | Consulta de vendedores e indicadores reales con clasificación informativa |
 

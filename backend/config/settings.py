@@ -137,6 +137,7 @@ STORAGES = {
         else "whitenoise.storage.CompressedStaticFilesStorage"},
 }
 REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "config.security.session_exception_handler",
     "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],
     "DEFAULT_PERMISSION_CLASSES": ["sellers.permissions.IsMarketplaceAgent"],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",

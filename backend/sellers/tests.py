@@ -48,10 +48,11 @@ class AccessAndFlowTests(TestCase):
         self.assertEqual(self.api.get(f"/api/sellers/{self.hidden.pk}/").status_code, 404)
         self.assertEqual(self.api.get(f"/api/metrics/{self.hidden.metrics.first().pk}/").status_code, 404)
 
-    def test_admin_sees_all_records(self):
+    def test_admin_catalog_is_separate_from_personal_workspace(self):
         self.api.force_login(self.admin)
-        self.assertEqual(self.api.get("/api/sellers/").json()["count"], 2)
-        self.assertEqual(self.api.get("/api/metrics/").json()["count"], 2)
+        self.assertEqual(self.api.get("/api/sellers/").json()["count"], 0)
+        self.assertEqual(self.api.get("/api/metrics/").json()["count"], 0)
+        self.assertEqual(len(self.api.get("/api/users/").json()["sellers"]), 2)
 
     def test_staff_model_permissions_cannot_bypass_domain_admin_restriction(self):
         from django.contrib.auth.models import Permission
@@ -66,10 +67,12 @@ class AccessAndFlowTests(TestCase):
 
     def test_seller_crud_persists_and_validates(self):
         self.api.force_login(self.agent)
+        self.assertEqual(self.api.post("/api/sellers/", {"name": "Nueva", "reference": "NEW"}).status_code, 403)
+        self.api.force_login(self.admin)
         response = self.api.post("/api/sellers/", {"name": "Nueva", "reference": "NEW", "owner": self.other.pk})
         self.assertEqual(response.status_code, 201)
         seller = Seller.objects.get(pk=response.json()["id"])
-        self.assertEqual(seller.owner, self.agent)
+        self.assertEqual(seller.owner, self.admin)
         url = f"/api/sellers/{seller.pk}/"
         self.assertEqual(self.api.patch(url, {"name": "Editada"}).status_code, 200)
         seller.refresh_from_db()
@@ -92,7 +95,7 @@ class AccessAndFlowTests(TestCase):
         self.assertEqual(self.api.get("/").status_code, 302)
         response = self.api.post("/accounts/login/", {"username": "agent", "password": "test-password-for-tests-only"})
         self.assertEqual(response.status_code, 302)
-        response = self.api.get("/")
+        response = self.api.get("/portal/")
         self.assertTemplateUsed(response, "home.html")
         self.assertContains(response, "Visible")
         self.assertNotContains(response, "Privada")
@@ -102,10 +105,10 @@ class AccessAndFlowTests(TestCase):
 
     def test_csrf_required_for_login_and_authenticated_mutations(self):
         client = APIClient(enforce_csrf_checks=True)
-        self.assertEqual(client.post("/accounts/login/", {"username": "agent", "password": "test-password-for-tests-only"}).status_code, 403)
+        self.assertEqual(client.post("/accounts/login/", {"username": "admin", "password": "test-admin-password-only"}).status_code, 403)
         client.get("/accounts/login/")
         token = client.cookies["csrftoken"].value
-        response = client.post("/accounts/login/", {"username": "agent", "password": "test-password-for-tests-only"}, HTTP_X_CSRFTOKEN=token)
+        response = client.post("/accounts/login/", {"username": "admin", "password": "test-admin-password-only"}, HTTP_X_CSRFTOKEN=token)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(client.post("/api/sellers/", {"name": "CSRF", "reference": "CSRF"}).status_code, 403)
         token = client.cookies["csrftoken"].value
@@ -115,6 +118,6 @@ class AccessAndFlowTests(TestCase):
         self.seller.name = '<script>alert("xss")</script>'
         self.seller.save()
         self.api.force_login(self.agent)
-        response = self.api.get("/")
+        response = self.api.get("/portal/")
         self.assertContains(response, "&lt;script&gt;")
         self.assertNotContains(response, '<script>alert("xss")</script>')
