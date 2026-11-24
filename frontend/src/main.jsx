@@ -20,6 +20,8 @@ import { resolveRoute, routeBreadcrumbs } from "./services/routes.js";
 import { Users } from "./pages/Users.jsx";
 import { Guide } from "./components/Guide.jsx";
 import "./styles.css";
+import "../../backend/sellers/static/sap/focus-input.css";
+import "../../backend/sellers/static/sap/focus-input.js";
 
 function App() {
   const requestLeave = useLeaveConfirmation();
@@ -28,6 +30,7 @@ function App() {
   const [isMobile, setIsMobile] = useState(() => window.matchMedia("(max-width: 760px)").matches);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.matchMedia("(max-width: 1199px)").matches);
   const menuButton = useRef(null);
+  const skipLink = useRef(null);
   const sidebar = useRef(null);
   const content = useRef(null);
   useRouteFocus(route, content);
@@ -70,6 +73,7 @@ function App() {
       if (event.key === "Tab") {
         const controls = [...sidebar.current.querySelectorAll("a[href], button:not([disabled])")]
           .filter(control => control.getClientRects().length);
+        controls.unshift(skipLink.current);
         controls.push(menuButton.current);
         const index = controls.indexOf(document.activeElement);
         if (index === -1 || (!event.shiftKey && index === controls.length - 1) || (event.shiftKey && index === 0)) {
@@ -100,6 +104,7 @@ function App() {
   return (
     <div className={`app-shell${sidebarCollapsed && !isMobile ? " sidebar-collapsed" : ""}`}>
       <a
+        ref={skipLink}
         className="skip-link"
         href="#main-content"
         onClick={(e) => {

@@ -56,10 +56,10 @@ export function Sidebar({
       className={`sidebar${open ? " is-open" : ""}`}
       inert={mobile && !open ? true : undefined} aria-hidden={mobile && !open ? true : undefined}>
       <div className="sidebar-scroll">
-        <a className="brand" href="#/" aria-label="SAP · Seller Action Plan" onClick={closeCurrentRoute}
+        <a className="brand" href="#/" onClick={closeCurrentRoute}
           {...describe("SAP · Seller Action Plan")}>
           <span className="brand-mark"><Icon name="trend" size={27} /></span>
-          <span className="sidebar-label">SAP<small>Seller Action Plan</small></span>
+          <span className="sidebar-label">SAP{" "}<small>Seller Action Plan</small></span>
         </a>
         <p className="nav-label">GESTIÓN OPERATIVA</p>
         <nav aria-label="Navegación principal">

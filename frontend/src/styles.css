@@ -92,7 +92,8 @@ a {
 a:hover {
   text-decoration: underline;
 }
-button:disabled {
+button:disabled,
+.state-actions > button[aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -107,17 +108,6 @@ textarea:focus-visible,
 }
 .table-wrap:focus-visible {
   outline-offset: -3px;
-}
-.page-heading h1:focus-visible,
-.action-item:focus,
-.pagination-status:focus,
-.modal-head h2:focus {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 3px;
-}
-.form-section-body > h2:focus {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 3px;
 }
 button, a, input, select, textarea, [tabindex] {
   scroll-margin-block: calc(var(--topbar-height) + 12px);

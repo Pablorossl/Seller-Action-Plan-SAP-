@@ -49,6 +49,7 @@ def responsive_flow(*, base, username, password, artifacts, local_tls=False, str
         page.get_by_label('Contraseña', exact=True).fill(password)
         page.get_by_role('button', name='Iniciar sesión').click()
         expect(page.get_by_role('heading', name='Prioridades de la semana')).to_be_visible()
+        primary_nav = page.get_by_role('navigation', name='Navegación principal')
         sellers = context.request.get(base + '/api/sellers/').json()['results']
         seller = next(s for s in sellers if s['reference'] == 'SAP-EVAL-ACTIVO')
         active = context.request.get(base + f"/api/plans/?seller={seller['id']}&status=open").json()['results'][0]
@@ -177,14 +178,14 @@ def responsive_flow(*, base, username, password, artifacts, local_tls=False, str
                     expect(page.get_by_role('button', name='Mostrar navegación')).to_be_focused()
                     expect(page.locator('.sidebar')).not_to_be_visible()
                     page.get_by_role('button', name='Mostrar navegación').click()
-                page.get_by_role('link', name='Dashboard', exact=True).click()
+                primary_nav.get_by_role('link', name='Dashboard', exact=True).click()
                 expect(page.get_by_role('heading', name='Prioridades de la semana')).to_be_visible()
                 if strict:
                     go(f"/plans/{active['id']}")
                     page.get_by_role('button',name='Editar plan',exact=True).click()
                     page.get_by_label('Título del plan').fill('Texto ficticio protegido tras menú compacto')
                     page.get_by_role('button',name='Mostrar navegación').click()
-                    page.get_by_role('link',name='Vendedores',exact=True).click()
+                    primary_nav.get_by_role('link',name='Vendedores',exact=True).click()
                     warning=page.get_by_role('dialog',name='Cambios sin guardar',exact=True)
                     expect(warning).to_have_count(1)
                     warning.get_by_role('button',name='Continuar editando').click()

@@ -15,6 +15,7 @@ from verify_unsaved_changes import navigation_flow
 from verify_browser import run_flow as full_flow
 
 AXE = Path(os.environ.get('SAP_AXE_PATH','/tmp/sap-accessibility-tools/node_modules/axe-core/axe.min.js'))
+MEASURE_CONTRAST = Path(__file__).with_name('measure_contrast.js').read_text()
 
 
 def keyboard_flow(*,base,username,password,artifacts,local_tls=False,strict=True,**unused):
@@ -69,24 +70,61 @@ def keyboard_flow(*,base,username,password,artifacts,local_tls=False,strict=True
         def scan(name):
             if not AXE.exists():return
             page.add_script_tag(path=str(AXE))
-            result=page.evaluate('''async () => { const r=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']}});
+            result=page.evaluate('''async () => { const r=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}});
                 return {version:axe.version,violations:r.violations.map(v=>({id:v.id,impact:v.impact,description:v.description,
-                  nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})),incomplete:r.incomplete.map(v=>v.id)}; }''')
+                  nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})),incomplete:r.incomplete.map(v=>v.id),
+                  incompleteContrast:r.incomplete.filter(v=>v.id==='color-contrast').flatMap(v=>v.nodes.map(n=>({
+                    target:n.target,html:n.html,summary:n.failureSummary,checks:[...n.any,...n.all,...n.none].map(c=>c.data)
+                  })))}; }''')
             scans.append({'screen':name,**result})
             (artifacts/'axe.json').write_text(json.dumps(scans,ensure_ascii=False,indent=2))
+            (artifacts/(name+'.aria.txt')).write_text(page.locator('body').aria_snapshot(),encoding='utf-8')
+            if result['incompleteContrast']:
+                evidence = page.evaluate(MEASURE_CONTRAST)
+                (artifacts/(name+'-contrast.json')).write_text(json.dumps(evidence,ensure_ascii=False,indent=2))
         def go(route):
             page.goto(base+'/dashboard/#'+route)
             expect(page.locator('main .loading')).to_have_count(0)
             page.wait_for_load_state('networkidle')
         page.goto(base+'/accounts/login/')
+        if strict:
+            username_field = page.get_by_label('Nombre de usuario')
+            password_field = page.get_by_label('Contraseña', exact=True)
+            username_field.click()
+            expect(username_field).to_be_focused()
+            expect(username_field).to_have_css('outline-width', '0px')
+            page.keyboard.press('Tab')
+            expect(password_field).to_be_focused()
+            expect(password_field).to_have_css('outline-width', '2px')
+            with browser.new_context(ignore_https_errors=local_tls, has_touch=True, is_mobile=True) as touch_context:
+                touch_page = touch_context.new_page()
+                touch_page.goto(base+'/accounts/login/')
+                touch_field = touch_page.get_by_label('Nombre de usuario')
+                touch_field.tap()
+                expect(touch_field).to_be_focused()
+                expect(touch_field).to_have_css('outline-width', '0px')
+            check('Acceso: clic y toque sin contorno, Tab con contorno visible')
         type_text(page.get_by_label('Nombre de usuario'),username)
         type_text(page.get_by_label('Contraseña', exact=True),password)
         activate(page.get_by_role('button',name='Iniciar sesión'))
         expect(page.get_by_role('heading',name='Prioridades de la semana')).to_be_visible()
         scan('dashboard')
+        if strict:
+            page.get_by_role('link',name='Vendedores',exact=True).click()
+            expect(page.locator('main h1')).to_have_text('Vendedores')
+            expect(page.locator('main h1')).to_be_focused()
+            expect(page.locator('main h1')).to_have_css('outline-width', '0px')
+            search_field = page.get_by_label('Buscar por nombre o identificador…')
+            search_field.click()
+            expect(search_field).to_be_focused()
+            expect(search_field).to_have_css('outline-width', '0px')
+            check('Aplicación: clic sin contorno en el destino de ruta y en el buscador')
+            go('/')
         activate(page.get_by_role('link',name='Vendedores',exact=True))
         expect(page.locator('main h1')).to_have_text('Vendedores')
-        if strict:expect(page.locator('main h1')).to_be_focused()
+        if strict:
+            expect(page.locator('main h1')).to_be_focused()
+            expect(page.locator('main h1')).to_have_css('outline-width', '3px')
         snapshot('route-sellers')
         activate(page.get_by_role('button',name='Siguiente',exact=True),'Space')
         expect(page.get_by_text('Página 2 de 2',exact=True)).to_be_visible()
@@ -109,7 +147,8 @@ def keyboard_flow(*,base,username,password,artifacts,local_tls=False,strict=True
         observations.append({'screen':'seller-history','aria_pressed':history.get_attribute('aria-pressed')})
         if strict:expect(history).to_have_attribute('aria-pressed','true')
         activate(page.get_by_role('button',name='Planes activos',exact=False))
-        activate(page.get_by_role('link',name='Dashboard',exact=True))
+        primary_nav = page.get_by_role('navigation', name='Navegación principal')
+        activate(primary_nav.get_by_role('link',name='Dashboard',exact=True))
         expect(page.get_by_role('heading',name='Prioridades de la semana')).to_be_visible()
         activate(page.get_by_role('button',name='Acciones vencidas',exact=False),'Space')
         if strict:expect(page.get_by_role('heading',name='Prioridades de la semana')).to_be_focused()
@@ -222,10 +261,50 @@ def keyboard_flow(*,base,username,password,artifacts,local_tls=False,strict=True
             expect(page.get_by_role('dialog')).to_have_count(0)
             page.unroute(action_pattern,held_action)
             expect(page.get_by_role('button',name='Añadir acción',exact=True)).to_be_focused()
-            activate(page.get_by_role('button',name='Activar plan',exact=True),'Space')
-            expect(page.get_by_role('button',name='Pasar a revisión')).to_be_visible()
-            expect(page.locator('main h1')).to_be_focused()
-            check('Acción guardada y activación: foco lógico después de desaparecer el control de transición')
+            plan_api = base + '/api/plans/' + plan_url.rsplit('/', 1)[-1] + '/'
+            confirmation = page.locator('.success-notice').get_by_role('status').element_handle()
+            transitions = []
+            def record_transition(request):
+                if request.url == plan_api and request.method == 'PATCH':
+                    transitions.append(request.post_data_json['status'])
+            page.on('request', record_transition)
+            for label, key, status, next_label in [
+                ('Activar plan', 'Space', 'in_progress', 'Pasar a revisión'),
+                ('Pasar a revisión', 'Enter', 'in_review', 'Continuar en progreso'),
+                ('Continuar en progreso', 'Space', 'in_progress', 'Pasar a revisión'),
+            ]:
+                control = page.get_by_role('button', name=label, exact=True)
+                tab_to(control)
+                expect(control).to_be_enabled()
+                control.evaluate("""button => {
+                    window.transitionActivation = null;
+                    const before = window.scrollY;
+                    button.addEventListener('click', event => {
+                        window.transitionActivation = [event.detail, window.scrollY - before];
+                    }, { once: true });
+                }""")
+                def verify_pending_transition(route):
+                    expect(control).to_have_attribute('aria-disabled', 'true')
+                    expect(control).to_be_focused()
+                    page.keyboard.press(key)
+                    expect(control).to_be_focused()
+                    route.continue_()
+                page.route(plan_api, verify_pending_transition)
+                with page.expect_response(lambda r: r.url == plan_api and r.request.method == 'PATCH') as pending:
+                    page.keyboard.press(key)
+                page.unroute(plan_api, verify_pending_transition)
+                assert pending.value.ok, pending.value.status
+                assert pending.value.json()['status'] == status
+                assert page.evaluate('window.transitionActivation') == [0, 0]
+                expect(page.get_by_role('button', name=next_label, exact=True)).to_be_visible()
+                expect(page.locator('main h1')).to_be_focused()
+                state_name = {'in_progress': 'En progreso', 'in_review': 'En revisión'}[status]
+                expect(page.locator('.success-notice').get_by_role('status')).to_have_text(
+                    'Estado del plan actualizado. ' + state_name + '.')
+                assert confirmation.evaluate('(node) => node.isConnected')
+            assert transitions == ['in_progress', 'in_review', 'in_progress'], transitions
+            page.remove_listener('request', record_transition)
+            check('Transiciones con Espacio y Enter: una petición por transición, sin desplazamiento nativo y con foco durante y después de la petición')
             activate(page.get_by_role('button',name='Registrar revisión',exact=True))
             type_text(page.get_by_label('Valor observado'),'101')
             type_text(page.get_by_label('Pedidos del periodo'),'100')
@@ -290,13 +369,17 @@ def keyboard_flow(*,base,username,password,artifacts,local_tls=False,strict=True
             expect(page.locator('main h1')).to_be_focused()
             scan('mobile-seller')
             check('Menú compacto, salto al contenido y tabla local con foco visible: solo teclado')
-            page.set_viewport_size({'width':768,'height':1024})
+            page.set_viewport_size({'width':760,'height':1024})
             activate(page.get_by_role('button',name='Mostrar navegación'),'Space')
             page.keyboard.press('Escape')
             expect(page.get_by_role('button',name='Mostrar navegación')).to_be_focused()
-            check('Tablet: apertura/cierre del menú con Espacio/Escape y foco restaurado')
+            page.set_viewport_size({'width':768,'height':1024})
+            expect(page.get_by_role('button',name='Mostrar navegación')).to_have_count(0)
+            expect(primary_nav.get_by_role('link',name='Vendedores',exact=True)).to_be_focused()
+            check('Límite del menú compacto: Espacio/Escape a 760 px y foco en la sección activa al pasar a 768 px')
             critical={'button-name','link-name','label','select-name','aria-valid-attr','aria-valid-attr-value',
-                      'aria-required-attr','aria-required-children','aria-required-parent','aria-input-field-name','nested-interactive'}
+                      'aria-required-attr','aria-required-children','aria-required-parent','aria-input-field-name',
+                      'nested-interactive','label-content-name-mismatch'}
             failures=[(s['screen'],v['id']) for s in scans for v in s['violations'] if v['id'] in critical]
             assert not failures,failures
         if not strict:

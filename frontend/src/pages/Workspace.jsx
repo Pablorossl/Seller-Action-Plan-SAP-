@@ -41,7 +41,7 @@ export function PlanTable({
     );
   return (
     <ScrollableTable label="Planes de mejora">
-      <table>
+      <table aria-label="Planes de mejora">
         <thead>
           <tr>
             <th scope="col">Plan / vendedor</th>
@@ -357,7 +357,7 @@ export function Dashboard({ user }) {
                   </span>
                 </div>
                 <ScrollableTable label="Desviaciones registradas">
-                  <table>
+                  <table aria-label="Desviaciones registradas">
                     <thead>
                       <tr>
                         <th>Vendedor</th>
@@ -446,7 +446,7 @@ export function Sellers() {
             <>
               {data.results.length ? (
                 <ScrollableTable label="Directorio de vendedores">
-                  <table>
+                  <table aria-label="Directorio de vendedores">
                     <thead>
                       <tr>
                         <th>Vendedor</th>
@@ -666,7 +666,7 @@ export function SellerDetail({ id, user, seller }) {
                 <>
                   {data.results.length ? (
                     <ScrollableTable label="Indicadores del vendedor">
-                      <table>
+                      <table aria-label="Indicadores del vendedor">
                         <thead>
                           <tr>
                             <th>Indicador</th>

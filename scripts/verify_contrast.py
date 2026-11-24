@@ -58,7 +58,15 @@ def contrast_flow(*,base,username,password,artifacts,local_tls=False,strict=True
             if scan and AXE.exists():
                 page.add_script_tag(path=str(AXE))
                 result=page.evaluate('''async()=>{const r=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}});
-                    return {version:axe.version,violations:r.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})),incomplete:r.incomplete.map(v=>v.id)};}''')
+                    return {version:axe.version,violations:r.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})),
+                        incomplete:r.incomplete.map(v=>v.id),
+                        incompleteContrast:r.incomplete.filter(v=>v.id==='color-contrast').flatMap(v=>v.nodes.map(n=>({
+                            target:n.target,checks:[...n.any,...n.all,...n.none].map(c=>c.data)
+                        })))};}''')
+                targets = [node['target'][0] for node in result['incompleteContrast'] if len(node['target']) == 1]
+                if targets:
+                    evidence = page.evaluate(MEASURE, targets)
+                    result['contrastEvidence'] = [row for row in evidence['text'] if row['selector'] in targets]
                 scans.append({'screen':name,**result})
                 (artifacts/'axe.json').write_text(json.dumps(scans,ensure_ascii=False,indent=2))
             if strict:
@@ -97,7 +105,7 @@ def contrast_flow(*,base,username,password,artifacts,local_tls=False,strict=True
                     m=record('primary-focus',False)
                     assert 'solid' in m['focus']['outline'] and m['focus']['ratio']>=3,m['focus']
                     page.get_by_role('button',name='Cancelar',exact=True).hover();record('secondary-hover',False)
-                    nav=page.get_by_role('link',name='Dashboard',exact=True)
+                    nav=page.get_by_role('navigation',name='Navegación principal').get_by_role('link',name='Dashboard',exact=True)
                     for _ in range(200):
                         if nav.evaluate('(e)=>e===document.activeElement'):break
                         page.keyboard.press('Tab')

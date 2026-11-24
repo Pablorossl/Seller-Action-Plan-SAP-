@@ -30,7 +30,7 @@ import { PlanForm } from "./PlanForm.jsx";
 function Comparison({ plan, compact = false }) {
   return (
     <ScrollableTable label="Comparación de indicadores" compact={compact}>
-      <table>
+      <table aria-label="Comparación de indicadores">
         <thead>
           <tr>
             <th>Indicador / canal</th>
@@ -540,7 +540,7 @@ export function PlanDetail({ user, params, resource }) {
     setNotice(message);
   };
   const transition = useMutation((plan) => {
-    done(plan, "Estado del plan actualizado.");
+    done(plan, `Estado del plan actualizado. ${labels[plan.status]}.`);
     requestAnimationFrame(() => document.querySelector(".page-heading h1")?.focus());
   });
   if (editing && resource.data)
@@ -608,10 +608,10 @@ export function PlanDetail({ user, params, resource }) {
                 </button>
               )}
             </PageHeading>
-            {notice && (
-              <div className="success-notice" role="status">
-                <Icon name="check" size={18} />
-                {notice}
+            <div className={notice ? "success-notice" : undefined}>
+              {notice && <Icon name="check" size={18} />}
+              <span role="status">{notice}</span>
+              {notice && (
                 <button
                   className="icon-button"
                   aria-label="Ocultar confirmación"
@@ -619,8 +619,8 @@ export function PlanDetail({ user, params, resource }) {
                 >
                   <Icon name="close" size={16} />
                 </button>
-              </div>
-            )}
+              )}
+            </div>
             <FormError error={transition.error} />
             <ol className="stepper">
               {[
@@ -927,11 +927,12 @@ export function PlanDetail({ user, params, resource }) {
                             el plan.
                           </p>
                           <button
+                            type="button"
                             className="button primary"
-                            disabled={transition.busy}
+                            aria-disabled={transition.busy || undefined}
                             onClick={() =>
                               transition.submit(
-                                `/api/plans/${id}/`,
+                                `/api/plans/${plan.id}/`,
                                 { status: "in_progress", revision: plan.revision },
                                 "PATCH",
                               )
@@ -944,11 +945,12 @@ export function PlanDetail({ user, params, resource }) {
                       )}
                       {plan.status === "in_progress" && (
                         <button
+                          type="button"
                           className="button secondary"
-                          disabled={transition.busy}
+                          aria-disabled={transition.busy || undefined}
                           onClick={() =>
                             transition.submit(
-                              `/api/plans/${id}/`,
+                              `/api/plans/${plan.id}/`,
                               { status: "in_review", revision: plan.revision },
                               "PATCH",
                             )
@@ -959,11 +961,12 @@ export function PlanDetail({ user, params, resource }) {
                       )}
                       {plan.status === "in_review" && (
                         <button
+                          type="button"
                           className="button secondary"
-                          disabled={transition.busy}
+                          aria-disabled={transition.busy || undefined}
                           onClick={() =>
                             transition.submit(
-                              `/api/plans/${id}/`,
+                              `/api/plans/${plan.id}/`,
                               { status: "in_progress", revision: plan.revision },
                               "PATCH",
                             )

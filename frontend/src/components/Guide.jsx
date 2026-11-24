@@ -21,8 +21,10 @@ export function Guide({ user, close }) {
     } catch (err) { setError(err); setBusy(false); }
   }
   return <Modal title="Guía de SAP" close={finish} busy={busy}>
-    <div className="guide-step" key={step} aria-live="polite">
-      <small>Paso {step + 1} de {steps.length}</small><h3>{steps[step][0]}</h3><p>{steps[step][1]}</p>
+    <div aria-live="polite" aria-atomic="true">
+      <div className="guide-step" key={step}>
+        <small>Paso {step + 1} de {steps.length}</small><h3>{steps[step][0]}</h3><p>{steps[step][1]}</p>
+      </div>
     </div>
     <FormError error={error}/>
     <div className="form-actions">

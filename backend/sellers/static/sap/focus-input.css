@@ -1,0 +1,3 @@
+:root[data-focus-input="pointer"] :focus {
+  outline-width: 0;
+}

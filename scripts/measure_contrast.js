@@ -1,4 +1,4 @@
-() => {
+(extraSelectors) => {
   const parse = color => {
     const values = color.match(/[\d.]+/g)?.map(Number) || [0,0,0,0];
     return [...values.slice(0,3),values[3]??1];
@@ -20,7 +20,7 @@
     '.metric-tags span','.back-link','.stat-warning strong','.button.primary','.button.secondary','.button.dark',
     '.field small','.check-label','.field label','.field label span','.picker-options button','.icon-button','.sidebar nav a',
     '.form-stepper button','.form-stepper button > span','.form-context','.summary-count','.plan-followup',
-    '.plan-followup a','.context-action small','.review-assessment .result-label'];
+    '.plan-followup a','.context-action small','.review-assessment .result-label','.closure-summary > p',...(extraSelectors ?? [])];
   const text=[];
   for(const selector of selectors) for(const e of [...document.querySelectorAll(selector)].slice(0,4)) {
     if(!e.getClientRects().length || e.matches(':disabled') || e.closest('[inert]')) continue;

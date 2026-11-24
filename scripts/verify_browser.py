@@ -39,6 +39,7 @@ def run_flow(*, base, username, password, other_username, other_password,
         page.get_by_label("Contraseña", exact=True).fill(password)
         page.get_by_role("button", name="Iniciar sesión").click()
         expect(page.get_by_role("heading", name="Prioridades de la semana")).to_be_visible()
+        primary_nav = page.get_by_role("navigation", name="Navegación principal")
         # H02: el error atraviesa api/useResource/Resource y permite recuperar
         # el Dashboard sin errores de renderizado ni cerrar la sesión.
         for invalid_body in ('{"today":', '<html>Proxy inesperado</html>'):
@@ -60,7 +61,7 @@ def run_flow(*, base, username, password, other_username, other_password,
         assert health_response.json() == {"status": "ok"}
         workspace = context.request.get(base + "/api/workspace/").json()
         assert workspace["permissions"]["close_improvementplan"]
-        page.get_by_role("link", name="Vendedores", exact=True).click()
+        primary_nav.get_by_role("link", name="Vendedores", exact=True).click()
         page.get_by_label("Buscar por nombre o identificador…").fill(seller_reference)
         page.get_by_role("button", name="Buscar", exact=True).click()
         seller_link = page.get_by_role("link", name="Tienda Ficticia Envíos", exact=True)
@@ -155,11 +156,11 @@ def run_flow(*, base, username, password, other_username, other_password,
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"), "Desbordamiento móvil"
         page.screenshot(path=str(artifacts / "movil.png"), full_page=True)
         page.set_viewport_size({"width": 1440, "height": 1060})
-        page.get_by_role("link", name="Planes de mejora", exact=True).click()
+        primary_nav.get_by_role("link", name="Planes de mejora", exact=True).click()
         expect(page.get_by_role("heading", name="Planes de mejora", exact=True)).to_be_visible()
         expect(page.get_by_role("link", name=title, exact=True)).to_be_visible()
         page.screenshot(path=str(artifacts / "planes.png"), full_page=True)
-        page.get_by_role("link", name="Vendedores", exact=True).click()
+        primary_nav.get_by_role("link", name="Vendedores", exact=True).click()
         expect(page.get_by_role("heading", name="Vendedores", exact=True)).to_be_visible()
         expect(page.get_by_role("link", name="Tienda Ficticia Envíos", exact=True)).to_be_visible()
         page.screenshot(path=str(artifacts / "vendedores.png"), full_page=True)
